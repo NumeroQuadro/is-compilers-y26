@@ -1,0 +1,18 @@
+num x = 10;
+num y = 5;
+
+if x == 10 and y < 10 {
+    num result = x + y;
+} elif y == 5 {
+    y = y + 1;
+} else {
+    x = x - 1;
+}
+
+while x <> 0 {
+    x = x - 1;
+}
+
+for num i = 0; i < 5; i = i + 1 {
+    num square = i * i;
+}
