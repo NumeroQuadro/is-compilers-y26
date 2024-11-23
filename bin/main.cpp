@@ -21,7 +21,7 @@ int main() {
   YalLLVM vm;
   vm.exec(program);
 
-  std::ifstream stream("/home/mityaiii/is-compilers-y26/src/example.txt");
+  std::ifstream stream("../src/example.txt");
   if (!stream) {
     std::cerr << "Cannot open input file\n";
     return 1;
