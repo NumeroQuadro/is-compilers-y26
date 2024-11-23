@@ -1,17 +1,15 @@
 #!/bin/bash
 
-# Если build директория не существует, создаём её
 if [ ! -d build ]; then
     mkdir build
 fi
 
 cd build
 
-# Генерация сборочных файлов с использованием Ninja
-cmake -G Ninja .. || exit 1
+if [ ! -f build.ninja ]; then
+    cmake -G Ninja ..
+fi
 
-# Собираем проект с помощью Ninja
-ninja || exit 1
+ninja
 
-# Запускаем программу
-./yal
+./bin/yal
