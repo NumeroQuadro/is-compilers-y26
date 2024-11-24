@@ -4,10 +4,8 @@ project(yal)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Укажите минимальную версию Java, необходимую для ANTLR4
 find_package(Java 1.11 COMPONENTS Runtime REQUIRED)
 
-# Подключение ANTLR4 в проект
 include(FetchContent)
 FetchContent_Declare(
     antlr4
@@ -19,16 +17,16 @@ if(NOT antlr4_POPULATED)
     FetchContent_MakeAvailable(antlr4)
 endif()
 
-# LLVM настройки
+add_custom_target(generate_ir ALL DEPENDS ${CMAKE_BINARY_DIR}/out.ll)
+
 find_package(LLVM REQUIRED CONFIG)
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-# Добавление поддиректорий
 add_subdirectory(include)
 add_subdirectory(bin)
+add_subdirectory(tests)
 
-# Завершающее сообщение
 set(MESSAGE "
 ************************************
 *                                  *

@@ -2,6 +2,8 @@
 *.d
 
 .vscode
+cmake-build-debug
+out.ll
 build/
 dist/
 
