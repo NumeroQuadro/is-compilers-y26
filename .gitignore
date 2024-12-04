@@ -2,7 +2,6 @@
 *.d
 
 .vscode
-.idea
 cmake-build-debug
 out.ll
 build/
@@ -37,3 +36,5 @@ dist/
 *.exe
 *.out
 *.app
+
+.clang-format
