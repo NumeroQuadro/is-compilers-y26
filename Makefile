@@ -46,3 +46,6 @@ reconfigure:
 rebuild: clean all
 
 .PHONY: all tests clean run test rebuild reconfigure
+
+delete: 
+	rm -rf build

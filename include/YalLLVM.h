@@ -21,7 +21,7 @@ public:
         // auto ast = parser->parser(program);
 
         // 2. Compile to LLVM IR
-        compile(/* TODO: ast */);
+        // compile(ast);
 
         // Print generated code
         module->print(llvm::outs(), nullptr);
