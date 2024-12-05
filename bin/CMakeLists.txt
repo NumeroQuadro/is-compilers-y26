@@ -11,3 +11,9 @@ target_link_libraries(
     PRIVATE Grammar_lib
     PRIVATE ${llvm_libs}
 )
+
+add_custom_command(
+        TARGET yal POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/src/example.txt
+                ${CMAKE_CURRENT_BINARY_DIR}/src/example.txt)

@@ -17,7 +17,6 @@ if(NOT antlr4_POPULATED)
     FetchContent_MakeAvailable(antlr4)
 endif()
 
-add_custom_target(generate_ir ALL DEPENDS ${CMAKE_BINARY_DIR}/out.ll)
 
 find_package(LLVM REQUIRED CONFIG)
 include_directories(${LLVM_INCLUDE_DIRS})
