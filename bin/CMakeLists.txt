@@ -1,4 +1,6 @@
-add_executable(yal main.cpp)
+add_executable(yal main.cpp
+        CalculatorInterpreter.h
+        CalculateInterpretator.cpp)
 
 target_include_directories(yal PRIVATE 
     ${CMAKE_SOURCE_DIR}/include

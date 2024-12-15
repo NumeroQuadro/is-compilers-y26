@@ -1,130 +1,64 @@
-#include <any>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <typeinfo>
-
-#include "GrammarBaseVisitor.h"
 #include "GrammarLexer.h"
 #include "GrammarParser.h"
-#include "YalLLVM.h"
-#include "antlr4-runtime.h"
+#include "CalculatorInterpreter.h"
 
-class SimpleValue {
-   public:
-    int *value;
-};
+#include <iostream>
+#include <antlr4-runtime.h>
 
-class CustomVisitor : public GrammarBaseVisitor {
-   public:
-    std::any visitAssignment(GrammarParser::AssignmentContext *ctx) override {
-        std::cout << "from visitAssignment: " << ctx->IDENTIFIER()->getText() << std::endl;
-        visit(ctx->expression());
-        return visitChildren(ctx);
-    }
+class ExceptionErrorListener : public antlr4::BaseErrorListener {
+public:
+  virtual void syntaxError(
+    antlr4::Recognizer *recognizer, antlr4::Token *offendingSymbol,
+    size_t line, size_t charPositionInLine, const std::string &msg,
+    std::exception_ptr e) override {
+    e = nullptr;
+    std::ostringstream oss;
+    oss << "line: " << line << ":" << charPositionInLine << " " << msg;
+    error_msg = oss.str();
+    throw antlr4::ParseCancellationException(error_msg);
+  }
 
-    std::any visitStatement(GrammarParser::StatementContext *ctx) override {
-        std::cout << "from visitStatement" << std::endl;  // Added logging
-        return visitChildren(ctx);
-    }
-
-    std::any visitIfStatement(GrammarParser::IfStatementContext *ctx) override {
-        std::cout << "from visitIfStatement" << std::endl;  // Added logging
-
-        return visitChildren(ctx);
-    }
-
-    std::any visitElifStatement(GrammarParser::ElifStatementContext *ctx) override {
-        std::cout << "from visitElifStatement" << std::endl;  // Added logging
-
-        return visitChildren(ctx);
-    }
-
-    std::any visitElseStatement(GrammarParser::ElseStatementContext *ctx) override {
-        std::cout << "from visitElseStatement" << std::endl;  // Added logging
-
-        return visitChildren(ctx);
-    }
-
-    std::any visitBlock(GrammarParser::BlockContext *ctx) override {
-        std::cout << "from visitBlock" << std::endl;  // Added logging
-
-        return visitChildren(ctx);
-    }
-
-    std::any visitWhileStatement(GrammarParser::WhileStatementContext *ctx) override {
-        std::cout << "from visitWhileStatement" << std::endl;  // Added logging
-
-        return visitChildren(ctx);
-    }
-
-    std::any visitForStatement(GrammarParser::ForStatementContext *ctx) override {
-        std::cout << "from visitForStatement" << std::endl;  // Added logging
-        return visitChildren(ctx);
-    }
-
-    std::any visitExpression(GrammarParser::ExpressionContext *ctx) override {
-        std::cout << "from visitExpression" << std::endl;  // Added logging
-        return visitChildren(ctx);
-    }
-
-    std::any visitComparison(GrammarParser::ComparisonContext *ctx) override {
-        std::cout << "from visitComparison" << std::endl;  // Added logging
-        return visitChildren(ctx);
-    }
-
-    std::any visitComparisonOperator(GrammarParser::ComparisonOperatorContext *ctx) override {
-        std::cout << "from visitComparisonOperator" << std::endl;  // Added logging
-        return visitChildren(ctx);
-    }
-
-    std::any visitTerm(GrammarParser::TermContext *ctx) override {
-        std::cout << "from visitTerm" << std::endl;  // Added logging
-        return visitChildren(ctx);
-    }
-
-    std::any visitVariableDeclaration(GrammarParser::VariableDeclarationContext *ctx) override {
-        std::cout << "from visitVariableDeclaration: " << ctx->IDENTIFIER()->getText()
-                  << std::endl;  // Example log with identifier
-        return visitChildren(ctx);
-    }
-
-    std::any visitType(GrammarParser::TypeContext *ctx) override {
-        std::cout << "from visitType: " << ctx->getText()
-                  << std::endl;  // Example log with type text
-        return visitChildren(ctx);
-    }
+private:
+  std::string error_msg;
 };
 
 int main() {
-    std::cout << "./src/example.txt";
-
-    std::string program = R"(
-  
-  42
-  
+  std::string example = R"(
+    if 5 > 3 {
+      2 + 3 + 1
+    } else {
+      10 - 5
+    }
   )";
 
-    YalLLVM vm;
-    // vm.exec(program);
+  antlr4::ANTLRInputStream input(example);
 
-    std::ifstream stream("./src/example.txt");
-    if (!stream) {
-        std::cerr << "Cannot open input file\n";
-        return 1;
-    }
+  GrammarLexer lexer(&input);
+  lexer.removeErrorListeners();
+  lexer.addErrorListener(new ExceptionErrorListener());
 
-    antlr4::ANTLRInputStream input(stream);
-    GrammarLexer lexer(&input);
-    antlr4::CommonTokenStream tokens(&lexer);
-    GrammarParser parser(&tokens);
-    GrammarParser::ProgContext *tree = parser.prog();
+  antlr4::CommonTokenStream tokens(&lexer);
 
-    CustomVisitor visitor;
-    visitor.visit(tree);
+  GrammarParser parser(&tokens);
+  parser.removeErrorListeners();
+  parser.addErrorListener(new ExceptionErrorListener());
 
-    std::cout << "Parsed Tree: " << tree->toStringTree(&parser) << std::endl;
+  antlr4::tree::ParseTree *tree = nullptr;
 
-    return 0;
+  try {
+    tree = parser.input();
+  } catch (antlr4::ParseCancellationException &e) {
+    std::cout << "Syntax Error: " << e.what() << std::endl;
+    return 1;
+  }
+
+  CalculatorInterpreter interpreter;
+
+  // Используем Visitor для обхода дерева
+  interpreter.visit(tree);
+
+  // Вывод результата
+  std::cout << "Result: " << interpreter.get_result() << std::endl;
+
+  return 0;
 }
