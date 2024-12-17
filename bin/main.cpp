@@ -1,6 +1,6 @@
 #include "GrammarLexer.h"
 #include "GrammarParser.h"
-#include "CalculatorInterpreter.h"
+#include "GrammarASTInterpreter.h"
 
 #include <iostream>
 #include <antlr4-runtime.h>
@@ -24,11 +24,14 @@ private:
 
 int main() {
   std::string example = R"(
-    if 5 > 3 {
-      2 + 3 + 1
+    var b = 3;
+    if (b > 2) {
+      b = 52
     } else {
-      10 - 5
+      b = 12
     }
+
+    print(b);
   )";
 
   antlr4::ANTLRInputStream input(example);
@@ -46,19 +49,16 @@ int main() {
   antlr4::tree::ParseTree *tree = nullptr;
 
   try {
-    tree = parser.input();
+    tree = parser.script();
   } catch (antlr4::ParseCancellationException &e) {
     std::cout << "Syntax Error: " << e.what() << std::endl;
     return 1;
   }
 
-  CalculatorInterpreter interpreter;
+  GrammarASTInterpreter interpreter;
 
   // Используем Visitor для обхода дерева
   interpreter.visit(tree);
-
-  // Вывод результата
-  std::cout << "Result: " << interpreter.get_result() << std::endl;
 
   return 0;
 }

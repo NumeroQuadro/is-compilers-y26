@@ -1,6 +1,8 @@
 add_executable(yal main.cpp
-        CalculatorInterpreter.h
-        CalculateInterpretator.cpp)
+        GrammarASTInterpreter.h
+        GrammarASTInterpreter.cpp
+        Value.cpp
+        Value.h)
 
 target_include_directories(yal PRIVATE 
     ${CMAKE_SOURCE_DIR}/include
