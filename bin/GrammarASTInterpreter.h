@@ -1,71 +1,33 @@
+#pragma once
 #include "antlr4-runtime.h"
 #include "GrammarBaseVisitor.h"
 #include "GrammarParser.h"
 #include "Value.h"
 
-class GrammarASTInterpreter : public GrammarBaseVisitor {
+struct Instruction;
+
+class GrammarASTInterpreter final : public GrammarBaseVisitor {
 public:
-  std::map<std::string, Value> globalScope;
-  std::map<std::string, GrammarParser::FunctionContext *> functionMap;
-
-  antlrcpp::Any visitScript(GrammarParser::ScriptContext *context) override;
-
-  antlrcpp::Any visitFunction(GrammarParser::FunctionContext *context) override;
-
-  antlrcpp::Any visitBlockStatement(GrammarParser::BlockStatementContext *context) override;
-
-  antlrcpp::Any visitBlock(GrammarParser::BlockContext *context) override;
-
-  antlrcpp::Any visitReturn(GrammarParser::ReturnContext *context) override;
-
-  antlrcpp::Any visitCallStatement(GrammarParser::CallStatementContext *context) override;
-
-  antlrcpp::Any visitCall(GrammarParser::CallContext *context) override;
-
-  antlrcpp::Any visitCall_expr(GrammarParser::Call_exprContext *context) override;
-
-  antlrcpp::Any visitVardef(GrammarParser::VardefContext *context) override;
-
-  antlrcpp::Any visitIf(GrammarParser::IfContext *context) override;
-
-  antlrcpp::Any visitWhile(GrammarParser::WhileContext *context) override;
-
-  antlrcpp::Any visitAssign(GrammarParser::AssignContext *context) override;
-
-  antlrcpp::Any visitElementAssign(GrammarParser::ElementAssignContext *context) override;
-
-  antlrcpp::Any visitPrint(GrammarParser::PrintContext *context) override;
-
-  antlrcpp::Any visitOp(GrammarParser::OpContext *context) override;
-
-  antlrcpp::Any visitNegate(GrammarParser::NegateContext *context) override;
-
-  antlrcpp::Any visitNot(GrammarParser::NotContext *context) override;
-
-  antlrcpp::Any visitParens(GrammarParser::ParensContext *context) override;
-
-  antlrcpp::Any visitAtom(GrammarParser::AtomContext *context) override;
-
-  antlrcpp::Any visitIdentifier(GrammarParser::IdentifierContext *context) override;
-
-  antlrcpp::Any visitInteger(GrammarParser::IntegerContext *context) override;
-
-  antlrcpp::Any visitFloat(GrammarParser::FloatContext *context) override;
-
-  antlrcpp::Any visitString(GrammarParser::StringContext *context) override;
-
-  antlrcpp::Any visitVector(GrammarParser::VectorContext *context) override;
-
-  antlrcpp::Any visitTrueLiteral(GrammarParser::TrueLiteralContext *context) override;
-
-  antlrcpp::Any visitFalseLiteral(GrammarParser::FalseLiteralContext *context) override;
-
+  std::vector<Instruction> code;
 private:
-  Value evaluate(antlr4::tree::ParseTree *node);
+  antlrcpp::Any visitScript(GrammarParser::ScriptContext *ctx) override;
+  antlrcpp::Any visitVardef(GrammarParser::VardefContext *ctx) override;
+  antlrcpp::Any visitIf(GrammarParser::IfContext *ctx) override;
+  antlrcpp::Any visitAssign(GrammarParser::AssignContext *ctx) override;
+  antlrcpp::Any visitPrint(GrammarParser::PrintContext *ctx) override;
 
-  Value callFunction(const std::string &functionName, const std::vector<Value> &args);
+  antlrcpp::Any visitOp(GrammarParser::OpContext *ctx) override;
+  antlrcpp::Any visitNegate(GrammarParser::NegateContext *ctx) override;
+  antlrcpp::Any visitNot(GrammarParser::NotContext *ctx) override;
+  antlrcpp::Any visitParens(GrammarParser::ParensContext *ctx) override;
+  antlrcpp::Any visitAtom(GrammarParser::AtomContext *ctx) override;
+  antlrcpp::Any visitIdentifier(GrammarParser::IdentifierContext *ctx) override;
+  antlrcpp::Any visitInteger(GrammarParser::IntegerContext *ctx) override;
+  antlrcpp::Any visitString(GrammarParser::StringContext *ctx) override;
+  antlrcpp::Any visitTrueLiteral(GrammarParser::TrueLiteralContext *ctx) override;
+  antlrcpp::Any visitFalseLiteral(GrammarParser::FalseLiteralContext *ctx) override;
 
-  Value &getVariable(const std::string &variableName);
-
-  bool isTruthy(const Value &value);
+  antlrcpp::Any visitVector(GrammarParser::VectorContext *ctx) override;
+  antlrcpp::Any visitIndex(GrammarParser::IndexContext *ctx) override;
+  antlrcpp::Any visitElementAssign(GrammarParser::ElementAssignContext *ctx) override;
 };

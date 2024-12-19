@@ -1,107 +1,151 @@
 #include "GrammarASTInterpreter.h"
 
-Value &GrammarASTInterpreter::getVariable(const std::string &variableName) {
-  auto it = globalScope.find(variableName);
-  if (it == globalScope.end()) {
-    throw std::runtime_error("Variable not found");
-  }
+#include "Instruction.h"
 
-  return it->second;
+antlrcpp::Any GrammarASTInterpreter::visitScript(GrammarParser::ScriptContext *ctx) {
+  for (const auto v: ctx->vardef()) {
+    visit(v);
+  }
+  for (auto f: ctx->function()) {
+    // no functions
+  }
+  for (const auto s: ctx->statement()) {
+    visit(s);
+  }
+  code.emplace_back(InstructionType::HALT);
+  return nullptr;
 }
 
-bool GrammarASTInterpreter::isTruthy(const Value &val) {
-  switch (val.type) {
-    case Value::Type::BOOL:   return val.asBool;
-    case Value::Type::INT:    return val.asInt != 0;
-    case Value::Type::FLOAT:  return val.asFloat != 0.0f;
-    case Value::Type::STRING: return !val.asString.empty();
-    case Value::Type::VECTOR: return !val.asVector.empty();
-  }
-  return false;
+antlrcpp::Any GrammarASTInterpreter::visitVardef(GrammarParser::VardefContext *ctx) {
+  // var ID = expr
+  visit(ctx->expr());
+  code.emplace_back(InstructionType::STORE_VAR, ctx->ID()->getText());
+  return nullptr;
 }
 
-Value GrammarASTInterpreter::callFunction(const std::string &functionName, const std::vector<Value> &args) {
-  auto it = functionMap.find(functionName);
-  if (it == functionMap.end()) {
-    throw std::runtime_error("Function not found");
+antlrcpp::Any GrammarASTInterpreter::visitIf(GrammarParser::IfContext *ctx) {
+  visit(ctx->expr());
+  const int jmzIndex = static_cast<int>(code.size());
+  code.emplace_back(InstructionType::JMZ, 0);
+
+  visit(ctx->statement(0));
+  const int jmpIndex = static_cast<int>(code.size());
+  code.emplace_back(InstructionType::JMP, 0);
+
+  const int elseStart = static_cast<int>(code.size());
+  if (ctx->statement().size() > 1) {
+    visit(ctx->statement(1));
   }
+  const int endPos = static_cast<int>(code.size());
 
-  auto functionCtx = it->second;
-
-  std::map<std::string, Value> localScope;
-
-  GrammarParser::Formal_argsContext *formal_args_context = functionCtx->formal_args();
-  size_t paramCount = 0;
-  if (formal_args_context) {
-    paramCount = formal_args_context->formal_arg().size();
-    if (paramCount != args.size()) {
-      throw std::runtime_error("Wrong number of arguments");
-    }
-
-    for (size_t i = 0; i < paramCount; i++) {
-      auto argName = formal_args_context->formal_arg(i)->ID()->getText();
-      localScope[argName] = args[i];
-    }
-  } else {
-    if (!args.empty()) {
-      throw std::runtime_error("Wrong number of arguments");
-    }
-  }
-
-  std::map<std::string, Value> oldScope = globalScope;
-  for (const auto &[fst, snd]: globalScope) {
-    globalScope[fst] = snd;
-  }
-
-  Value returnValue;
-  auto blockContext = functionCtx->block();
-  for (auto item: blockContext->children) {
-    Value result;
-    try {
-      result = evaluate(item);
-    } catch (const std::string &signalReturn) {
-      // TODO
-    }
-
-    if (result.type == Value::Type::STRING && result.asString == "__return_signal__") {
-      break;
-    }
-
-    if (result.type == Value::Type::BOOL && result.asBool == true && result.asString == "HAS_RETURN_VALUE") {
-    }
-  }
-
-  globalScope = oldScope;
-  return returnValue;
+  code[jmzIndex].intOperand = elseStart;
+  code[jmpIndex].intOperand = endPos;
+  return nullptr;
 }
 
-Value GrammarASTInterpreter::evaluate(antlr4::tree::ParseTree* node) {
-  if (!node) {
-    return Value::makeInt(0);
-  }
-
-  antlrcpp::Any value = node->accept(this);
-
-  if (const auto result = std::any_cast<Value>(&value)) {
-    return *result;
-  }
-
-  return Value::makeInt(0);
+antlrcpp::Any GrammarASTInterpreter::visitAssign(GrammarParser::AssignContext *ctx) {
+  visit(ctx->expr());
+  code.emplace_back(InstructionType::STORE_VAR, ctx->ID()->getText());
+  return nullptr;
 }
 
-antlrcpp::Any GrammarASTInterpreter::visitScript(GrammarParser::ScriptContext *context) {
-  for (const auto& vd : context->vardef()) {
-    visitVardef(vd);
+antlrcpp::Any GrammarASTInterpreter::visitPrint(GrammarParser::PrintContext *ctx) {
+  if (ctx->expr()) {
+    visit(ctx->expr());
   }
+  code.emplace_back(InstructionType::PRINT);
+  return nullptr;
+}
 
-  for (const auto& fn : context->function()) {
-    visitFunction(fn);
-  }
+antlrcpp::Any GrammarASTInterpreter::visitOp(GrammarParser::OpContext *ctx) {
+  visit(ctx->expr(0));
+  visit(ctx->expr(1));
+  std::string op = ctx->operator_()->getText();
+  if (op == "+") code.emplace_back(InstructionType::ADD);
+  else if (op == "-") code.emplace_back(InstructionType::SUB);
+  else if (op == "*") code.emplace_back(InstructionType::MUL);
+  else if (op == "/") code.emplace_back(InstructionType::DIV);
+  else if (op == "==") code.emplace_back(InstructionType::EQ);
+  else if (op == "!=") code.emplace_back(InstructionType::NEQ);
+  else if (op == "<") code.emplace_back(InstructionType::LT);
+  else if (op == "<=") code.emplace_back(InstructionType::LE);
+  else if (op == ">") code.emplace_back(InstructionType::GT);
+  else if (op == ">=") code.emplace_back(InstructionType::GE);
+  return nullptr;
+}
 
-  for (const auto& st : context->statement()) {
-    evaluate(st);
+antlrcpp::Any GrammarASTInterpreter::visitNegate(GrammarParser::NegateContext *ctx) {
+  visit(ctx->expr());
+  code.emplace_back(InstructionType::NEG);
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitNot(GrammarParser::NotContext *ctx) {
+  visit(ctx->expr());
+  code.emplace_back(InstructionType::NOT);
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitParens(GrammarParser::ParensContext *ctx) {
+  return visit(ctx->expr());
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitAtom(GrammarParser::AtomContext *ctx) {
+  return visit(ctx->primary());
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitIdentifier(GrammarParser::IdentifierContext *ctx) {
+  code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitInteger(GrammarParser::IntegerContext *ctx) {
+  int val = std::stoi(ctx->INT()->getText());
+  code.emplace_back(InstructionType::PUSH_INT, val);
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitString(GrammarParser::StringContext *ctx) {
+  std::string str = ctx->STRING()->getText();
+  str = str.substr(1, str.size() - 2);
+  code.emplace_back(InstructionType::PUSH_STRING, str);
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitTrueLiteral(GrammarParser::TrueLiteralContext *ctx) {
+  code.emplace_back(InstructionType::PUSH_BOOL, true);
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitFalseLiteral(GrammarParser::FalseLiteralContext *ctx) {
+  code.emplace_back(InstructionType::PUSH_BOOL, false);
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitVector(GrammarParser::VectorContext *ctx) {
+  int count = static_cast<int>(ctx->expr_list()->expr().size());
+  code.emplace_back(InstructionType::NEW_ARRAY, count);
+  for (int i = 0; i < count; i++) {
+    code.emplace_back(InstructionType::PUSH_VAR, ""); // тут tricky: нет arr в var, значит надо дублировать верх стека
+    visit(ctx->expr_list()->expr(i));
+    code.emplace_back(InstructionType::PUSH_INT, i);
+    code.emplace_back(InstructionType::PUSH_INT, i);
   }
 
   return nullptr;
 }
 
+antlrcpp::Any GrammarASTInterpreter::visitIndex(GrammarParser::IndexContext *ctx) {
+  code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
+  visit(ctx->expr());
+  code.emplace_back(InstructionType::GET_ELEMENT);
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitElementAssign(GrammarParser::ElementAssignContext *ctx) {
+  code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
+  visit(ctx->expr(0));
+  visit(ctx->expr(1));
+  code.emplace_back(InstructionType::SET_ELEMENT);
+  return nullptr;
+}

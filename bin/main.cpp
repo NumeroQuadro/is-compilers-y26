@@ -63,26 +63,31 @@
 //   return 0;
 // }
 
+#include <iostream>
+#include "antlr4-runtime.h"
+#include "GrammarLexer.h"
+#include "GrammarParser.h"
+#include "GrammarASTInterpreter.h"
 #include "VirtualMachine.h"
-#include <cstdint>
-
 
 int main() {
-  uint8_t bytecode[] = {
-    static_cast<uint8_t>(OP_INC),
-    static_cast<uint8_t>(OP_ADDI), 10,
-    static_cast<uint8_t>(OP_SUBI), 5,
-    static_cast<uint8_t>(DONE)
-  };
+  std::string input =
+      "var x = 10\n"
+      "var y = 20\n"
+      "if (x > y) print(x + y) else print(x - y)\n";
 
-  VirtualMachine virtual_machine;
-  InterpretResult result = virtual_machine.interpret(bytecode);
+  antlr4::ANTLRInputStream inputStream(input);
+  GrammarLexer lexer(&inputStream);
+  antlr4::CommonTokenStream tokens(&lexer);
+  GrammarParser parser(&tokens);
 
-  if (result != SUCCESS) {
-    std::cout << virtual_machine.getAccumulator() << std::endl;
-  } else {
-    std::cerr << "Error: Unknown opcode encountered." << std::endl;
-  }
+  GrammarParser::ScriptContext* tree = parser.script();
+
+  GrammarASTInterpreter visitor;
+  visitor.visit(tree);
+
+  VirtualMachine vm(visitor.code);
+  vm.run();
 
   return 0;
 }

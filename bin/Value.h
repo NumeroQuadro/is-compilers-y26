@@ -1,58 +1,83 @@
 #pragma once
 
+#include <stdexcept>
 #include <utility>
 #include <vector>
-#include <string>
+#include <variant>
 
-struct Value {
-  enum class Type {
-    INT,
-    FLOAT,
-    STRING,
-    BOOL,
-    VECTOR
+class Value;
+
+class HeapValue {
+public:
+  virtual ~HeapValue() = default;
+};
+
+class ArrayValue : public HeapValue {
+public:
+  std::vector<Value> elements;
+
+  explicit ArrayValue(const size_t size): elements(size) {
   };
+};
 
-  Type type;
-  int asInt;
-  float asFloat;
-  std::string asString;
-  bool asBool;
-  std::vector<Value> asVector;
+enum class ValueType {
+  INT,
+  FLOAT,
+  BOOL,
+  REF
+};
 
-  explicit Value()
-    : type(Type::INT), asInt(0), asFloat(0.0f), asBool(false) {
+class Value {
+public:
+  Value() : _type(ValueType::INT) {
+    _data = 0;
   }
 
-  explicit Value(int v)
-    : type(Type::INT), asInt(v), asFloat(0.0f), asBool(false) {
+  explicit Value(int v) : _type(ValueType::INT) {
+    _data = v;
   }
 
-  explicit Value(float f)
-    : type(Type::FLOAT), asInt(0), asFloat(f), asBool(false) {
+  explicit Value(float v) : _type(ValueType::FLOAT) {
+    _data = v;
   }
 
-  explicit Value(bool b)
-    : type(Type::BOOL), asInt(0), asFloat(0.0f), asBool(b) {
+  explicit Value(bool b) : _type(ValueType::BOOL) {
+    _data = b;
   }
 
-  explicit Value(std::string  s)
-    : type(Type::STRING), asInt(0), asFloat(0.0f), asString(std::move(s)), asBool(false) {
+  explicit Value(HeapValue *ref) : _type(ValueType::REF) {
+    _data = ref;
   }
 
-  explicit Value(std::vector<Value> v)
-    : type(Type::VECTOR), asInt(0), asFloat(0.0f), asBool(false), asVector(std::move(v)) {
+  [[nodiscard]] int asInt() const {
+    if (_type == ValueType::INT) return std::get<int>(_data);
+    throw std::runtime_error("Value is not int");
   }
 
-  std::string toString() const;
+  [[nodiscard]] float asFloat() const {
+    if (_type == ValueType::FLOAT) return std::get<float>(_data);
+    throw std::runtime_error("Value is not float");
+  }
 
-  static Value makeInt(int v);
-  static Value makeFloat(float v);
-  static Value makeBool(bool b);
-  static Value makeString(std::string  s);
-  static Value makeVector(std::vector<Value> v);
+  [[nodiscard]] bool asBool() const {
+    if (_type == ValueType::BOOL) return std::get<bool>(_data);
+    throw std::runtime_error("Value is not bool");
+  }
 
-  Value operator+(const Value& rhs) const;
-  Value operator*(const Value& rhs) const;
-  bool operator>(const Value& rhs) const;
+  [[nodiscard]] HeapValue *asHeapRef() const {
+    if (_type == ValueType::REF) return std::get<HeapValue *>(_data);
+    throw std::runtime_error("Value is not heap reference");
+  }
+
+  [[nodiscard]] std::variant<int, float, bool, HeapValue *> getValue() const {
+    return _data;
+  }
+
+  [[nodiscard]] ValueType getType() const {
+    return _type;
+  }
+
+private:
+  std::variant<int, float, bool, HeapValue *> _data;
+  ValueType _type;
 };

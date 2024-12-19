@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+
 #include "Instruction.h"
 #include "MyStack.h"
 
@@ -6,17 +8,32 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Value.h"
+
 class VirtualMachine {
-private:
-  bool is_running = true;
-
-  int _ip;
-  std::vector<Instruction> _code;
-  MyStack<int> _stack;
-  std::unordered_map<std::string,int> _memory;
 public:
-  explicit VirtualMachine(const std::vector<Instruction>& code)
-      : _ip(0), _code(code) {}
-
+  explicit VirtualMachine(const std::vector<Instruction> &code);
   void run();
+  std::vector<Instruction> getInstructions() const;
+
+private:
+  std::vector<Instruction> code;
+  std::unordered_map<std::string, Value> variables;
+  std::stack<Value> stack;
+
+  std::vector<std::unique_ptr<HeapValue>> heap;
+
+  int ip = 0;
+
+  Value pop();
+  Value top();
+  void push(const Value &v);
+
+  template<typename Op>
+  void binaryOp(Op op);
+
+  template<typename Op>
+  void cmpOp(Op op);
+
+  HeapValue* allocHeap(std::unique_ptr<HeapValue> hv);
 };

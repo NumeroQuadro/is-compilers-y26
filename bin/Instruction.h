@@ -1,22 +1,47 @@
 #pragma once
 #include <string>
+#include <utility>
 
-enum OpCode {
-  OP_PUSH,
-  OP_LOAD,
-  OP_STORE,
-  OP_ADD,
-  OP_SUB,
-  OP_MUL,
-  OP_DIV,
-  OP_JMP,
-  OP_JMZ,
-  OP_PRINT,
-  OP_HALT
+enum class InstructionType {
+  PUSH_INT,
+  PUSH_FLOAT,
+  PUSH_BOOL,
+  PUSH_STRING,
+  PUSH_VAR,
+  STORE_VAR,
+  ADD,
+  SUB,
+  MUL,
+  DIV,
+  EQ,
+  NEQ,
+  LT,
+  LE,
+  GT,
+  GE,
+  NOT,
+  NEG,
+  JMP,
+  JMZ,
+  PRINT,
+  HALT,
+  NEW_ARRAY,
+  GET_ELEMENT,
+  SET_ELEMENT
 };
 
 struct Instruction {
-  OpCode opcode;
-  std::string arg;
+  InstructionType op;
+
+  int intOperand = 0;
+  float floatOperand = 0.0f;
+  bool boolOperand = false;
+  std::string strOperand;
+
+  explicit Instruction(const InstructionType op) : op(op) {}
+  Instruction(const InstructionType op, const int i) : op(op), intOperand(i) {}
+  Instruction(const InstructionType op, const float f) : op(op), floatOperand(f) {}
+  Instruction(const InstructionType op, const bool b) : op(op), boolOperand(b) {}
+  Instruction(const InstructionType op, std::string s) : op(op), strOperand(std::move(s)) {}
 };
 

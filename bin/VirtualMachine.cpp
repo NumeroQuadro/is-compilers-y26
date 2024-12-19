@@ -1,82 +1,213 @@
-
 #include "VirtualMachine.h"
-
 #include <iostream>
-#include <ostream>
+#include <stdexcept>
+#include <functional>
+
+Value VirtualMachine::pop() {
+  if (stack.empty()) throw std::runtime_error("Stack underflow");
+  const Value v = stack.top();
+  stack.pop();
+  return v;
+}
+
+Value VirtualMachine::top() {
+  if (stack.empty()) throw std::runtime_error("Stack underflow");
+  return stack.top();
+}
+
+void VirtualMachine::push(const Value &v) {
+  stack.push(v);
+}
+
+template<typename Op>
+void VirtualMachine::binaryOp(Op op) {
+  const Value b = pop();
+  const Value a = pop();
+
+  int ai = a.asInt();
+  int bi = b.asInt();
+  const int res = op(ai, bi);
+  push(Value(res));
+  ip++;
+}
+
+template<typename Op>
+void VirtualMachine::cmpOp(Op op) {
+  Value b = pop();
+  Value a = pop();
+  int ai = a.asInt();
+  int bi = b.asInt();
+  bool r = op(ai, bi);
+  push(Value(r));
+  ip++;
+}
+
+HeapValue *VirtualMachine::allocHeap(std::unique_ptr<HeapValue> hv) {
+  HeapValue *ptr = hv.get();
+  heap.push_back(std::move(hv));
+  return ptr;
+}
+
+VirtualMachine::VirtualMachine(const std::vector<Instruction> &code) : code(code) {
+}
 
 void VirtualMachine::run() {
-  while (is_running) {
-    const auto& instr = _code[_ip];
-    switch (instr.opcode) {
-      case OP_PUSH: {
-        int val = std::stoi(instr.arg);
-        _stack.push(val);
-        ++_ip;
+  while (ip >= 0 && ip < static_cast<int>(code.size())) {
+    switch (const Instruction &inst = code[ip]; inst.op) {
+      case InstructionType::PUSH_INT:
+        push(Value(inst.intOperand));
+        ip++;
+        break;
+      case InstructionType::PUSH_FLOAT:
+        push(Value(inst.floatOperand)); // не полностью реализовано
+        ip++;
+        break;
+      case InstructionType::PUSH_BOOL:
+        push(Value(inst.boolOperand));
+        ip++;
+        break;
+      case InstructionType::PUSH_VAR: {
+        auto it = variables.find(inst.strOperand);
+        if (it == variables.end()) throw std::runtime_error("Undefined variable " + inst.strOperand);
+        push(it->second);
+        ip++;
         break;
       }
-      case OP_LOAD: {
-        int val = _memory[instr.arg];
-        _stack.push(val);
-        ++_ip;
+      case InstructionType::STORE_VAR: {
+        Value v = pop();
+        variables[inst.strOperand] = v;
+        ip++;
         break;
       }
-      case OP_STORE: {
-        int val = _stack.topAndPop();
-
-        _memory[instr.arg] = val;
-        ++_ip;
+      case InstructionType::ADD:
+        binaryOp(std::plus<int>());
+        break;
+      case InstructionType::SUB:
+        binaryOp(std::minus<int>());
+        break;
+      case InstructionType::MUL:
+        binaryOp(std::multiplies<int>());
+        break;
+      case InstructionType::DIV: {
+        Value b = pop();
+        Value a = pop();
+        int bi = b.asInt();
+        if (bi == 0) throw std::runtime_error("Division by zero");
+        int ai = a.asInt();
+        push(Value(ai / bi));
+        ip++;
         break;
       }
-      case OP_ADD: {
-        const int a = _stack.topAndPop();
-        const int b = _stack.topAndPop();
-        _stack.push(a + b);
-        ++_ip;
+      case InstructionType::EQ:
+        cmpOp(std::equal_to<int>());
+        break;
+      case InstructionType::NEQ:
+        cmpOp(std::not_equal_to<int>());
+        break;
+      case InstructionType::LT:
+        cmpOp(std::less<int>());
+        break;
+      case InstructionType::LE:
+        cmpOp(std::less_equal<int>());
+        break;
+      case InstructionType::GT:
+        cmpOp(std::greater<int>());
+        break;
+      case InstructionType::GE:
+        cmpOp(std::greater_equal<int>());
+        break;
+      case InstructionType::NOT: {
+        Value v = pop();
+        bool val = v.asBool();
+        push(Value(!val));
+        ip++;
         break;
       }
-      case OP_SUB: {
-        const int a = _stack.topAndPop();
-        const int b = _stack.topAndPop();
-        _stack.push(a - b);
-        ++_ip;
+      case InstructionType::NEG: {
+        Value v = pop();
+        int vi = v.asInt();
+        push(Value(-vi));
+        ip++;
         break;
       }
-      case OP_MUL: {
-        const int a = _stack.topAndPop();
-        const int b = _stack.topAndPop();
-        _stack.push(a * b);
-        ++_ip;
+      case InstructionType::JMP:
+        ip = inst.intOperand;
         break;
-      }
-      case OP_DIV: {
-        const int a = _stack.topAndPop();
-        const int b = _stack.topAndPop();
-        _stack.push(a * b);
-        ++_ip;
-        break;
-      }
-      case OP_JMP: {
-        _ip = std::stoi(instr.arg);
-        break;
-      }
-      case OP_JMZ: {
-        int cond = _stack.topAndPop();
-        if (cond == 0) {
-          _ip = std::stoi(instr.arg);
+      case InstructionType::JMZ: {
+        Value v = pop();
+        bool val = v.asBool();
+        if (!val) {
+          ip = inst.intOperand;
         } else {
-          _ip++;
+          ip++;
         }
         break;
       }
-      case OP_PRINT: {
-        int val = _stack.topAndPop();
-        std::cout << val << std::endl;
-        _ip++;
+      case InstructionType::PRINT: {
+        if (!stack.empty()) {
+          Value v = pop();
+          if (v.getType() == ValueType::INT) {
+            std::cout << v.asInt() << "\n";
+          } else if (v.getType() == ValueType::BOOL) {
+            std::cout << (v.asBool() ? "true" : "false") << "\n";
+          } else if (v.getType() == ValueType::REF) {
+            HeapValue *hv = v.asHeapRef();
+            if (auto av = dynamic_cast<ArrayValue *>(hv)) {
+              std::cout << "[";
+              for (size_t i = 0; i < av->elements.size(); i++) {
+                if (i > 0) std::cout << ", ";
+                std::cout << av->elements[i].asInt();
+              }
+              std::cout << "]\n";
+            }
+          } else {
+            std::cout << "Unsupported print type\n";
+          }
+        } else {
+          std::cout << "\n";
+        }
+        ip++;
         break;
       }
-      case OP_HALT: {
-        return;
+      case InstructionType::NEW_ARRAY: {
+        auto arr = std::make_unique<ArrayValue>(static_cast<size_t>(inst.intOperand));
+        HeapValue *ref = allocHeap(std::move(arr));
+        push(Value(ref));
+        ip++;
+        break;
       }
+      case InstructionType::GET_ELEMENT: {
+        Value idxVal = pop();
+        Value arrVal = pop();
+        int idx = idxVal.asInt();
+        auto *arr = dynamic_cast<ArrayValue *>(arrVal.asHeapRef());
+        if (!arr) throw std::runtime_error("Not an array");
+        if (idx < 0 || idx >= static_cast<int>(arr->elements.size())) throw std::runtime_error(
+          "Array index out of bounds");
+        push(arr->elements[idx]);
+        ip++;
+        break;
+      }
+      case InstructionType::SET_ELEMENT: {
+        Value val = pop();
+        Value idxVal2 = pop();
+        Value arrVal2 = pop();
+        int idx2 = idxVal2.asInt();
+        auto *arr2 = dynamic_cast<ArrayValue *>(arrVal2.asHeapRef());
+        if (!arr2) throw std::runtime_error("Not an array");
+        if (idx2 < 0 || idx2 >= static_cast<int>(arr2->elements.size())) throw std::runtime_error("Array index out of bounds");
+        arr2->elements[idx2] = val;
+        ip++;
+        break;
+      }
+      case InstructionType::HALT:
+        return;
+      default:
+        throw std::runtime_error("Unknown instruction");
     }
   }
+}
+
+std::vector<Instruction> VirtualMachine::getInstructions() const {
+  return code;
 }
