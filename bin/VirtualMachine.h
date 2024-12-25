@@ -2,14 +2,13 @@
 #include <memory>
 
 #include "Instruction.h"
-#include "MyStack.h"
 
 #include <stack>
-#include <unordered_map>
 #include <vector>
 
 #include "Scope.h"
 #include "Value.h"
+#include "CallFrame.h"
 
 class VirtualMachine {
 public:
@@ -17,13 +16,15 @@ public:
 
   void run();
 
-  std::vector<Instruction> getInstructions() const;
+  [[nodiscard]] std::vector<Instruction> getInstructions() const;
 
 private:
   Scope *scope_ = nullptr;
+
   std::vector<Instruction> code;
   std::stack<Value> stack;
   std::vector<std::unique_ptr<HeapValue> > heap;
+  std::stack<CallFrame> callStack;
 
   int ip = 0;
 

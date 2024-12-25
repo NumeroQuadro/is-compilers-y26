@@ -37,7 +37,8 @@ block
 statement
 	:	'if' '(' expr ')' statement ('else' statement)?		# If
 	|	'while' '(' expr ')' statement						# While
-	|	ID '=' expr											# Assign
+	|   'for' '(' forInit? ';' forCondition? ';' forIncrement? ')' statement                  # For
+	|	assign											    # AssignStmt
 	|	ID '[' expr ']' '=' expr							# ElementAssign
 	|	call_expr											# CallStatement
 	|	'print' '(' expr? ')'								# Print
@@ -45,7 +46,25 @@ statement
 	|	block				 								# BlockStatement
 	;
 
+/** Присваивание */
+assign : ID '=' expr ;
+
+/** Variable definition */
 vardef : 'var' ID '=' expr ;
+
+/** For loop components */
+forInit
+    : vardef
+    | assign
+    ;
+
+forCondition
+    : expr
+    ;
+
+forIncrement
+    : assign
+  ;
 
 expr
 	:	expr operator expr									# Op

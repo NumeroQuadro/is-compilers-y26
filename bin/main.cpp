@@ -72,15 +72,13 @@
 
 int main() {
   std::string input =
-    "var x = 1\n"
-    "var i = 1\n"
-    "while (i <= 10)\n"
-    "{\n"
-      "x = x * i\n"
-      "i = i + 1"
-    "}\n"
-    "print(x)\n"
-;
+      "func add(a: int, b: int) : int {\n"
+      "    var result = a + b\n"
+      "    return result\n"
+      "}\n"
+      "var c = 3"
+      "var z = add(c, c)\n"
+      "print(z)\n";
 
   antlr4::ANTLRInputStream inputStream(input);
   GrammarLexer lexer(&inputStream);

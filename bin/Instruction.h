@@ -30,7 +30,9 @@ enum class InstructionType {
   ENTER_SCOPE,
   EXIT_SCOPE,
   DUP_TOP,
-  SWAP
+  SWAP,
+  CALL,
+  RET
 };
 
 struct Instruction {

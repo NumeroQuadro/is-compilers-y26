@@ -9,16 +9,20 @@ struct Instruction;
 class GrammarASTInterpreter final : public GrammarBaseVisitor {
 public:
   std::vector<Instruction> code;
+  std::unordered_map<std::string, int> functionTable;
 private:
   antlrcpp::Any visitScript(GrammarParser::ScriptContext *ctx) override;
   antlrcpp::Any visitBlockStatement(GrammarParser::BlockStatementContext *ctx) override;
-  antlrcpp::Any visitBlock(GrammarParser::BlockContext *context) override;
+  antlrcpp::Any visitBlock(GrammarParser::BlockContext *ctx) override;
   antlrcpp::Any visitIf(GrammarParser::IfContext *ctx) override;
   antlrcpp::Any visitWhile(GrammarParser::WhileContext *ctx) override;
-  // antlrcpp::Any visitFor(GrammarParser::ForContext *ctx) override; // Новый метод
   antlrcpp::Any visitVardef(GrammarParser::VardefContext *ctx) override;
   antlrcpp::Any visitAssign(GrammarParser::AssignContext *ctx) override;
   antlrcpp::Any visitPrint(GrammarParser::PrintContext *ctx) override;
+
+  antlrcpp::Any visitFor(GrammarParser::ForContext *ctx) override;
+  antlrcpp::Any visitForInit(GrammarParser::ForInitContext *ctx) override;
+  antlrcpp::Any visitForIncrement(GrammarParser::ForIncrementContext *ctx) override;
 
   antlrcpp::Any visitOp(GrammarParser::OpContext *ctx) override;
   antlrcpp::Any visitNegate(GrammarParser::NegateContext *ctx) override;
@@ -34,4 +38,9 @@ private:
   antlrcpp::Any visitVector(GrammarParser::VectorContext *ctx) override;
   antlrcpp::Any visitIndex(GrammarParser::IndexContext *ctx) override;
   antlrcpp::Any visitElementAssign(GrammarParser::ElementAssignContext *ctx) override;
+
+  antlrcpp::Any visitFunction(GrammarParser::FunctionContext *ctx) override;
+  antlrcpp::Any visitReturn(GrammarParser::ReturnContext *context) override;
+  antlrcpp::Any visitCallStatement(GrammarParser::CallStatementContext *ctx) override;
+  antlrcpp::Any visitCall_expr(GrammarParser::Call_exprContext *ctx) override;
 };

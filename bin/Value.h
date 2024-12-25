@@ -87,3 +87,7 @@ private:
   std::variant<int, float, bool, HeapValue *> _data;
   ValueType _type;
 };
+
+// num, string, array, bool
+// Num + Num int64 -> int128 -> string
+// int, float, string, array, bool
