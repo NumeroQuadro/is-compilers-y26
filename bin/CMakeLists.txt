@@ -8,7 +8,9 @@ add_executable(yal main.cpp
         VirtualMachine.cpp
         VirtualMachine.h
         Instruction.h
-        MyStack.h)
+        MyStack.h
+        Scope.h
+        Scope.cpp)
 
 target_include_directories(yal PRIVATE 
     ${CMAKE_SOURCE_DIR}/include

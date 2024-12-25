@@ -11,8 +11,12 @@ public:
   std::vector<Instruction> code;
 private:
   antlrcpp::Any visitScript(GrammarParser::ScriptContext *ctx) override;
-  antlrcpp::Any visitVardef(GrammarParser::VardefContext *ctx) override;
+  antlrcpp::Any visitBlockStatement(GrammarParser::BlockStatementContext *ctx) override;
+  antlrcpp::Any visitBlock(GrammarParser::BlockContext *context) override;
   antlrcpp::Any visitIf(GrammarParser::IfContext *ctx) override;
+  antlrcpp::Any visitWhile(GrammarParser::WhileContext *ctx) override;
+  // antlrcpp::Any visitFor(GrammarParser::ForContext *ctx) override; // Новый метод
+  antlrcpp::Any visitVardef(GrammarParser::VardefContext *ctx) override;
   antlrcpp::Any visitAssign(GrammarParser::AssignContext *ctx) override;
   antlrcpp::Any visitPrint(GrammarParser::PrintContext *ctx) override;
 

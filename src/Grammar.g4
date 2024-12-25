@@ -85,6 +85,7 @@ RBRACE : '}' ;
 IF : 'if' ;
 ELSE : 'else' ;
 WHILE : 'while' ;
+FOR : 'for' ;
 VAR : 'var' ;
 EQUAL : '=' ;
 RETURN : 'return' ;

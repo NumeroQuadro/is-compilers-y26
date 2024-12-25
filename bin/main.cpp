@@ -72,9 +72,15 @@
 
 int main() {
   std::string input =
-      "var x = 10\n"
-      "var y = 20\n"
-      "if (x > y) print(x + y) else print(x - y)\n";
+    "var x = 1\n"
+    "var i = 1\n"
+    "while (i <= 10)\n"
+    "{\n"
+      "x = x * i\n"
+      "i = i + 1"
+    "}\n"
+    "print(x)\n"
+;
 
   antlr4::ANTLRInputStream inputStream(input);
   GrammarLexer lexer(&inputStream);

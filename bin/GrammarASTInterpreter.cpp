@@ -1,151 +1,190 @@
 #include "GrammarASTInterpreter.h"
-
+#include "GrammarParser.h"
 #include "Instruction.h"
 
 antlrcpp::Any GrammarASTInterpreter::visitScript(GrammarParser::ScriptContext *ctx) {
-  for (const auto v: ctx->vardef()) {
-    visit(v);
-  }
-  for (auto f: ctx->function()) {
-    // no functions
-  }
-  for (const auto s: ctx->statement()) {
-    visit(s);
-  }
-  code.emplace_back(InstructionType::HALT);
-  return nullptr;
+    // Глобальные переменные
+    for (auto v : ctx->vardef()) {
+        visit(v);
+    }
+    // Функции пропустим (для примера)
+    for (auto s : ctx->statement()) {
+        visit(s);
+    }
+    code.emplace_back(InstructionType::HALT);
+    return nullptr;
 }
 
-antlrcpp::Any GrammarASTInterpreter::visitVardef(GrammarParser::VardefContext *ctx) {
-  // var ID = expr
-  visit(ctx->expr());
-  code.emplace_back(InstructionType::STORE_VAR, ctx->ID()->getText());
-  return nullptr;
+antlrcpp::Any GrammarASTInterpreter::visitBlock(GrammarParser::BlockContext *ctx) {
+
+    // блок: '{' (statement|vardef)* '}'
+    // В CodeGenVisitor:
+    // но мы уже в blockStatement вызываем ENTER_SCOPE/EXIT_SCOPE
+    // Здесь просто обойдем содержимое по порядку
+    for (auto c : ctx->children) {
+        // c может быть statement или vardef
+        auto stmt = dynamic_cast<GrammarParser::StatementContext*>(c);
+        if (stmt) visit(stmt);
+        auto vd = dynamic_cast<GrammarParser::VardefContext*>(c);
+        if (vd) visit(vd);
+    }
+    return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitBlockStatement(GrammarParser::BlockStatementContext *ctx) {
+    code.emplace_back(InstructionType::ENTER_SCOPE);
+    visit(ctx->block());
+    code.emplace_back(InstructionType::EXIT_SCOPE);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitIf(GrammarParser::IfContext *ctx) {
-  visit(ctx->expr());
-  const int jmzIndex = static_cast<int>(code.size());
-  code.emplace_back(InstructionType::JMZ, 0);
+    visit(ctx->expr());
+    int jmzIndex = (int)code.size();
+    code.emplace_back(InstructionType::JMZ, 0);
 
-  visit(ctx->statement(0));
-  const int jmpIndex = static_cast<int>(code.size());
-  code.emplace_back(InstructionType::JMP, 0);
+    visit(ctx->statement(0));
+    int jmpIndex = (int)code.size();
+    code.emplace_back(InstructionType::JMP, 0);
 
-  const int elseStart = static_cast<int>(code.size());
-  if (ctx->statement().size() > 1) {
-    visit(ctx->statement(1));
-  }
-  const int endPos = static_cast<int>(code.size());
+    int elseStart = (int)code.size();
+    if(ctx->statement().size() > 1) {
+        visit(ctx->statement(1));
+    }
+    int endPos = (int)code.size();
 
-  code[jmzIndex].intOperand = elseStart;
-  code[jmpIndex].intOperand = endPos;
-  return nullptr;
+    code[jmzIndex].intOperand = elseStart;
+    code[jmpIndex].intOperand = endPos;
+    return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitWhile(GrammarParser::WhileContext *ctx) {
+    int startIp = (int)code.size();
+    visit(ctx->expr());
+    int jmzIndex = (int)code.size();
+    code.emplace_back(InstructionType::JMZ, 0);
+    visit(ctx->statement());
+    code.emplace_back(InstructionType::JMP, startIp);
+    int endIp = (int)code.size();
+    code[jmzIndex].intOperand = endIp;
+    return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitVardef(GrammarParser::VardefContext *ctx) {
+    visit(ctx->expr());
+    // STORE_VAR создаст переменную, если её нет
+    code.emplace_back(InstructionType::STORE_VAR, ctx->ID()->getText());
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitAssign(GrammarParser::AssignContext *ctx) {
-  visit(ctx->expr());
-  code.emplace_back(InstructionType::STORE_VAR, ctx->ID()->getText());
-  return nullptr;
+    visit(ctx->expr());
+    code.emplace_back(InstructionType::STORE_VAR, ctx->ID()->getText());
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitPrint(GrammarParser::PrintContext *ctx) {
-  if (ctx->expr()) {
-    visit(ctx->expr());
-  }
-  code.emplace_back(InstructionType::PRINT);
-  return nullptr;
+    if(ctx->expr()) visit(ctx->expr());
+    code.emplace_back(InstructionType::PRINT);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitOp(GrammarParser::OpContext *ctx) {
-  visit(ctx->expr(0));
-  visit(ctx->expr(1));
-  std::string op = ctx->operator_()->getText();
-  if (op == "+") code.emplace_back(InstructionType::ADD);
-  else if (op == "-") code.emplace_back(InstructionType::SUB);
-  else if (op == "*") code.emplace_back(InstructionType::MUL);
-  else if (op == "/") code.emplace_back(InstructionType::DIV);
-  else if (op == "==") code.emplace_back(InstructionType::EQ);
-  else if (op == "!=") code.emplace_back(InstructionType::NEQ);
-  else if (op == "<") code.emplace_back(InstructionType::LT);
-  else if (op == "<=") code.emplace_back(InstructionType::LE);
-  else if (op == ">") code.emplace_back(InstructionType::GT);
-  else if (op == ">=") code.emplace_back(InstructionType::GE);
-  return nullptr;
+    visit(ctx->expr(0));
+    visit(ctx->expr(1));
+    std::string op = ctx->operator_()->getText();
+    if(op == "+") code.emplace_back(InstructionType::ADD);
+    else if(op == "-") code.emplace_back(InstructionType::SUB);
+    else if(op == "*") code.emplace_back(InstructionType::MUL);
+    else if(op == "/") code.emplace_back(InstructionType::DIV);
+    else if(op == "==") code.emplace_back(InstructionType::EQ);
+    else if(op == "!=") code.emplace_back(InstructionType::NEQ);
+    else if(op == "<") code.emplace_back(InstructionType::LT);
+    else if(op == "<=") code.emplace_back(InstructionType::LE);
+    else if(op == ">") code.emplace_back(InstructionType::GT);
+    else if(op == ">=") code.emplace_back(InstructionType::GE);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitNegate(GrammarParser::NegateContext *ctx) {
-  visit(ctx->expr());
-  code.emplace_back(InstructionType::NEG);
-  return nullptr;
+    visit(ctx->expr());
+    code.emplace_back(InstructionType::NEG);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitNot(GrammarParser::NotContext *ctx) {
-  visit(ctx->expr());
-  code.emplace_back(InstructionType::NOT);
-  return nullptr;
+    visit(ctx->expr());
+    code.emplace_back(InstructionType::NOT);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitParens(GrammarParser::ParensContext *ctx) {
-  return visit(ctx->expr());
+    return visit(ctx->expr());
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitAtom(GrammarParser::AtomContext *ctx) {
-  return visit(ctx->primary());
+    return visit(ctx->primary());
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitIdentifier(GrammarParser::IdentifierContext *ctx) {
-  code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
-  return nullptr;
+    code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitInteger(GrammarParser::IntegerContext *ctx) {
-  int val = std::stoi(ctx->INT()->getText());
-  code.emplace_back(InstructionType::PUSH_INT, val);
-  return nullptr;
+    int val = std::stoi(ctx->INT()->getText());
+    code.emplace_back(InstructionType::PUSH_INT, val);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitString(GrammarParser::StringContext *ctx) {
-  std::string str = ctx->STRING()->getText();
-  str = str.substr(1, str.size() - 2);
-  code.emplace_back(InstructionType::PUSH_STRING, str);
-  return nullptr;
+    std::string str = ctx->STRING()->getText();
+    str = str.substr(1, str.size()-2);
+    code.emplace_back(InstructionType::PUSH_STRING, str);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitTrueLiteral(GrammarParser::TrueLiteralContext *ctx) {
-  code.emplace_back(InstructionType::PUSH_BOOL, true);
-  return nullptr;
+    code.emplace_back(InstructionType::PUSH_BOOL, true);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitFalseLiteral(GrammarParser::FalseLiteralContext *ctx) {
-  code.emplace_back(InstructionType::PUSH_BOOL, false);
-  return nullptr;
+    code.emplace_back(InstructionType::PUSH_BOOL, false);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitVector(GrammarParser::VectorContext *ctx) {
-  int count = static_cast<int>(ctx->expr_list()->expr().size());
-  code.emplace_back(InstructionType::NEW_ARRAY, count);
-  for (int i = 0; i < count; i++) {
-    code.emplace_back(InstructionType::PUSH_VAR, ""); // тут tricky: нет arr в var, значит надо дублировать верх стека
-    visit(ctx->expr_list()->expr(i));
-    code.emplace_back(InstructionType::PUSH_INT, i);
-    code.emplace_back(InstructionType::PUSH_INT, i);
-  }
-
-  return nullptr;
+    int count = (int)ctx->expr_list()->expr().size();
+    code.emplace_back(InstructionType::NEW_ARRAY, count);
+    // Инициализируем каждый элемент
+    for (int i=0; i<count; i++) {
+        // дубль массива
+        code.emplace_back(InstructionType::DUP_TOP);
+        // индекс
+        code.emplace_back(InstructionType::PUSH_INT, i);
+        // значение
+        visit(ctx->expr_list()->expr(i));
+        // теперь на стеке arr, i, val (в порядке: top=val, ниже=i, ниже=arr)
+        // SET_ELEMENT забирает value, index, arr из стека
+        code.emplace_back(InstructionType::SET_ELEMENT);
+    }
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitIndex(GrammarParser::IndexContext *ctx) {
-  code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
-  visit(ctx->expr());
-  code.emplace_back(InstructionType::GET_ELEMENT);
-  return nullptr;
+    // ID[expr]
+    code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
+    visit(ctx->expr());
+    code.emplace_back(InstructionType::GET_ELEMENT);
+    return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitElementAssign(GrammarParser::ElementAssignContext *ctx) {
-  code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
-  visit(ctx->expr(0));
-  visit(ctx->expr(1));
-  code.emplace_back(InstructionType::SET_ELEMENT);
-  return nullptr;
+    // ID[expr] = expr
+    code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
+    visit(ctx->expr(0));
+    visit(ctx->expr(1));
+    code.emplace_back(InstructionType::SET_ELEMENT);
+    return nullptr;
 }

@@ -4,7 +4,6 @@
 
 enum class InstructionType {
   PUSH_INT,
-  PUSH_FLOAT,
   PUSH_BOOL,
   PUSH_STRING,
   PUSH_VAR,
@@ -27,7 +26,11 @@ enum class InstructionType {
   HALT,
   NEW_ARRAY,
   GET_ELEMENT,
-  SET_ELEMENT
+  SET_ELEMENT,
+  ENTER_SCOPE,
+  EXIT_SCOPE,
+  DUP_TOP,
+  SWAP
 };
 
 struct Instruction {
@@ -38,10 +41,18 @@ struct Instruction {
   bool boolOperand = false;
   std::string strOperand;
 
-  explicit Instruction(const InstructionType op) : op(op) {}
-  Instruction(const InstructionType op, const int i) : op(op), intOperand(i) {}
-  Instruction(const InstructionType op, const float f) : op(op), floatOperand(f) {}
-  Instruction(const InstructionType op, const bool b) : op(op), boolOperand(b) {}
-  Instruction(const InstructionType op, std::string s) : op(op), strOperand(std::move(s)) {}
-};
+  explicit Instruction(const InstructionType op) : op(op) {
+  }
 
+  Instruction(const InstructionType op, const int i) : op(op), intOperand(i) {
+  }
+
+  Instruction(const InstructionType op, const float f) : op(op), floatOperand(f) {
+  }
+
+  Instruction(const InstructionType op, const bool b) : op(op), boolOperand(b) {
+  }
+
+  Instruction(const InstructionType op, std::string s) : op(op), strOperand(std::move(s)) {
+  }
+};

@@ -12,12 +12,18 @@ public:
   virtual ~HeapValue() = default;
 };
 
-class ArrayValue : public HeapValue {
+class ArrayValue final : public HeapValue {
 public:
   std::vector<Value> elements;
 
   explicit ArrayValue(const size_t size): elements(size) {
-  };
+  }
+};
+
+class StringValue : public HeapValue {
+public:
+  std::string value;
+  explicit StringValue(std::string v) : value(std::move(v)) {}
 };
 
 enum class ValueType {
