@@ -7,9 +7,10 @@ antlrcpp::Any GrammarASTInterpreter::visitScript(GrammarParser::ScriptContext *c
     visit(v);
   }
 
-  for (const auto f : ctx->function()) {
+  for (const auto f: ctx->function()) {
     visit(f);
   }
+  startPos = code.size();
 
   for (const auto s: ctx->statement()) {
     visit(s);
@@ -20,12 +21,7 @@ antlrcpp::Any GrammarASTInterpreter::visitScript(GrammarParser::ScriptContext *c
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitBlock(GrammarParser::BlockContext *ctx) {
-  // блок: '{' (statement|vardef)* '}'
-  // В CodeGenVisitor:
-  // но мы уже в blockStatement вызываем ENTER_SCOPE/EXIT_SCOPE
-  // Здесь просто обойдем содержимое по порядку
   for (auto c: ctx->children) {
-    // c может быть statement или vardef
     auto stmt = dynamic_cast<GrammarParser::StatementContext *>(c);
     if (stmt) visit(stmt);
     auto vd = dynamic_cast<GrammarParser::VardefContext *>(c);
@@ -43,18 +39,18 @@ antlrcpp::Any GrammarASTInterpreter::visitBlockStatement(GrammarParser::BlockSta
 
 antlrcpp::Any GrammarASTInterpreter::visitIf(GrammarParser::IfContext *ctx) {
   visit(ctx->expr());
-  int jmzIndex = (int) code.size();
-  code.emplace_back(InstructionType::JMZ, 0);
+  const size_t jmzIndex = code.size();
+  code.emplace_back(InstructionType::JMZ, static_cast<int64_t>(0));
 
   visit(ctx->statement(0));
-  int jmpIndex = (int) code.size();
-  code.emplace_back(InstructionType::JMP, 0);
+  const size_t jmpIndex = code.size();
+  code.emplace_back(InstructionType::JMP, static_cast<int64_t>(0));
 
-  int elseStart = (int) code.size();
+  const size_t elseStart = code.size();
   if (ctx->statement().size() > 1) {
     visit(ctx->statement(1));
   }
-  int endPos = (int) code.size();
+  const size_t endPos = code.size();
 
   code[jmzIndex].intOperand = elseStart;
   code[jmpIndex].intOperand = endPos;
@@ -62,13 +58,13 @@ antlrcpp::Any GrammarASTInterpreter::visitIf(GrammarParser::IfContext *ctx) {
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitWhile(GrammarParser::WhileContext *ctx) {
-  int startIp = (int) code.size();
+  const int64_t startIp = code.size();
   visit(ctx->expr());
-  int jmzIndex = (int) code.size();
-  code.emplace_back(InstructionType::JMZ, 0);
+  const int64_t jmzIndex = code.size();
+  code.emplace_back(InstructionType::JMZ, static_cast<int64_t>(0));
   visit(ctx->statement());
   code.emplace_back(InstructionType::JMP, startIp);
-  int endIp = (int) code.size();
+  const int64_t endIp = code.size();
   code[jmzIndex].intOperand = endIp;
   return nullptr;
 }
@@ -80,7 +76,7 @@ antlrcpp::Any GrammarASTInterpreter::visitFor(GrammarParser::ForContext *ctx) {
     visit(ctx->forInit());
   }
 
-  int conditionStart = (int) code.size();
+  const size_t conditionStart = code.size();
 
   if (ctx->forCondition()) {
     visit(ctx->forCondition());
@@ -88,18 +84,18 @@ antlrcpp::Any GrammarASTInterpreter::visitFor(GrammarParser::ForContext *ctx) {
     code.emplace_back(InstructionType::PUSH_BOOL, true);
   }
 
-  int jmzIndex = (int) code.size();
-  code.emplace_back(InstructionType::JMZ, 0);
+  const size_t jmzIndex = code.size();
+  code.emplace_back(InstructionType::JMZ, static_cast<int64_t>(0));
   visit(ctx->statement());
 
   if (ctx->forIncrement()) {
     visit(ctx->forIncrement());
   }
 
-  code.emplace_back(InstructionType::JMP, conditionStart);
+  code.emplace_back(InstructionType::JMP, static_cast<int64_t>(conditionStart));
 
-  int endPos = (int) code.size();
-  code[jmzIndex].intOperand = endPos;
+  const size_t endPos = code.size();
+  code[jmzIndex].intOperand = static_cast<int64_t>(endPos);
 
   code.emplace_back(InstructionType::EXIT_SCOPE);
 
@@ -186,7 +182,7 @@ antlrcpp::Any GrammarASTInterpreter::visitIdentifier(GrammarParser::IdentifierCo
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitInteger(GrammarParser::IntegerContext *ctx) {
-  int val = std::stoi(ctx->INT()->getText());
+  int64_t val = std::stoll(ctx->INT()->getText());
   code.emplace_back(InstructionType::PUSH_INT, val);
   return nullptr;
 }
@@ -209,33 +205,44 @@ antlrcpp::Any GrammarASTInterpreter::visitFalseLiteral(GrammarParser::FalseLiter
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitVector(GrammarParser::VectorContext *ctx) {
-  int count = (int) ctx->expr_list()->expr().size();
-  code.emplace_back(InstructionType::NEW_ARRAY, count);
-  // Инициализируем каждый элемент
-  for (int i = 0; i < count; i++) {
-    // дубль массива
+  const size_t count = ctx->expr_list()->expr().size();
+  code.emplace_back(InstructionType::NEW_ARRAY, static_cast<int64_t>(count));
+  for (int64_t i = 0; i < count; i++) {
     code.emplace_back(InstructionType::DUP_TOP);
-    // индекс
     code.emplace_back(InstructionType::PUSH_INT, i);
-    // значение
     visit(ctx->expr_list()->expr(i));
-    // теперь на стеке arr, i, val (в порядке: top=val, ниже=i, ниже=arr)
-    // SET_ELEMENT забирает value, index, arr из стека
     code.emplace_back(InstructionType::SET_ELEMENT);
   }
   return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitIndex(GrammarParser::IndexContext *ctx) {
-  // ID[expr]
   code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
   visit(ctx->expr());
   code.emplace_back(InstructionType::GET_ELEMENT);
   return nullptr;
 }
 
+antlrcpp::Any GrammarASTInterpreter::visitArraySize(GrammarParser::ArraySizeContext *ctx) {
+  int64_t size = std::stoll(ctx->INT()->getText());
+  code.emplace_back(InstructionType::NEW_ARRAY, size);
+
+  for (int64_t i = 0; i < size; i++) {
+    code.emplace_back(InstructionType::DUP_TOP);
+    code.emplace_back(InstructionType::PUSH_INT, i);
+    code.emplace_back(InstructionType::PUSH_INT, static_cast<int64_t>(0));
+    code.emplace_back(InstructionType::SET_ELEMENT);
+  }
+
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitMethodCall(GrammarParser::MethodCallContext *ctx) {
+  std::cout << 1;
+  return GrammarBaseVisitor::visitMethodCall(ctx);
+}
+
 antlrcpp::Any GrammarASTInterpreter::visitElementAssign(GrammarParser::ElementAssignContext *ctx) {
-  // ID[expr] = expr
   code.emplace_back(InstructionType::PUSH_VAR, ctx->ID()->getText());
   visit(ctx->expr(0));
   visit(ctx->expr(1));
@@ -245,20 +252,23 @@ antlrcpp::Any GrammarASTInterpreter::visitElementAssign(GrammarParser::ElementAs
 
 antlrcpp::Any GrammarASTInterpreter::visitFunction(GrammarParser::FunctionContext *ctx) {
   const std::string funcName = ctx->ID()->getText();
-  functionTable[funcName] = code.size();
 
-  code.emplace_back(InstructionType::ENTER_SCOPE);
-
+  const std::size_t startAddr = code.size();
+  std::vector<std::string> params;
   if (ctx->formal_args()) {
-    for (const auto arg: ctx->formal_args()->formal_arg()) {
-      std::string argType = arg->type()->getText();
-      std::string argName = arg->ID()->getText();
-
-      code.emplace_back(InstructionType::PUSH_VAR, argName);
+    for (const auto fa: ctx->formal_args()->formal_arg()) {
+      std::string argName = fa->ID()->getText();
+      params.emplace_back(argName);
     }
   }
 
-  visit(ctx->block());
+  functionTable[funcName] = FunctionInfo{
+    funcName,
+    params,
+    static_cast<int64_t>(startAddr)
+  };
+
+  visitBlock(ctx->block());
   code.emplace_back(InstructionType::RET);
   return nullptr;
 }
@@ -270,17 +280,19 @@ antlrcpp::Any GrammarASTInterpreter::visitReturn(GrammarParser::ReturnContext *c
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitCallStatement(GrammarParser::CallStatementContext *ctx) {
-  return visit(ctx->call_expr());
+  return GrammarBaseVisitor::visitCallStatement(ctx);
 }
 
-antlrcpp::Any GrammarASTInterpreter::visitCall_expr(GrammarParser::Call_exprContext *ctx) {
-  const std::string funcName = ctx->ID()->getText();
-  const auto it = functionTable.find(funcName);
-  if (it == functionTable.end()) {
-    throw std::runtime_error("Undefined function: " + funcName);
-  }
-  int funcIp = it->second;
 
-  code.emplace_back(InstructionType::CALL, funcIp);
+antlrcpp::Any GrammarASTInterpreter::visitCall_expr(GrammarParser::Call_exprContext *ctx) {
+  if (ctx->expr_list()) {
+    for (const auto e: ctx->expr_list()->expr()) {
+      visit(e);
+    }
+  }
+
+  std::string funcName = ctx->ID()->getText();
+  code.emplace_back(InstructionType::CALL, funcName);
+
   return nullptr;
 }

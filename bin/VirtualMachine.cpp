@@ -3,13 +3,107 @@
 #include <stdexcept>
 #include <functional>
 
-VirtualMachine::VirtualMachine(const std::vector<Instruction> &c) : code(c) {
+#include "FunctionInfo.h"
+
+VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
+                               const std::unordered_map<std::string, FunctionInfo> &functions)
+  : functionTable(functions), code(code) {
   scope_ = new Scope(nullptr);
+
+  functionTable["__pushBack"] = FunctionInfo{
+    "__pushBack",
+    {"array", "value"},
+    -1ll
+  };
+
+  functionTable["__popBack"] = FunctionInfo{
+    "__popBack",
+    {"array"},
+    -1ll
+  };
+
+  functionTable["__size"] = FunctionInfo{
+    "__size",
+    {"array"},
+    1ll
+  };
+}
+
+void VirtualMachine::builtInPushBack() {
+  if (stack.size() < 2) {
+    throw std::runtime_error("pushBack requires 2 arguments: array and value");
+  }
+
+  const Value value = pop();
+  const Value arrayValue = pop();
+
+  if (arrayValue.getType() != ValueType::REF) {
+    throw std::runtime_error("popBack requires an array reference");
+  }
+
+  auto *array = dynamic_cast<ArrayValue *>(arrayValue.asHeapRef());
+  if(!array) {
+    throw std::runtime_error("pushBack requires an array reference");
+  }
+  array->elements.push_back(value);
+  ++ip;
+}
+
+void VirtualMachine::builtInPopBack() {
+  if(stack.empty()) {
+    throw std::runtime_error("popBack requires 1 argument: array");
+  }
+
+  const Value arrayValue = pop();
+
+  if (arrayValue.getType() != ValueType::REF) {
+    throw std::runtime_error("popBack requires an array reference");
+  }
+  auto *array = dynamic_cast<ArrayValue *>(arrayValue.asHeapRef());
+  if (!array) {
+    throw std::runtime_error("popBack requires an array reference");
+  }
+  if(array->elements.empty()) {
+    throw std::runtime_error("Cannot popBack from an empty array");
+  }
+
+  const Value popped = array->elements.back();
+  array->elements.pop_back();
+  push(popped);
+
+  ++ip;
+}
+
+int64_t VirtualMachine::builtInSize() {
+  if(stack.empty()) {
+    throw std::runtime_error("size requires 1 argument: array");
+  }
+
+  const Value arrayValue = pop();
+
+  if (arrayValue.getType() != ValueType::REF) {
+    throw std::runtime_error("size requires an array reference");
+  }
+  const auto *array = dynamic_cast<ArrayValue *>(arrayValue.asHeapRef());
+  if (!array) {
+    throw std::runtime_error("size requires an array reference");
+  }
+
+  const auto size = static_cast<int64_t>(array->elements.size());
+  push(Value(size));
+
+  ++ip;
+}
+
+VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
+                               const std::unordered_map<std::string, FunctionInfo> &functions, const int64_t startPos)
+  : VirtualMachine(code, functions) {
+  ip = startPos;
 }
 
 Value VirtualMachine::pop() {
   if (stack.empty()) throw std::runtime_error("Stack underflow");
-  Value v = stack.top();
+  const Value v = stack.top();
   stack.pop();
   return v;
 }
@@ -27,8 +121,8 @@ template<typename Op>
 void VirtualMachine::binaryOp(Op op) {
   Value b = pop();
   Value a = pop();
-  int ai = a.asInt();
-  int bi = b.asInt();
+  size_t ai = a.asInt();
+  size_t bi = b.asInt();
   push(Value(op(ai, bi)));
   ip++;
 }
@@ -59,9 +153,7 @@ Value VirtualMachine::loadVar(const std::string &name) {
 }
 
 void VirtualMachine::storeVar(const std::string &name, const Value &val) {
-  // Попытка обновить существующую переменную вверх по цепочке скоупов
   if (!scope_->setVar(name, val)) {
-    // Если не нашли – создаём в текущем скоупе
     scope_->createVar(name, val);
   }
 }
@@ -80,10 +172,74 @@ void VirtualMachine::exitScope() {
   delete old;
 }
 
+void VirtualMachine::doCall(const std::string &funcName) {
+  if (funcName == "__pushBack") {
+    builtInPushBack();
+    return;
+  }
+
+  if (funcName == "__popBack") {
+    builtInPopBack();
+    return;
+  }
+
+  if (funcName == "__size") {
+    builtInSize();
+    return;
+  }
+
+  auto it = functionTable.find(funcName);
+  if (it == functionTable.end()) {
+    throw std::runtime_error("Function not found: " + funcName);
+  }
+
+  const auto &[name, paramNames, address] = it->second;
+  const auto newScope = new Scope(nullptr);
+
+  for (int64_t i = paramNames.size() - 1; i >= 0; i--) {
+    Value argVal = pop();
+    newScope->createVar(paramNames[i], argVal);
+  }
+
+  const auto frame = CallFrame {
+    ip + 1,
+    scope_,
+    true
+  };
+
+  callStack.push(frame);
+
+  scope_ = newScope;
+  ip = address;
+}
+
+void VirtualMachine::doRet() {
+  Value retVal;
+  if (!stack.empty()) {
+    retVal = pop();
+  }
+
+  if (callStack.empty()) {
+    ip = static_cast<int64_t>(code.size());
+    return;
+  }
+
+  const auto [returnIp, prevScope, hasReturnValue] = callStack.top();
+  callStack.pop();
+
+  delete scope_;
+  scope_ = prevScope;
+
+  if (hasReturnValue) {
+    push(retVal);
+  }
+
+  ip = returnIp;
+}
+
 void VirtualMachine::run() {
-  while (ip >= 0 && ip < (int) code.size()) {
-    const Instruction &inst = code[ip];
-    switch (inst.op) {
+  while (ip >= 0 && ip < code.size()) {
+    switch (const Instruction &inst = code[ip]; inst.op) {
       case InstructionType::PUSH_INT:
         push(Value(inst.intOperand));
         ip++;
@@ -112,41 +268,43 @@ void VirtualMachine::run() {
         break;
       }
       case InstructionType::ADD:
-        binaryOp(std::plus<int>());
+        binaryOp(std::plus<int64_t>());
         break;
       case InstructionType::SUB:
-        binaryOp(std::minus<int>());
+        binaryOp(std::minus<int64_t>());
         break;
       case InstructionType::MUL:
-        binaryOp(std::multiplies<int>());
+        binaryOp(std::multiplies<int64_t>());
         break;
       case InstructionType::DIV: {
         Value b = pop();
         Value a = pop();
-        int bi = b.asInt();
-        if (bi == 0) throw std::runtime_error("Division by zero");
-        int ai = a.asInt();
+        int64_t bi = b.asInt();
+        if (bi == 0) {
+          throw std::runtime_error("Division by zero");
+        }
+        int64_t ai = a.asInt();
         push(Value(ai / bi));
         ip++;
         break;
       }
       case InstructionType::EQ:
-        cmpOp(std::equal_to<int>());
+        cmpOp(std::equal_to<size_t>());
         break;
       case InstructionType::NEQ:
-        cmpOp(std::not_equal_to<int>());
+        cmpOp(std::not_equal_to<size_t>());
         break;
       case InstructionType::LT:
-        cmpOp(std::less<int>());
+        cmpOp(std::less<size_t>());
         break;
       case InstructionType::LE:
-        cmpOp(std::less_equal<int>());
+        cmpOp(std::less_equal<size_t>());
         break;
       case InstructionType::GT:
-        cmpOp(std::greater<int>());
+        cmpOp(std::greater<size_t>());
         break;
       case InstructionType::GE:
-        cmpOp(std::greater_equal<int>());
+        cmpOp(std::greater_equal<size_t>());
         break;
       case InstructionType::NOT: {
         Value v = pop();
@@ -157,7 +315,7 @@ void VirtualMachine::run() {
       }
       case InstructionType::NEG: {
         Value v = pop();
-        int vi = v.asInt();
+        int64_t vi = v.asInt();
         push(Value(-vi));
         ip++;
         break;
@@ -256,28 +414,11 @@ void VirtualMachine::run() {
         break;
       }
       case InstructionType::CALL: {
-        int funcIp = inst.intOperand;
-
-        CallFrame frame;
-        frame.returnIp = ip + 1;
-        frame.prevScope = scope_;
-        callStack.push(frame);
-
-        enterScope();
-        ip = funcIp;
+        doCall(inst.strOperand);
         break;
       }
       case InstructionType::RET: {
-        if (callStack.empty()) {
-          throw std::runtime_error("RET called without a matching CALL");
-        }
-
-        CallFrame frame = callStack.top();
-        callStack.pop();
-
-        exitScope();
-
-        ip = frame.returnIp;
+        doRet();
         break;
       }
       case InstructionType::HALT:

@@ -5,14 +5,21 @@
 
 #include <stack>
 #include <vector>
+#include <unordered_map>
 
 #include "Scope.h"
 #include "Value.h"
 #include "CallFrame.h"
+#include "FunctionInfo.h"
 
 class VirtualMachine {
 public:
-  explicit VirtualMachine(const std::vector<Instruction> &code);
+  explicit VirtualMachine(const std::vector<Instruction> &code,
+                          const std::unordered_map<std::string, FunctionInfo> &functions);
+
+  explicit VirtualMachine(const std::vector<Instruction> &code,
+                          const std::unordered_map<std::string, FunctionInfo> &functions,
+                          int64_t startPos);
 
   void run();
 
@@ -21,12 +28,13 @@ public:
 private:
   Scope *scope_ = nullptr;
 
+  std::unordered_map<std::string, FunctionInfo> functionTable;
   std::vector<Instruction> code;
   std::stack<Value> stack;
   std::vector<std::unique_ptr<HeapValue> > heap;
   std::stack<CallFrame> callStack;
 
-  int ip = 0;
+  int64_t ip = 0;
 
   Value pop();
 
@@ -51,4 +59,14 @@ private:
   void enterScope();
 
   void exitScope();
+
+  void doCall(const std::string &funcName);
+
+  void doRet();
+
+  void builtInPushBack();
+
+  void builtInPopBack();
+
+  int64_t builtInSize();
 };

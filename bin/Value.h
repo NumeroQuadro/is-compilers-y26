@@ -36,10 +36,10 @@ enum class ValueType {
 class Value {
 public:
   Value() : _type(ValueType::INT) {
-    _data = 0;
+    _data = static_cast<int64_t>(0);
   }
 
-  explicit Value(int v) : _type(ValueType::INT) {
+  explicit Value(int64_t v) : _type(ValueType::INT) {
     _data = v;
   }
 
@@ -55,8 +55,8 @@ public:
     _data = ref;
   }
 
-  [[nodiscard]] int asInt() const {
-    if (_type == ValueType::INT) return std::get<int>(_data);
+  [[nodiscard]] int64_t asInt() const {
+    if (_type == ValueType::INT) return std::get<int64_t>(_data);
     throw std::runtime_error("Value is not int");
   }
 
@@ -75,7 +75,7 @@ public:
     throw std::runtime_error("Value is not heap reference");
   }
 
-  [[nodiscard]] std::variant<int, float, bool, HeapValue *> getValue() const {
+  [[nodiscard]] std::variant<int64_t, float, bool, HeapValue *> getValue() const {
     return _data;
   }
 
@@ -84,7 +84,7 @@ public:
   }
 
 private:
-  std::variant<int, float, bool, HeapValue *> _data;
+  std::variant<int64_t, float, bool, HeapValue *> _data;
   ValueType _type;
 };
 

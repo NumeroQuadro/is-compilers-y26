@@ -38,7 +38,7 @@ enum class InstructionType {
 struct Instruction {
   InstructionType op;
 
-  int intOperand = 0;
+  int64_t intOperand = 0;
   float floatOperand = 0.0f;
   bool boolOperand = false;
   std::string strOperand;
@@ -46,7 +46,7 @@ struct Instruction {
   explicit Instruction(const InstructionType op) : op(op) {
   }
 
-  Instruction(const InstructionType op, const int i) : op(op), intOperand(i) {
+  Instruction(const InstructionType op, const int64_t i) : op(op), intOperand(i) {
   }
 
   Instruction(const InstructionType op, const float f) : op(op), floatOperand(f) {

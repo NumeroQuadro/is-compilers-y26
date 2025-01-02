@@ -2,6 +2,7 @@
 #include "Scope.h"
 
 struct CallFrame {
-  int returnIp;
+  int64_t returnIp;
   Scope* prevScope;
+  bool hasReturnValue;
 };

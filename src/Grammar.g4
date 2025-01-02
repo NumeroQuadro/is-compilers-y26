@@ -1,17 +1,5 @@
-/** A simple language for use with this sample plugin.
- *  It's C-like but without semicolons. Symbol resolution semantics are
- *  C-like: resolve symbol in current scope. If not in this scope, ask
- *  enclosing scope to resolve (recurse up tree until no more scopes or found).
- *  Forward refs allowed for functions but not variables. Globals must
- *  appear first syntactically.
- *
- *  Generate the parser via "mvn compile" from root dir of project.
- */
 grammar Grammar;
 
-/** The start rule must be whatever you would normally use, such as script
- *  or compilationUnit, etc...
- */
 script
 	:	vardef* function* statement* EOF
 	;
@@ -71,6 +59,7 @@ expr
 	|	'-' expr											# Negate
 	|	'!' expr											# Not
 	|	call_expr											# Call
+    |   ID '->' ID '(' expr_list? ')'                       # MethodCall
 	|	ID '[' expr ']'										# Index
 	|	'(' expr ')'										# Parens
 	|	primary												# Atom
@@ -79,7 +68,8 @@ expr
 operator  : MUL|DIV|ADD|SUB|GT|GE|LT|LE|EQUAL_EQUAL|NOT_EQUAL|OR|AND|DOT ; // no implicit precedence
 
 call_expr
-	: ID '(' expr_list? ')' ;
+	: ID '(' expr_list? ')'
+	;
 
 expr_list : expr (',' expr)* ;
 
@@ -88,6 +78,7 @@ primary
 	|	INT													# Integer
 	|	FLOAT												# Float
 	|	STRING												# String
+	|   '[' '..' INT ']'                                    # ArraySize
 	|	'[' expr_list ']'									# Vector
 	|	'true'												# TrueLiteral
 	|	'false'												# FalseLiteral
@@ -147,12 +138,6 @@ fragment ESC :   '\\' ["\bfnrt] ;
 
 WS : [ \t\n\r]+ -> channel(HIDDEN) ;
 
-/** "catch all" rule for any char not matche in a token rule of your
- *  grammar. Lexers in Intellij must return all tokens good and bad.
- *  There must be a token to cover all characters, which makes sense, for
- *  an IDE. The parser however should not see these bad tokens because
- *  it just confuses the issue. Hence, the hidden channel.
- */
 ERRCHAR
 	:	.	-> channel(HIDDEN)
 	;

@@ -1,5 +1,6 @@
 #pragma once
 #include "antlr4-runtime.h"
+#include "FunctionInfo.h"
 #include "GrammarBaseVisitor.h"
 #include "GrammarParser.h"
 #include "Value.h"
@@ -9,8 +10,10 @@ struct Instruction;
 class GrammarASTInterpreter final : public GrammarBaseVisitor {
 public:
   std::vector<Instruction> code;
-  std::unordered_map<std::string, int> functionTable;
+  std::unordered_map<std::string, FunctionInfo> functionTable;
+  size_t startPos = 0;
 private:
+
   antlrcpp::Any visitScript(GrammarParser::ScriptContext *ctx) override;
   antlrcpp::Any visitBlockStatement(GrammarParser::BlockStatementContext *ctx) override;
   antlrcpp::Any visitBlock(GrammarParser::BlockContext *ctx) override;
@@ -37,6 +40,8 @@ private:
 
   antlrcpp::Any visitVector(GrammarParser::VectorContext *ctx) override;
   antlrcpp::Any visitIndex(GrammarParser::IndexContext *ctx) override;
+  antlrcpp::Any visitArraySize(GrammarParser::ArraySizeContext *ctx) override;
+  antlrcpp::Any visitMethodCall(GrammarParser::MethodCallContext *ctx) override;
   antlrcpp::Any visitElementAssign(GrammarParser::ElementAssignContext *ctx) override;
 
   antlrcpp::Any visitFunction(GrammarParser::FunctionContext *ctx) override;

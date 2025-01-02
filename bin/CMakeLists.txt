@@ -11,7 +11,8 @@ add_executable(yal main.cpp
         MyStack.h
         Scope.h
         Scope.cpp
-        CallFrame.h)
+        CallFrame.h
+        FunctionInfo.h)
 
 target_include_directories(yal PRIVATE 
     ${CMAKE_SOURCE_DIR}/include
