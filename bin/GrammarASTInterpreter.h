@@ -3,9 +3,7 @@
 #include "FunctionInfo.h"
 #include "GrammarBaseVisitor.h"
 #include "GrammarParser.h"
-#include "Value.h"
-
-struct Instruction;
+#include "Instruction.h"
 
 class GrammarASTInterpreter final : public GrammarBaseVisitor {
 public:

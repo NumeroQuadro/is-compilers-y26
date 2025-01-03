@@ -74,7 +74,7 @@ void VirtualMachine::builtInPopBack() {
   ++ip;
 }
 
-int64_t VirtualMachine::builtInSize() {
+void VirtualMachine::builtInSize() {
   if(stack.empty()) {
     throw std::runtime_error("size requires 1 argument: array");
   }
@@ -144,7 +144,7 @@ HeapValue *VirtualMachine::allocHeap(std::unique_ptr<HeapValue> hv) {
   return ptr;
 }
 
-Value VirtualMachine::loadVar(const std::string &name) {
+Value VirtualMachine::loadVar(const std::string &name) const {
   Value out;
   if (!scope_->findVar(name, out)) {
     throw std::runtime_error("Undefined variable: " + name);
@@ -152,13 +152,13 @@ Value VirtualMachine::loadVar(const std::string &name) {
   return out;
 }
 
-void VirtualMachine::storeVar(const std::string &name, const Value &val) {
+void VirtualMachine::storeVar(const std::string &name, const Value &val) const {
   if (!scope_->setVar(name, val)) {
     scope_->createVar(name, val);
   }
 }
 
-void VirtualMachine::createVar(const std::string &name, const Value &val) {
+void VirtualMachine::createVar(const std::string &name, const Value &val) const {
   scope_->createVar(name, val);
 }
 
@@ -362,19 +362,42 @@ void VirtualMachine::run() {
         break;
       }
       case InstructionType::NEW_ARRAY: {
-        auto arr = std::make_unique<ArrayValue>((size_t) inst.intOperand);
-        HeapValue *ref = allocHeap(std::move(arr));
+        int64_t size;
+        if (inst.strOperand == "__stack") {
+          if (stack.empty()) {
+            throw std::runtime_error("NEW_ARRAY: stack underflow (need size on stack)");
+          }
+          Value sizeVal = pop();
+          size = sizeVal.asInt();
+        } else {
+          size = inst.intOperand;
+        }
+
+        if(size < 0) {
+          throw std::runtime_error("NEW_ARRAY: negative size is not allowed");
+        }
+
+        auto arrPtr = std::make_unique<ArrayValue>(size);
+        HeapValue* ref = allocHeap(std::move(arrPtr));
+
         push(Value(ref));
+
         ip++;
         break;
+
+        // auto arr = std::make_unique<ArrayValue>(inst.intOperand);
+        // HeapValue *ref = allocHeap(std::move(arr));
+        // push(Value(ref));
+        // ip++;
+        // break;
       }
       case InstructionType::GET_ELEMENT: {
         Value idxVal = pop();
         Value arrVal = pop();
-        int idx = idxVal.asInt();
-        ArrayValue *arr = dynamic_cast<ArrayValue *>(arrVal.asHeapRef());
+        int64_t idx = idxVal.asInt();
+        auto *arr = dynamic_cast<ArrayValue *>(arrVal.asHeapRef());
         if (!arr) throw std::runtime_error("Not an array");
-        if (idx < 0 || idx >= (int) arr->elements.size()) throw std::runtime_error("Array index out of bounds");
+        if (idx < 0 || idx >= arr->elements.size()) throw std::runtime_error("Array index out of bounds");
         push(arr->elements[idx]);
         ip++;
         break;
@@ -383,10 +406,10 @@ void VirtualMachine::run() {
         Value val = pop();
         Value idxVal2 = pop();
         Value arrVal2 = pop();
-        int idx2 = idxVal2.asInt();
-        ArrayValue *arr2 = dynamic_cast<ArrayValue *>(arrVal2.asHeapRef());
+        int64_t idx2 = idxVal2.asInt();
+        auto *arr2 = dynamic_cast<ArrayValue *>(arrVal2.asHeapRef());
         if (!arr2) throw std::runtime_error("Not an array");
-        if (idx2 < 0 || idx2 >= (int) arr2->elements.size()) throw std::runtime_error("Array index out of bounds");
+        if (idx2 < 0 || idx2 >= arr2->elements.size()) throw std::runtime_error("Array index out of bounds");
         arr2->elements[idx2] = val;
         ip++;
         break;

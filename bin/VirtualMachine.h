@@ -50,11 +50,11 @@ private:
 
   HeapValue *allocHeap(std::unique_ptr<HeapValue> hv);
 
-  Value loadVar(const std::string &name);
+  Value loadVar(const std::string &name) const;
 
-  void createVar(const std::string &name, const Value &val);
+  void createVar(const std::string &name, const Value &val) const;
 
-  void storeVar(const std::string &name, const Value &val);
+  void storeVar(const std::string &name, const Value &val) const;
 
   void enterScope();
 
@@ -68,5 +68,5 @@ private:
 
   void builtInPopBack();
 
-  int64_t builtInSize();
+  void builtInSize();
 };

@@ -52,9 +52,9 @@ struct Instruction {
   Instruction(const InstructionType op, const float f) : op(op), floatOperand(f) {
   }
 
-  Instruction(const InstructionType op, const bool b) : op(op), boolOperand(b) {
+  Instruction(const InstructionType op, std::string s) : op(op), strOperand(std::move(s)) {
   }
 
-  Instruction(const InstructionType op, std::string s) : op(op), strOperand(std::move(s)) {
+  Instruction(const InstructionType op, const bool b) : op(op), boolOperand(b) {
   }
 };

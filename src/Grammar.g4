@@ -78,7 +78,7 @@ primary
 	|	INT													# Integer
 	|	FLOAT												# Float
 	|	STRING												# String
-	|   '[' '..' INT ']'                                    # ArraySize
+	|   '[' '..' expr ']'                                   # ArraySize
 	|	'[' expr_list ']'									# Vector
 	|	'true'												# TrueLiteral
 	|	'false'												# FalseLiteral

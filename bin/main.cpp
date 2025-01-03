@@ -64,6 +64,7 @@
 // }
 
 
+#include <cmath>
 #include <iostream>
 #include "antlr4-runtime.h"
 #include "GrammarLexer.h"
@@ -83,44 +84,73 @@ int main() {
   }
   )";
 
-  std::string arraySorting = R"(
-func partition(vec: [int], low: int, high: int) {
-  var pivot = vec[high]
-  var = low - 1
+  std::string mergeSort = R"(
+func merge (arr: [], left: int, mid: int, right: int) {
+  var n1 = mid - left + 1
+  var n2 = right - mid
 
-  for (int j = low; j <= high - 1; j = j + 1) {
-    if (vec[j] <= pivot) {
-      i = i + 1
-      var tmp = vec[i]
-      vec[i] = vec[j]
-      vec[j] = tmp
-    }
+  var l = [..n1]
+  var r = [..n2]
+
+  for (var i = 0; i < n1; i = i + 1) {
+    l[i] = arr[left + i]
   }
 
-  var tmp = vec[i + 1]
-  vec[i + 1] = vec[j]
-  vec[j] = tmp
+  for (var i = 0; i < n2; i = i + 1) {
+    r[i] = arr[mid + 1 + i]
+  }
 
-  i = i + 1
-  return i
+  var i = 0
+  var j = 0
+  var k = left
+
+  while (i < n1 && j < n2) {
+    if (l[i] <= r[j]) {
+      arr[k] = l[i]
+      i = i + 1
+    } else {
+      arr[k] = r[j]
+      j = j + 1
+    }
+    k = k + 1
+  }
+
+  while (i < n1) {
+    arr[k] = l[i]
+    i = i + 1
+    k = k + 1
+  }
+
+  while (j < n2) {
+    arr[k] = r[j]
+    j = j + 1
+    k = k + 1
+  }
 }
 
-func quickSort(vec: [int], low: int, high: int) {
-  if (low < high) {
-    int pi = partition(vec, low, high)
-
-    quickSort(vec, low, pi - 1)
-    quickSort(vec, pi + 1, high)
+func mergeSort(arr: [], left: int, right: int) {
+  if (left >= right) {
+    return 0
   }
+
+  var tmp = right - left
+  tmp = tmp / 2
+  var mid = left + tmp
+  mergeSort(arr, left, mid)
+  mergeSort(arr, mid + 1, right)
+  // merge(arr, left, mid, right)
 }
 
 {
-  vec = [4, 3, 2, 1]
-  n = 4
+  var n = 10000
+  var vec = [..n]
+  for (var i = 0; i < n; i = i + 1) {
+    vec[i] = n - i
+  }
 
-  quickSort(vec, 0, n - 1)
-  for (var i = 0; i < n; i++) {
-    print(i)
+  mergeSort(vec, 0, n - 1)
+  for (var i = 0; i < n; i = i + 1) {
+    print(vec[i])
   }
 }
 )";
@@ -131,20 +161,14 @@ func quickSort(vec: [int], low: int, high: int) {
 
   std::string experiment = R"(
 {
-    var arr = [..4]
-    __pushBack(arr, 3)
-
-    print(__size(arr))
-    for (var i = 0; i < 5; i = i + 1) {
-      print(arr[i])
-    }
-
-    __popBack(arr)
-    print(__size(arr))
+  var n = 10
+  for (var j = n; j <= 20; j = j + 1) {
+    print(j)
+  }
 }
   )";
 
-  antlr4::ANTLRInputStream inputStream(experiment);
+  antlr4::ANTLRInputStream inputStream(mergeSort);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
@@ -157,5 +181,65 @@ func quickSort(vec: [int], low: int, high: int) {
   VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
   vm.run();
 
+  return 0;
+}
+
+using namespace std;
+
+int partition(vector<int> &vec, int low, int high) {
+
+  // Selecting last element as the pivot
+  int pivot = vec[high];
+
+  // Index of elemment just before the last element
+  // It is used for swapping
+  int i = (low - 1);
+
+  for (int j = low; j <= high - 1; j++) {
+
+    // If current element is smaller than or
+    // equal to pivot
+    if (vec[j] <= pivot) {
+      i++;
+      swap(vec[i], vec[j]);
+    }
+  }
+
+  // Put pivot to its position
+  swap(vec[i + 1], vec[high]);
+
+  // Return the point of partition
+  return (i + 1);
+}
+
+void quickSort(vector<int> &vec, int low, int high) {
+
+  // Base case: This part will be executed till the starting
+  // index low is lesser than the ending index high
+  cout << low;
+  cout << high;
+  if (low < high) {
+
+    // pi is Partitioning Index, arr[p] is now at
+    // right place
+    int pi = partition(vec, low, high);
+    cout << pi;
+    // Separately sort elements before and after the
+    // Partition Index pi
+    quickSort(vec, low, pi - 1);
+    quickSort(vec, pi + 1, high);
+  }
+}
+
+int main2() {
+  vector<int> vec = {4, 3, 2, 1};
+  int n = vec.size();
+
+  // Calling quicksort for the vector vec
+  quickSort(vec, 0, n - 1);
+
+  for (auto i : vec) {
+    cout << i << " ";
+  }
   return 0;
 }

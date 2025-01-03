@@ -224,16 +224,12 @@ antlrcpp::Any GrammarASTInterpreter::visitIndex(GrammarParser::IndexContext *ctx
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitArraySize(GrammarParser::ArraySizeContext *ctx) {
-  int64_t size = std::stoll(ctx->INT()->getText());
-  code.emplace_back(InstructionType::NEW_ARRAY, size);
-
-  for (int64_t i = 0; i < size; i++) {
-    code.emplace_back(InstructionType::DUP_TOP);
-    code.emplace_back(InstructionType::PUSH_INT, i);
-    code.emplace_back(InstructionType::PUSH_INT, static_cast<int64_t>(0));
-    code.emplace_back(InstructionType::SET_ELEMENT);
-  }
-
+  visit(ctx->expr());
+  auto instruction = Instruction {
+    InstructionType::NEW_ARRAY,
+  };
+  instruction.strOperand = "__stack";
+  code.emplace_back(instruction);
   return nullptr;
 }
 
