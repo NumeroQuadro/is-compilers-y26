@@ -158,7 +158,7 @@ struct Instruction {
                 oss << "RET";
                 break;
         }
-        oss << " " << std::to_string(intOperand) << " " << strOperand << " " << std::to_string(boolOperand);
+        oss << " " << std::to_string(intOperand) << " " << strOperand << " " << (boolOperand ? "true" : "false");
 
         return oss.str();
     }
@@ -236,10 +236,11 @@ struct Instruction {
     bool operator==(const Instruction &other) const {
         if (op != other.op) return false;
 
-        return (intOperand == other.intOperand) && (boolOperand == other.boolOperand) && (strOperand == other.strOperand);
+        return (intOperand == other.intOperand) && (boolOperand == other.boolOperand) &&
+               (strOperand == other.strOperand);
     }
 
-    bool operator!=(const Instruction& other) const {
+    bool operator!=(const Instruction &other) const {
         return !(*this == other);
     }
 };

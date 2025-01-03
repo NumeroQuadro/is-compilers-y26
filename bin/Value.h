@@ -57,7 +57,8 @@ public:
 
   [[nodiscard]] int64_t asInt() const {
     if (_type == ValueType::INT) return std::get<int64_t>(_data);
-    throw std::runtime_error("Value is not int");
+    if (_type == ValueType::BOOL) return std::get<bool>(_data);
+    throw std::runtime_error("Value is not int and cannot be casted to int");
   }
 
   [[nodiscard]] float asFloat() const {

@@ -24,7 +24,7 @@ VirtualMachine::VirtualMachine() {
     functionTable["__size"] = FunctionInfo{
             "__size",
             {"array"},
-            1ll
+            -1ll
     };
 }
 
@@ -48,9 +48,10 @@ VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
     functionTable["__size"] = FunctionInfo{
             "__size",
             {"array"},
-            1ll
+            -1ll
     };
     waitFile = false;
+    start_adress = ip;
 }
 
 void VirtualMachine::builtInPushBack() {
@@ -123,6 +124,7 @@ VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
                                const std::unordered_map<std::string, FunctionInfo> &functions, const int64_t startPos)
         : VirtualMachine(code, functions) {
     ip = startPos;
+    start_adress = startPos;
 }
 
 Value VirtualMachine::pop() {
@@ -212,9 +214,12 @@ void VirtualMachine::doCall(const std::string &funcName) {
         return;
     }
 
+    if (isOptimized && optimized_functions.find(funcName) == optimized_functions.end()) {
+        optimizeFunction(funcName);
+    }
+
     auto it = functionTable.find(funcName);
     if (it == functionTable.end()) {
-        std::cout << ip << " " << funcName;
         throw std::runtime_error("Function not found: " + code[ip].toStr());
     }
 
@@ -270,6 +275,9 @@ void VirtualMachine::run() {
 
     while (ip >= 0 && ip < code.size()) {
         switch (const Instruction &inst = code[ip]; inst.op) {
+            case InstructionType::JMP:
+                ip = inst.intOperand;
+                break;
             case InstructionType::PUSH_INT:
                 push(Value(inst.intOperand));
                 ip++;
@@ -350,9 +358,7 @@ void VirtualMachine::run() {
                 ip++;
                 break;
             }
-            case InstructionType::JMP:
-                ip = inst.intOperand;
-                break;
+
             case InstructionType::JMZ: {
                 Value v = pop();
                 bool val = v.asBool();
@@ -439,7 +445,8 @@ void VirtualMachine::run() {
                 int64_t idx2 = idxVal2.asInt();
                 auto *arr2 = dynamic_cast<ArrayValue *>(arrVal2.asHeapRef());
                 if (!arr2) throw std::runtime_error("Not an array");
-                if (idx2 < 0 || idx2 >= arr2->elements.size()) throw std::runtime_error("Array index out of bounds" + code[ip].toStr());
+                if (idx2 < 0 || idx2 >= arr2->elements.size())
+                    throw std::runtime_error("Array index out of bounds" + code[ip].toStr());
                 arr2->elements[idx2] = val;
                 ip++;
                 break;
@@ -530,9 +537,65 @@ void VirtualMachine::fromFile(const std::string &path) {
         code.push_back(Instruction::fromStr(line));
     }
 
+    start_adress = ip;
     waitFile = false;
 }
 
 std::vector<Instruction> VirtualMachine::getInstructions() {
     return code;
+}
+
+void VirtualMachine::optimize(bool optimizeOn = true) {
+    isOptimized = optimizeOn;
+}
+
+void VirtualMachine::optimizeFunction(const std::string &function_name) {
+    auto iter = functionTable.find(function_name);
+    if (iter == functionTable.end()) {
+        throw std::runtime_error("Function not found: " + code[ip].toStr());
+    }
+
+    int64_t address = iter->second.address;
+    int64_t next_function_adress = start_adress;
+    for (auto &p: functionTable) {
+        if (p.second.address > address) {
+            next_function_adress = std::min(next_function_adress, p.second.address);
+        }
+    }
+
+    std::unordered_set<std::string> usedVariables;
+
+    for (int64_t i = next_function_adress - 1; i >= address; i--) {
+        if (code[i].op == InstructionType::RET || code[i].op == InstructionType::PUSH_VAR) {
+            usedVariables.insert(code[i].strOperand);
+        } else if (code[i].op == InstructionType::STORE_VAR) {
+            if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
+                int64_t k = 1;
+                --i;
+                while (code[i].op == InstructionType::ADD
+                       || code[i].op == InstructionType::MUL
+                       || code[i].op == InstructionType::SUB
+                       || code[i].op == InstructionType::DIV
+                       || code[i].op == InstructionType::PUSH_INT
+                       || code[i].op == InstructionType::PUSH_BOOL
+                       || code[i].op == InstructionType::PUSH_STRING
+                       || code[i].op == InstructionType::PUSH_VAR) {
+                    --i;
+                    k++;
+                }
+                ++i;
+                code[i] = Instruction(InstructionType::JMP, k + i);
+                while (code[i + k].op == InstructionType::JMP) {
+                    k = code[i + k].intOperand - i;
+                    code[i] = Instruction(InstructionType::JMP, k + i);
+                }
+                continue;
+            }
+        }
+    }
+
+//    for (int64_t i = address; i < next_function_adress; i++) {
+//        std::cout << code[i].toStr() << '\n';
+//    }
+    optimized_functions.insert(function_name);
 }

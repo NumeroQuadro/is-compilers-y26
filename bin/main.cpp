@@ -160,15 +160,25 @@ func mergeSort(arr: [], left: int, right: int) {
 )";
 
   std::string experiment = R"(
-{
-  var n = 10
-  for (var j = n; j <= 20; j = j + 1) {
-    print(j)
-  }
+func test(left: int, right: int) {
+var res = left + right
+var a = (5 == 5)
+if (a == true) {
+    print(a)
 }
+var c = 3
+var z = (3 + c + 4) * 3
+var b = 2
+return res
+}
+{
+    var value = test(62, 54)
+    var value = test(1, 2)
+    print(value)
+  }
   )";
 
-  antlr4::ANTLRInputStream inputStream(mergeSort);
+  antlr4::ANTLRInputStream inputStream(experiment);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
@@ -180,6 +190,7 @@ func mergeSort(arr: [], left: int, right: int) {
   visitor.toFile("test.txt");
 
   VirtualMachine vm;
+  vm.optimize(true);
   vm.fromFile("test.txt");
   auto code = vm.getInstructions();
   for (int i = 0; i < code.size(); i++) {

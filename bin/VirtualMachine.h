@@ -7,6 +7,7 @@
 #include <stack>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <fstream>
 #include <sstream>
 
@@ -18,6 +19,7 @@
 class VirtualMachine {
 public:
     VirtualMachine();
+
     explicit VirtualMachine(const std::vector<Instruction> &code,
                             const std::unordered_map<std::string, FunctionInfo> &functions);
 
@@ -33,6 +35,8 @@ public:
 
     std::vector<Instruction> getInstructions();
 
+    void optimize(bool optimizeOn);
+
 private:
     Scope *scope_ = nullptr;
 
@@ -42,6 +46,9 @@ private:
     std::vector<std::unique_ptr<HeapValue> > heap;
     std::stack<CallFrame> callStack;
     bool waitFile = true;
+    bool isOptimized = false;
+    std::unordered_set<std::string> optimized_functions;
+    int64_t start_adress;
 
     int64_t ip = 0;
 
@@ -78,4 +85,6 @@ private:
     void builtInPopBack();
 
     void builtInSize();
+
+    void optimizeFunction(const std::string &function_name);
 };
