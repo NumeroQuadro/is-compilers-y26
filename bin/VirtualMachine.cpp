@@ -147,6 +147,8 @@ template<typename Op>
 void VirtualMachine::binaryOp(Op op) {
     Value b = pop();
     Value a = pop();
+    if (a.getType() != b.getType())
+        throw std::runtime_error("Different types of a and b exception in binaryOp!");
     size_t ai = a.asInt();
     size_t bi = b.asInt();
     push(Value(op(ai, bi)));
@@ -157,8 +159,16 @@ template<typename Op>
 void VirtualMachine::cmpOp(Op op) {
     Value b = pop();
     Value a = pop();
-    int ai = a.asInt();
-    int bi = b.asInt();
+    if (a.getType() != b.getType())
+        throw std::runtime_error("Different types of a and b exception in cmpOp!");
+    size_t ai, bi;
+    if (a.getType() == ValueType::BOOL) {
+        ai = a.asBool();
+        bi = b.asBool();
+    } else {
+        ai = a.asInt();
+        bi = b.asInt();
+    }
     bool r = op(ai, bi);
     push(Value(r));
     ip++;
