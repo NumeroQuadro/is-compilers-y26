@@ -177,9 +177,22 @@ func mergeSort(arr: [], left: int, right: int) {
 
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
+  visitor.toFile("test.txt");
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+  VirtualMachine vm;
+  vm.fromFile("test.txt");
+  auto code = vm.getInstructions();
+  for (int i = 0; i < code.size(); i++) {
+      if (code[i] != visitor.code[i]) {
+          std::cout << "Error in instruction " + std::to_string(i) + "\n";
+          std::cout << code[i].toStr() << "\n";
+          std::cout << visitor.code[i].toStr() << "\n";
+      }
+  }
   vm.run();
+
+//    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+//    vm.run();
 
   return 0;
 }

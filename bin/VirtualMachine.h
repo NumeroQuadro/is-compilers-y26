@@ -1,4 +1,5 @@
 #pragma once
+
 #include <memory>
 
 #include "Instruction.h"
@@ -6,6 +7,8 @@
 #include <stack>
 #include <vector>
 #include <unordered_map>
+#include <fstream>
+#include <sstream>
 
 #include "Scope.h"
 #include "Value.h"
@@ -14,59 +17,65 @@
 
 class VirtualMachine {
 public:
-  explicit VirtualMachine(const std::vector<Instruction> &code,
-                          const std::unordered_map<std::string, FunctionInfo> &functions);
+    VirtualMachine();
+    explicit VirtualMachine(const std::vector<Instruction> &code,
+                            const std::unordered_map<std::string, FunctionInfo> &functions);
 
-  explicit VirtualMachine(const std::vector<Instruction> &code,
-                          const std::unordered_map<std::string, FunctionInfo> &functions,
-                          int64_t startPos);
+    explicit VirtualMachine(const std::vector<Instruction> &code,
+                            const std::unordered_map<std::string, FunctionInfo> &functions,
+                            int64_t startPos);
 
-  void run();
+    void run();
 
-  [[nodiscard]] std::vector<Instruction> getInstructions() const;
+    [[nodiscard]] std::vector<Instruction> getInstructions() const;
+
+    void fromFile(const std::string &path);
+
+    std::vector<Instruction> getInstructions();
 
 private:
-  Scope *scope_ = nullptr;
+    Scope *scope_ = nullptr;
 
-  std::unordered_map<std::string, FunctionInfo> functionTable;
-  std::vector<Instruction> code;
-  std::stack<Value> stack;
-  std::vector<std::unique_ptr<HeapValue> > heap;
-  std::stack<CallFrame> callStack;
+    std::unordered_map<std::string, FunctionInfo> functionTable;
+    std::vector<Instruction> code;
+    std::stack<Value> stack;
+    std::vector<std::unique_ptr<HeapValue> > heap;
+    std::stack<CallFrame> callStack;
+    bool waitFile = true;
 
-  int64_t ip = 0;
+    int64_t ip = 0;
 
-  Value pop();
+    Value pop();
 
-  Value top();
+    Value top();
 
-  void push(const Value &v);
+    void push(const Value &v);
 
-  template<typename Op>
-  void binaryOp(Op op);
+    template<typename Op>
+    void binaryOp(Op op);
 
-  template<typename Op>
-  void cmpOp(Op op);
+    template<typename Op>
+    void cmpOp(Op op);
 
-  HeapValue *allocHeap(std::unique_ptr<HeapValue> hv);
+    HeapValue *allocHeap(std::unique_ptr<HeapValue> hv);
 
-  Value loadVar(const std::string &name) const;
+    Value loadVar(const std::string &name) const;
 
-  void createVar(const std::string &name, const Value &val) const;
+    void createVar(const std::string &name, const Value &val) const;
 
-  void storeVar(const std::string &name, const Value &val) const;
+    void storeVar(const std::string &name, const Value &val) const;
 
-  void enterScope();
+    void enterScope();
 
-  void exitScope();
+    void exitScope();
 
-  void doCall(const std::string &funcName);
+    void doCall(const std::string &funcName);
 
-  void doRet();
+    void doRet();
 
-  void builtInPushBack();
+    void builtInPushBack();
 
-  void builtInPopBack();
+    void builtInPopBack();
 
-  void builtInSize();
+    void builtInSize();
 };

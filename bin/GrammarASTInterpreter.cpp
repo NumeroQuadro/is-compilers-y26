@@ -292,3 +292,28 @@ antlrcpp::Any GrammarASTInterpreter::visitCall_expr(GrammarParser::Call_exprCont
 
   return nullptr;
 }
+
+void GrammarASTInterpreter::toFile(const std::string& path) {
+    std::ofstream outFile(path);
+    if (!outFile.is_open()) {
+        throw std::runtime_error("Failed to open file: " + path);
+    }
+
+    outFile << startPos << "\n";
+
+    outFile << functionTable.size() << "\n";
+    for (const auto& [name, funcInfo] : functionTable) {
+        outFile << funcInfo.name << " " << funcInfo.address;
+        for (const auto& param : funcInfo.paramNames) {
+            outFile << " " << param;
+        }
+        outFile << "\n";
+    }
+
+    outFile << code.size() << "\n";
+    for (auto& instruction : code) {
+        outFile << instruction.toStr() << "\n";
+    }
+
+    outFile.close();
+}
