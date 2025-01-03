@@ -1,7 +1,7 @@
 #include "Scope.h"
 
 bool Scope::findVar(const std::string &name, Value &out) const {
-    auto it = values.find(name);
+    const auto it = values.find(name);
     if (it != values.end()) {
       out = it->second;
       return true;
@@ -11,7 +11,7 @@ bool Scope::findVar(const std::string &name, Value &out) const {
 }
 
 bool Scope::setVar(const std::string &name, const Value &val) {
-  auto it = values.find(name);
+  const auto it = values.find(name);
   if (it != values.end()) {
     it->second = val;
     return true;

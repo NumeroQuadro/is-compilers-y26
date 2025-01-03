@@ -12,8 +12,7 @@ formal_args : formal_arg (',' formal_arg)* ;
 
 formal_arg : ID ':' type ;
 
-type:	'int'                                               # IntTypeSpec
-	|	'float'                                             # FloatTypeSpec
+type:	'num'                                               # NumTypeSpec
 	|	'string'                                            # StringTypeSpec
 	|	'boolean'											# BooleanTypeSpec
 	|	'[' ']'                                             # VectorTypeSpec
@@ -65,7 +64,7 @@ expr
 	|	primary												# Atom
 	;
 
-operator  : MUL|DIV|ADD|SUB|GT|GE|LT|LE|EQUAL_EQUAL|NOT_EQUAL|OR|AND|DOT ; // no implicit precedence
+operator  : MUL|DIV|DIV_REM|ADD|SUB|GT|GE|LT|LE|EQUAL_EQUAL|NOT_EQUAL|OR|AND|DOT ; // no implicit precedence
 
 call_expr
 	: ID '(' expr_list? ')'
@@ -110,6 +109,7 @@ FALSE : 'false' ;
 SUB : '-' ;
 BANG : '!' ;
 MUL : '*' ;
+DIV_REM : '%' ;
 DIV : '/' ;
 ADD : '+' ;
 LT : '<' ;
@@ -118,8 +118,8 @@ EQUAL_EQUAL : '==' ;
 NOT_EQUAL : '!=' ;
 GT : '>' ;
 GE : '>=' ;
-OR : '||' ;
-AND : '&&' ;
+OR : 'or' ;
+AND : 'and' ;
 DOT : ' . ' ;
 
 LINE_COMMENT : '//' .*? ('\n'|EOF)	-> channel(HIDDEN) ;

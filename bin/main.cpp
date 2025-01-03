@@ -64,7 +64,6 @@
 // }
 
 
-#include <cmath>
 #include <iostream>
 #include "antlr4-runtime.h"
 #include "GrammarLexer.h"
@@ -72,187 +71,174 @@
 #include "GrammarASTInterpreter.h"
 #include "VirtualMachine.h"
 
-int main() {
-  std::string factorial = R"(
-  {
-    var value = 1
-    for (var i = 2; i <= 20; i = i + 1) {
-      value = value * i
-    }
+void getTimeScoreOfLanguage(const std::string &code) {
+  using namespace std::chrono;
+  auto start = high_resolution_clock::now();
 
-    print(value)
-  }
-  )";
-
-  std::string mergeSort = R"(
-func merge (arr: [], left: int, mid: int, right: int) {
-  var n1 = mid - left + 1
-  var n2 = right - mid
-
-  var l = [..n1]
-  var r = [..n2]
-
-  for (var i = 0; i < n1; i = i + 1) {
-    l[i] = arr[left + i]
-  }
-
-  for (var i = 0; i < n2; i = i + 1) {
-    r[i] = arr[mid + 1 + i]
-  }
-
-  var i = 0
-  var j = 0
-  var k = left
-
-  while (i < n1 && j < n2) {
-    if (l[i] <= r[j]) {
-      arr[k] = l[i]
-      i = i + 1
-    } else {
-      arr[k] = r[j]
-      j = j + 1
-    }
-    k = k + 1
-  }
-
-  while (i < n1) {
-    arr[k] = l[i]
-    i = i + 1
-    k = k + 1
-  }
-
-  while (j < n2) {
-    arr[k] = r[j]
-    j = j + 1
-    k = k + 1
-  }
-}
-
-func mergeSort(arr: [], left: int, right: int) {
-  if (left >= right) {
-    return 0
-  }
-
-  var tmp = right - left
-  tmp = tmp / 2
-  var mid = left + tmp
-  mergeSort(arr, left, mid)
-  mergeSort(arr, mid + 1, right)
-  // merge(arr, left, mid, right)
-}
-
-{
-  var n = 10000
-  var vec = [..n]
-  for (var i = 0; i < n; i = i + 1) {
-    vec[i] = n - i
-  }
-
-  mergeSort(vec, 0, n - 1)
-  for (var i = 0; i < n; i = i + 1) {
-    print(vec[i])
-  }
-}
-)";
-
-  std::string sieveOfEratosthenes = R"(
-
-)";
-
-  std::string experiment = R"(
-{
-  var n = 10
-  for (var j = n; j <= 20; j = j + 1) {
-    print(j)
-  }
-}
-  )";
-
-  antlr4::ANTLRInputStream inputStream(mergeSort);
+  antlr4::ANTLRInputStream inputStream(code);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
-
-  GrammarParser::ScriptContext* tree = parser.script();
+  GrammarParser::ScriptContext *tree = parser.script();
 
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
-  visitor.toFile("test.txt");
 
-  VirtualMachine vm;
-  vm.fromFile("test.txt");
-  auto code = vm.getInstructions();
-  for (int i = 0; i < code.size(); i++) {
-      if (code[i] != visitor.code[i]) {
-          std::cout << "Error in instruction " + std::to_string(i) + "\n";
-          std::cout << code[i].toStr() << "\n";
-          std::cout << visitor.code[i].toStr() << "\n";
-      }
-  }
+  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
   vm.run();
 
-//    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-//    vm.run();
+  auto end = high_resolution_clock::now();
+  auto duration = duration_cast<milliseconds>(end - start);
 
-  return 0;
+  std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
 }
 
-using namespace std;
 
-int partition(vector<int> &vec, int low, int high) {
-
-  // Selecting last element as the pivot
-  int pivot = vec[high];
-
-  // Index of elemment just before the last element
-  // It is used for swapping
-  int i = (low - 1);
-
-  for (int j = low; j <= high - 1; j++) {
-
-    // If current element is smaller than or
-    // equal to pivot
-    if (vec[j] <= pivot) {
-      i++;
-      swap(vec[i], vec[j]);
+int main() {
+  const std::string factorial = R"(
+    {
+        var value = 1
+        for (var i = 2; i <= 20; i = i + 1) {
+            value = value * i
+        }
+        print(value)
     }
-  }
+    )";
 
-  // Put pivot to its position
-  swap(vec[i + 1], vec[high]);
+  const std::string mergeSort = R"(
+    func merge (arr: [], left: num, mid: num, right: num) {
+        var n1 = mid - left + 1
+        var n2 = right - mid
 
-  // Return the point of partition
-  return (i + 1);
+        var l = [..n1]
+        var r = [..n2]
+
+        for (var i = 0; i < n1; i = i + 1) {
+            l[i] = arr[left + i]
+        }
+
+        for (var i = 0; i < n2; i = i + 1) {
+            r[i] = arr[mid + 1 + i]
+        }
+        var i = 0
+        var j = 0
+        var k = left
+
+        while ((i < n1) and (j < n2)) {
+            if (l[i] <= r[j]) {
+                arr[k] = l[i]
+                i = i + 1
+            } else {
+                arr[k] = r[j]
+                j = j + 1
+            }
+            k = k + 1
+        }
+
+        while (i < n1) {
+            arr[k] = l[i]
+            i = i + 1
+            k = k + 1
+        }
+
+        while (j < n2) {
+            arr[k] = r[j]
+            j = j + 1
+            k = k + 1
+        }
+    }
+
+    func mergeSort(arr: [], left: num, right: num) {
+        if (left >= right) {
+            return 0
+        }
+
+        var tmp = right - left
+        tmp = tmp / 2
+        var mid = left + tmp
+        mergeSort(arr, left, mid)
+        mergeSort(arr, mid + 1, right)
+        merge(arr, left, mid, right)
+    }
+
+    {
+        var n = 4
+        var vec = [1, 3, 2, -5]
+//        for (var i = 0; i < n; i = i + 1) {
+//            vec[i] = n
+//        }
+
+        mergeSort(vec, 0, n - 1)
+        for (var i = 0; i < __size(vec); i = i + 1) {
+            print(vec[i])
+        }
+    }
+    )";
+
+  const std::string sieveOfEratosthenes = R"(
+    func sieveOfEratosthenes(n: num) {
+        var prime = [..n + 1]
+        for (var i = 0; i < __size(prime); i = i + 1) {
+            prime[i] = 1
+        }
+
+        for (var p = 2; p <= n; p = p + 1) {
+            if (prime[p] == true) {
+                for (var i = p * p; i <= n; i = i + p) {
+                    prime[i] = false
+                }
+            }
+        }
+
+        for (var i = 2; i <= n; i = i + 1) {
+            if (prime[i] == true) {
+                // print(i)
+            }
+        }
+    }
+
+    {
+        sieveOfEratosthenes(10000)
+    }
+    )";
+
+  std::string experiment = R"(
+    {
+if ((3 < 5) and (4 < 5)) {
+    print(1)
 }
+    }
+    )";
 
-void quickSort(vector<int> &vec, int low, int high) {
+    antlr4::ANTLRInputStream inputStream(mergeSort);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
+    GrammarParser::ScriptContext *tree = parser.script();
 
-  // Base case: This part will be executed till the starting
-  // index low is lesser than the ending index high
-  cout << low;
-  cout << high;
-  if (low < high) {
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
 
-    // pi is Partitioning Index, arr[p] is now at
-    // right place
-    int pi = partition(vec, low, high);
-    cout << pi;
-    // Separately sort elements before and after the
-    // Partition Index pi
-    quickSort(vec, low, pi - 1);
-    quickSort(vec, pi + 1, high);
-  }
-}
+    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+    vm.run();
 
-int main2() {
-  vector<int> vec = {4, 3, 2, 1};
-  int n = vec.size();
+  //
+  // GrammarASTInterpreter visitor;
+  // visitor.visit(tree);
+  // visitor.toFile("test.txt");
+  //
+  // VirtualMachine vm;
+  // vm.fromFile("test.txt");
+  // auto code = vm.getInstructions();
+  // for (int i = 0; i < code.size(); i++) {
+  //     if (code[i] != visitor.code[i]) {
+  //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
+  //         std::cout << code[i].toStr() << "\n";
+  //         std::cout << visitor.code[i].toStr() << "\n";
+  //     }
+  // }
+  // vm.run();
 
-  // Calling quicksort for the vector vec
-  quickSort(vec, 0, n - 1);
 
-  for (auto i : vec) {
-    cout << i << " ";
-  }
   return 0;
 }

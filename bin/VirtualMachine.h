@@ -49,13 +49,7 @@ private:
 
     Value top();
 
-    void push(const Value &v);
-
-    template<typename Op>
-    void binaryOp(Op op);
-
-    template<typename Op>
-    void cmpOp(Op op);
+  void push(const Value &v);
 
     HeapValue *allocHeap(std::unique_ptr<HeapValue> hv);
 

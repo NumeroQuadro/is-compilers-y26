@@ -52,19 +52,19 @@ antlrcpp::Any GrammarASTInterpreter::visitIf(GrammarParser::IfContext *ctx) {
   }
   const size_t endPos = code.size();
 
-  code[jmzIndex].intOperand = elseStart;
-  code[jmpIndex].intOperand = endPos;
+  code[jmzIndex].intOperand = static_cast<int64_t>(elseStart);
+  code[jmpIndex].intOperand = static_cast<int64_t>(endPos);
   return nullptr;
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitWhile(GrammarParser::WhileContext *ctx) {
-  const int64_t startIp = code.size();
+  const auto startIp = static_cast<int64_t>(code.size());
   visit(ctx->expr());
-  const int64_t jmzIndex = code.size();
+  const auto jmzIndex = static_cast<int64_t>(code.size());
   code.emplace_back(InstructionType::JMZ, static_cast<int64_t>(0));
   visit(ctx->statement());
   code.emplace_back(InstructionType::JMP, startIp);
-  const int64_t endIp = code.size();
+  const auto endIp = static_cast<int64_t>(code.size());
   code[jmzIndex].intOperand = endIp;
   return nullptr;
 }
@@ -141,17 +141,20 @@ antlrcpp::Any GrammarASTInterpreter::visitPrint(GrammarParser::PrintContext *ctx
 antlrcpp::Any GrammarASTInterpreter::visitOp(GrammarParser::OpContext *ctx) {
   visit(ctx->expr(0));
   visit(ctx->expr(1));
-  std::string op = ctx->operator_()->getText();
+  const std::string op = ctx->operator_()->getText();
   if (op == "+") code.emplace_back(InstructionType::ADD);
   else if (op == "-") code.emplace_back(InstructionType::SUB);
   else if (op == "*") code.emplace_back(InstructionType::MUL);
   else if (op == "/") code.emplace_back(InstructionType::DIV);
+  else if (op == "%") code.emplace_back(InstructionType::DIV_REM);
   else if (op == "==") code.emplace_back(InstructionType::EQ);
   else if (op == "!=") code.emplace_back(InstructionType::NEQ);
   else if (op == "<") code.emplace_back(InstructionType::LT);
   else if (op == "<=") code.emplace_back(InstructionType::LE);
   else if (op == ">") code.emplace_back(InstructionType::GT);
   else if (op == ">=") code.emplace_back(InstructionType::GE);
+  else if (op == "and") code.emplace_back(InstructionType::AND);
+  else if (op == "or") code.emplace_back(InstructionType::OR);
   return nullptr;
 }
 
@@ -225,7 +228,7 @@ antlrcpp::Any GrammarASTInterpreter::visitIndex(GrammarParser::IndexContext *ctx
 
 antlrcpp::Any GrammarASTInterpreter::visitArraySize(GrammarParser::ArraySizeContext *ctx) {
   visit(ctx->expr());
-  auto instruction = Instruction {
+  auto instruction = Instruction{
     InstructionType::NEW_ARRAY,
   };
   instruction.strOperand = "__stack";
@@ -250,11 +253,25 @@ antlrcpp::Any GrammarASTInterpreter::visitFunction(GrammarParser::FunctionContex
   const std::string funcName = ctx->ID()->getText();
 
   const std::size_t startAddr = code.size();
-  std::vector<std::string> params;
+  std::vector<FunctionParam> params;
   if (ctx->formal_args()) {
-    for (const auto fa: ctx->formal_args()->formal_arg()) {
-      std::string argName = fa->ID()->getText();
-      params.emplace_back(argName);
+    for (const auto fa : ctx->formal_args()->formal_arg()) {
+      const std::string argName = fa->ID()->getText();
+      const std::string argTypeStr = fa->type()->getText();
+      ValueType argType;
+
+      if (argTypeStr == "num") argType = ValueType::INT;
+      else if (argTypeStr == "boolean") argType = ValueType::BOOL;
+      else if (argTypeStr == "str") argType = ValueType::REF;
+      else if (argTypeStr == "[]") argType = ValueType::REF;
+      else {
+        throw std::invalid_argument("Unknown type: " + argTypeStr);
+      }
+
+      params.emplace_back(FunctionParam{
+        argName,
+        argType
+      });
     }
   }
 
@@ -304,8 +321,8 @@ void GrammarASTInterpreter::toFile(const std::string& path) {
     outFile << functionTable.size() << "\n";
     for (const auto& [name, funcInfo] : functionTable) {
         outFile << funcInfo.name << " " << funcInfo.address;
-        for (const auto& param : funcInfo.paramNames) {
-            outFile << " " << param;
+        for (const auto&[name, type] : funcInfo.params) {
+            outFile << " " << name;
         }
         outFile << "\n";
     }
