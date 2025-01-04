@@ -54,15 +54,46 @@ forIncrement
   ;
 
 expr
-	:	expr operator expr									# Op
-	|	'-' expr											# Negate
-	|	'!' expr											# Not
-	|	call_expr											# Call
-    |   ID '->' ID '(' expr_list? ')'                       # MethodCall
-	|	ID '[' expr ']'										# Index
-	|	'(' expr ')'										# Parens
-	|	primary												# Atom
-	;
+    :   logicalOrExpr
+    ;
+
+logicalOrExpr
+    :   logicalAndExpr (OR logicalAndExpr)*
+    ;
+
+logicalAndExpr
+    :   equalityExpr (AND equalityExpr)*
+    ;
+
+equalityExpr
+    :   relationalExpr ( (EQUAL_EQUAL | NOT_EQUAL) relationalExpr )*
+    ;
+
+relationalExpr
+    :   additiveExpr ( (LT | LE | GT | GE) additiveExpr )*
+    ;
+
+additiveExpr
+    :   multiplicativeExpr (  (ADD | SUB) multiplicativeExpr )*
+    ;
+
+multiplicativeExpr
+    :   unaryExpr ( (MUL | DIV | DIV_REM) unaryExpr )*
+    ;
+
+unaryExpr
+    :   SUB unaryExpr
+    |   BANG unaryExpr
+    |   primaryExpr
+    ;
+
+primaryExpr
+    : call_expr                        # CallExpr
+    | ID '->' ID '(' expr_list? ')'    # MethodCall
+    | ID '[' expr ']'                  # Index
+    | '(' expr ')'                     # Parens
+    | primary                          # Atom
+    ;
 
 operator  : MUL|DIV|DIV_REM|ADD|SUB|GT|GE|LT|LE|EQUAL_EQUAL|NOT_EQUAL|OR|AND|DOT ; // no implicit precedence
 

@@ -124,7 +124,7 @@ int main() {
         var j = 0
         var k = left
 
-        while ((i < n1) and (j < n2)) {
+        while (i < n1 and j < n2) {
             if (l[i] <= r[j]) {
                 arr[k] = l[i]
                 i = i + 1
@@ -167,7 +167,6 @@ int main() {
 //        for (var i = 0; i < n; i = i + 1) {
 //            vec[i] = n
 //        }
-
         mergeSort(vec, 0, n - 1)
         for (var i = 0; i < __size(vec); i = i + 1) {
             print(vec[i])
@@ -204,9 +203,9 @@ int main() {
 
   std::string experiment = R"(
     {
-if ((3 < 5) and (4 < 5)) {
-    print(1)
-}
+        var a = 1
+        var b = a + a - 3
+        print(b)
     }
     )";
 

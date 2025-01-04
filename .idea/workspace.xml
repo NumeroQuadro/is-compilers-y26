@@ -38,15 +38,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat">
-      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/FunctionInfo.h" beforeDir="false" afterPath="$PROJECT_DIR$/bin/FunctionInfo.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/GrammarASTInterpreter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/GrammarASTInterpreter.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Instruction.h" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Instruction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Scope.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Scope.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/Value.h" beforeDir="false" afterPath="$PROJECT_DIR$/bin/Value.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/VirtualMachine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/VirtualMachine.h" beforeDir="false" afterPath="$PROJECT_DIR$/bin/VirtualMachine.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/GrammarASTInterpreter.h" beforeDir="false" afterPath="$PROJECT_DIR$/bin/GrammarASTInterpreter.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Grammar.g4" beforeDir="false" afterPath="$PROJECT_DIR$/src/Grammar.g4" afterDir="false" />
     </list>
@@ -71,6 +65,45 @@
     <setting file="file://$PROJECT_DIR$/../../../usr/include/c++/11/bits/vector.tcc" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../usr/include/c++/11/ext/aligned_buffer.h" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/../../../usr/include/c++/11/ext/new_allocator.h" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock:///dummy.cpp" root0="SKIP_HIGHLIGHTING" />
@@ -228,7 +261,7 @@
       <workItem from="1734535561568" duration="12899000" />
       <workItem from="1735139841127" duration="11722000" />
       <workItem from="1735896290665" duration="6283000" />
-      <workItem from="1735935048187" duration="5309000" />
+      <workItem from="1735935048187" duration="9972000" />
     </task>
     <task id="LOCAL-00001" summary="feat">
       <option name="closed" value="true" />
@@ -284,7 +317,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/bin/GrammarASTInterpreter.cpp</url>
-          <line>240</line>
+          <line>359</line>
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
@@ -294,13 +327,8 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/bin/GrammarASTInterpreter.cpp</url>
-          <line>234</line>
+          <line>353</line>
           <option name="timeStamp" value="49" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/bin/GrammarASTInterpreter.cpp</url>
-          <line>270</line>
-          <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/bin/VirtualMachine.cpp</url>

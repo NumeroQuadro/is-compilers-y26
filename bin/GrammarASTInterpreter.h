@@ -39,11 +39,19 @@ private:
 
     antlrcpp::Any visitForIncrement(GrammarParser::ForIncrementContext *ctx) override;
 
-    antlrcpp::Any visitOp(GrammarParser::OpContext *ctx) override;
+    antlrcpp::Any visitLogicalOrExpr(GrammarParser::LogicalOrExprContext *ctx) override;
 
-    antlrcpp::Any visitNegate(GrammarParser::NegateContext *ctx) override;
+    antlrcpp::Any visitLogicalAndExpr(GrammarParser::LogicalAndExprContext *ctx) override;
 
-    antlrcpp::Any visitNot(GrammarParser::NotContext *ctx) override;
+    antlrcpp::Any visitEqualityExpr(GrammarParser::EqualityExprContext *ctx) override;
+
+    antlrcpp::Any visitRelationalExpr(GrammarParser::RelationalExprContext *ctx) override;
+
+    antlrcpp::Any visitAdditiveExpr(GrammarParser::AdditiveExprContext *ctx) override;
+
+    antlrcpp::Any visitMultiplicativeExpr(GrammarParser::MultiplicativeExprContext *ctx) override;
+
+    antlrcpp::Any visitUnaryExpr(GrammarParser::UnaryExprContext *ctx) override;
 
     antlrcpp::Any visitParens(GrammarParser::ParensContext *ctx) override;
 

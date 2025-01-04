@@ -119,6 +119,143 @@ antlrcpp::Any GrammarASTInterpreter::visitForIncrement(GrammarParser::ForIncreme
   return nullptr;
 }
 
+antlrcpp::Any GrammarASTInterpreter::visitLogicalOrExpr(GrammarParser::LogicalOrExprContext *ctx) {
+  visit(ctx->logicalAndExpr(0));
+
+  for (int64_t i = 1; i < ctx->children.size(); i += 2) {
+    const auto exprNode = ctx->children[i + 1];
+    visit(exprNode);
+
+    code.emplace_back(InstructionType::OR);
+  }
+
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitLogicalAndExpr(GrammarParser::LogicalAndExprContext *ctx) {
+  visit(ctx->equalityExpr(0));
+
+  for (int64_t i = 1; i < ctx->children.size(); i += 2) {
+    const auto exprNode = ctx->children[i + 1];
+
+    visit(exprNode);
+    code.emplace_back(InstructionType::AND);
+  }
+
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitEqualityExpr(GrammarParser::EqualityExprContext *ctx) {
+  visit(ctx->relationalExpr(0));
+
+  for (int64_t i = 1; i < ctx->children.size(); i += 2) {
+    const auto opNode = ctx->children[i];
+    const auto exprNode = ctx->children[i + 1];
+
+    visit(exprNode);
+
+    const auto term = dynamic_cast<antlr4::tree::TerminalNode *>(opNode);
+    if (!term) {
+      continue;
+    }
+    const int8_t type = term->getSymbol()->getType();
+    if (type == GrammarParser::EQUAL_EQUAL) {
+      code.emplace_back(InstructionType::EQ);
+    } else {
+      code.emplace_back(InstructionType::NEQ);
+    }
+  }
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitRelationalExpr(GrammarParser::RelationalExprContext *ctx) {
+  visit(ctx->additiveExpr(0));
+
+  for (int64_t i = 1; i < ctx->children.size(); i += 2) {
+    const auto opNode = ctx->children[i];
+    const auto exprNode = ctx->children[i + 1];
+
+    visit(exprNode);
+
+    const auto term = dynamic_cast<antlr4::tree::TerminalNode *>(opNode);
+    if (!term) {
+      continue;
+    }
+    const int8_t type = term->getSymbol()->getType();
+    if (type == GrammarParser::LT) {
+      code.emplace_back(InstructionType::LT);
+    } else if (type == GrammarParser::LE) {
+      code.emplace_back(InstructionType::LE);
+    } else if (type == GrammarParser::GT) {
+      code.emplace_back(InstructionType::GT);
+    } else {
+      code.emplace_back(InstructionType::GE);
+    }
+  }
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitAdditiveExpr(GrammarParser::AdditiveExprContext *ctx) {
+  visit(ctx->multiplicativeExpr(0));
+
+  for (int i = 1; i < ctx->children.size(); i += 2) {
+    const auto opNode = ctx->children[i];
+    const auto exprNode = ctx->children[i + 1];
+
+    visit(exprNode);
+
+    const auto term = dynamic_cast<antlr4::tree::TerminalNode *>(opNode);
+    if (!term) {
+      continue;
+    }
+    const int8_t type = term->getSymbol()->getType();
+    if (type == GrammarParser::ADD) {
+      code.emplace_back(InstructionType::ADD);
+    } else {
+      code.emplace_back(InstructionType::SUB);
+    }
+  }
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitMultiplicativeExpr(GrammarParser::MultiplicativeExprContext *ctx) {
+  visit(ctx->unaryExpr(0));
+
+  for (int64_t i = 1; i < ctx->children.size(); i += 2) {
+    const auto opNode = ctx->children[i];
+    const auto exprNode = ctx->children[i + 1];
+
+    visit(exprNode);
+
+    const auto term = dynamic_cast<antlr4::tree::TerminalNode *>(opNode);
+    if (!term) {
+      continue;
+    }
+    const int8_t type = term->getSymbol()->getType();
+    if (type == GrammarParser::MUL) {
+      code.emplace_back(InstructionType::MUL);
+    } else if (type == GrammarParser::DIV) {
+      code.emplace_back(InstructionType::DIV);
+    } else {
+      code.emplace_back(InstructionType::DIV_REM);
+    }
+  }
+  return nullptr;
+}
+
+antlrcpp::Any GrammarASTInterpreter::visitUnaryExpr(GrammarParser::UnaryExprContext *ctx) {
+  if (ctx->SUB()) {
+    visit(ctx->unaryExpr());
+    code.emplace_back(InstructionType::NEG);
+  } else if (ctx->BANG()) {
+    visit(ctx->unaryExpr());
+    code.emplace_back(InstructionType::NOT);
+  } else {
+    visit(ctx->primaryExpr());
+  }
+  return nullptr;
+}
+
 antlrcpp::Any GrammarASTInterpreter::visitVardef(GrammarParser::VardefContext *ctx) {
   auto i = ctx->ID()->getText();
   visit(ctx->expr());
@@ -138,37 +275,37 @@ antlrcpp::Any GrammarASTInterpreter::visitPrint(GrammarParser::PrintContext *ctx
   return nullptr;
 }
 
-antlrcpp::Any GrammarASTInterpreter::visitOp(GrammarParser::OpContext *ctx) {
-  visit(ctx->expr(0));
-  visit(ctx->expr(1));
-  const std::string op = ctx->operator_()->getText();
-  if (op == "+") code.emplace_back(InstructionType::ADD);
-  else if (op == "-") code.emplace_back(InstructionType::SUB);
-  else if (op == "*") code.emplace_back(InstructionType::MUL);
-  else if (op == "/") code.emplace_back(InstructionType::DIV);
-  else if (op == "%") code.emplace_back(InstructionType::DIV_REM);
-  else if (op == "==") code.emplace_back(InstructionType::EQ);
-  else if (op == "!=") code.emplace_back(InstructionType::NEQ);
-  else if (op == "<") code.emplace_back(InstructionType::LT);
-  else if (op == "<=") code.emplace_back(InstructionType::LE);
-  else if (op == ">") code.emplace_back(InstructionType::GT);
-  else if (op == ">=") code.emplace_back(InstructionType::GE);
-  else if (op == "and") code.emplace_back(InstructionType::AND);
-  else if (op == "or") code.emplace_back(InstructionType::OR);
-  return nullptr;
-}
-
-antlrcpp::Any GrammarASTInterpreter::visitNegate(GrammarParser::NegateContext *ctx) {
-  visit(ctx->expr());
-  code.emplace_back(InstructionType::NEG);
-  return nullptr;
-}
-
-antlrcpp::Any GrammarASTInterpreter::visitNot(GrammarParser::NotContext *ctx) {
-  visit(ctx->expr());
-  code.emplace_back(InstructionType::NOT);
-  return nullptr;
-}
+// antlrcpp::Any GrammarASTInterpreter::visitOp(GrammarParser::OpContext *ctx) {
+//   visit(ctx->expr(0));
+//   visit(ctx->expr(1));
+//   const std::string op = ctx->operator_()->getText();
+//   if (op == "+") code.emplace_back(InstructionType::ADD);
+//   else if (op == "-") code.emplace_back(InstructionType::SUB);
+//   else if (op == "*") code.emplace_back(InstructionType::MUL);
+//   else if (op == "/") code.emplace_back(InstructionType::DIV);
+//   else if (op == "%") code.emplace_back(InstructionType::DIV_REM);
+//   else if (op == "==") code.emplace_back(InstructionType::EQ);
+//   else if (op == "!=") code.emplace_back(InstructionType::NEQ);
+//   else if (op == "<") code.emplace_back(InstructionType::LT);
+//   else if (op == "<=") code.emplace_back(InstructionType::LE);
+//   else if (op == ">") code.emplace_back(InstructionType::GT);
+//   else if (op == ">=") code.emplace_back(InstructionType::GE);
+//   else if (op == "and") code.emplace_back(InstructionType::AND);
+//   else if (op == "or") code.emplace_back(InstructionType::OR);
+//   return nullptr;
+// }
+//
+// antlrcpp::Any GrammarASTInterpreter::visitNegate(GrammarParser::NegateContext *ctx) {
+//   visit(ctx->expr());
+//   code.emplace_back(InstructionType::NEG);
+//   return nullptr;
+// }
+//
+// antlrcpp::Any GrammarASTInterpreter::visitNot(GrammarParser::NotContext *ctx) {
+//   visit(ctx->expr());
+//   code.emplace_back(InstructionType::NOT);
+//   return nullptr;
+// }
 
 antlrcpp::Any GrammarASTInterpreter::visitParens(GrammarParser::ParensContext *ctx) {
   return visit(ctx->expr());
@@ -255,7 +392,7 @@ antlrcpp::Any GrammarASTInterpreter::visitFunction(GrammarParser::FunctionContex
   const std::size_t startAddr = code.size();
   std::vector<FunctionParam> params;
   if (ctx->formal_args()) {
-    for (const auto fa : ctx->formal_args()->formal_arg()) {
+    for (const auto fa: ctx->formal_args()->formal_arg()) {
       const std::string argName = fa->ID()->getText();
       const std::string argTypeStr = fa->type()->getText();
       ValueType argType;
@@ -310,27 +447,27 @@ antlrcpp::Any GrammarASTInterpreter::visitCall_expr(GrammarParser::Call_exprCont
   return nullptr;
 }
 
-void GrammarASTInterpreter::toFile(const std::string& path) {
-    std::ofstream outFile(path);
-    if (!outFile.is_open()) {
-        throw std::runtime_error("Failed to open file: " + path);
+void GrammarASTInterpreter::toFile(const std::string &path) {
+  std::ofstream outFile(path);
+  if (!outFile.is_open()) {
+    throw std::runtime_error("Failed to open file: " + path);
+  }
+
+  outFile << startPos << "\n";
+
+  outFile << functionTable.size() << "\n";
+  for (const auto &[name, funcInfo]: functionTable) {
+    outFile << funcInfo.name << " " << funcInfo.address;
+    for (const auto &[name, type]: funcInfo.params) {
+      outFile << " " << name;
     }
+    outFile << "\n";
+  }
 
-    outFile << startPos << "\n";
+  outFile << code.size() << "\n";
+  for (auto &instruction: code) {
+    outFile << instruction.toStr() << "\n";
+  }
 
-    outFile << functionTable.size() << "\n";
-    for (const auto& [name, funcInfo] : functionTable) {
-        outFile << funcInfo.name << " " << funcInfo.address;
-        for (const auto&[name, type] : funcInfo.params) {
-            outFile << " " << name;
-        }
-        outFile << "\n";
-    }
-
-    outFile << code.size() << "\n";
-    for (auto& instruction : code) {
-        outFile << instruction.toStr() << "\n";
-    }
-
-    outFile.close();
+  outFile.close();
 }
