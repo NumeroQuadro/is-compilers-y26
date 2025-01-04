@@ -123,6 +123,7 @@ VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
                                const std::unordered_map<std::string, FunctionInfo> &functions, const int64_t startPos)
   : VirtualMachine(code, functions) {
   ip = startPos;
+    start_adress = ip;
 }
 
 Value VirtualMachine::pop() {
