@@ -192,7 +192,7 @@ int main() {
 
         for (var i = 2; i <= n; i = i + 1) {
             if (prime[i] == true) {
-                // print(i)
+                print(i)
             }
         }
     }
@@ -212,7 +212,7 @@ int main() {
     }
   )";
 
-  antlr4::ANTLRInputStream inputStream(experiment);
+  antlr4::ANTLRInputStream inputStream(mergeSort);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
@@ -221,24 +221,24 @@ int main() {
 
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
-  // visitor.toFile("test.txt");
+   visitor.toFile("test.txt");
 
-  // VirtualMachine vm;
-  // vm.optimize(true);
-  // vm.fromFile("test.txt");
-  // auto code = vm.getInstructions();
-  // for (int i = 0; i < code.size(); i++) {
-  //     if (code[i] != visitor.code[i]) {
-  //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
-  //         std::cout << code[i].toStr() << "\n";
-  //         std::cout << visitor.code[i].toStr() << "\n";
-  //     }
-  // }
-  // vm.run();
+   VirtualMachine vm;
+   vm.optimize(true);
+   vm.fromFile("test.txt");
+   auto code = vm.getInstructions();
+   for (int i = 0; i < code.size(); i++) {
+       if (code[i] != visitor.code[i]) {
+           std::cout << "Error in instruction " + std::to_string(i) + "\n";
+           std::cout << code[i].toStr() << "\n";
+           std::cout << visitor.code[i].toStr() << "\n";
+       }
+   }
+   vm.run();
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-  // vm.optimize(true);
-  vm.run();
+//  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+//   vm.optimize(true);
+//  vm.run();
 
   return 0;
 }

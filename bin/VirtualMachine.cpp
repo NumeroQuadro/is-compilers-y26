@@ -123,7 +123,7 @@ VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
                                const std::unordered_map<std::string, FunctionInfo> &functions, const int64_t startPos)
   : VirtualMachine(code, functions) {
   ip = startPos;
-    start_adress = ip;
+    start_address = ip;
 }
 
 Value VirtualMachine::pop() {
@@ -613,9 +613,29 @@ void VirtualMachine::fromFile(const std::string &path) {
     FunctionInfo funcInfo;
     iss >> funcInfo.name >> funcInfo.address;
 
-    std::string param;
-    while (iss >> param) {
-      funcInfo.params.push_back({param});
+
+    int tmp = 0;
+    std::string input;
+    std::string param_name;
+    ValueType type;
+    while (iss >> input) {
+        if (tmp % 2 == 0) {
+            param_name = input;
+        } else {
+            if (input == "INT") {
+                type = ValueType::INT;
+            } else if (input == "BOOL") {
+                type = ValueType::BOOL;
+            } else if (input == "DOUBLE") {
+                type = ValueType::DOUBLE;
+            } else if (input == "REF") {
+                type = ValueType::REF;
+            } else {
+                throw std::runtime_error("Unknown type!");
+            }
+            funcInfo.params.push_back({param_name, type});
+        }
+        tmp++;
     }
 
     functionTable[funcInfo.name] = funcInfo;
@@ -660,7 +680,18 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
     }
   }
 
-  std::unordered_set<std::string> usedVariables;
+    std::unordered_set<std::string> usedVariables;
+    std::unordered_map<std::string, int64_t> save_usages;
+    for (int64_t i = next_function_adress - 1; i >= address; i--) {
+        if (code[i].op == InstructionType::STORE_VAR) {
+            save_usages[code[i].strOperand]++;
+        }
+    }
+    for (auto& p : save_usages) {
+        if (p.second > 1) {
+            usedVariables.insert(p.first);
+        }
+    }
 
   for (int64_t i = next_function_adress - 1; i >= address; i--) {
     if (code[i].op == InstructionType::RET || code[i].op == InstructionType::PUSH_VAR) {

@@ -459,7 +459,7 @@ void GrammarASTInterpreter::toFile(const std::string &path) {
   for (const auto &[name, funcInfo]: functionTable) {
     outFile << funcInfo.name << " " << funcInfo.address;
     for (const auto &[name, type]: funcInfo.params) {
-      outFile << " " << name;
+      outFile << " " << name << " " << Value::valueTypeToStr(type);
     }
     outFile << "\n";
   }

@@ -96,6 +96,17 @@ public:
 
   bool isHeapRef() const;
 
+    static std::string valueTypeToStr(ValueType type) {
+        if (type == ValueType::INT) {
+            return "INT";
+        } else if (type == ValueType::BOOL) {
+            return "BOOL";
+        } else if (type == ValueType::DOUBLE) {
+            return "DOUBLE";
+        } else {
+            return "REF";
+        }
+    }
 private:
   std::variant<int64_t, double, bool, HeapValue *> _data;
   ValueType _type;
