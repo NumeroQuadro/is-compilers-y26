@@ -46,7 +46,7 @@ struct Instruction {
   InstructionType op;
 
   int64_t intOperand = 0;
-  float floatOperand = 0.0f;
+  double doubleOperand = 0.0;
   bool boolOperand = false;
   std::string strOperand;
 
@@ -56,7 +56,7 @@ struct Instruction {
   Instruction(const InstructionType op, const int64_t i) : op(op), intOperand(i) {
   }
 
-  Instruction(const InstructionType op, const float f) : op(op), floatOperand(f) {
+  Instruction(const InstructionType op, const double f) : op(op), doubleOperand(f) {
   }
 
   Instruction(const InstructionType op, std::string s) : op(op), strOperand(std::move(s)) {

@@ -138,13 +138,64 @@ Value VirtualMachine::top() {
 }
 
 void VirtualMachine::push(const Value &v) {
-  stack.push(v);
+  stack.emplace(v);
 }
 
-HeapValue *VirtualMachine::allocHeap(std::unique_ptr<HeapValue> hv) {
-  HeapValue *ptr = hv.get();
-  heap.push_back(std::move(hv));
-  return ptr;
+void VirtualMachine::unmarkAll() {
+  for (auto &objPtr: heap) {
+    if (objPtr) {
+      objPtr->marked = false;
+    }
+  }
+}
+
+void VirtualMachine::markAll() {
+  markScope(scope_);
+
+  std::stack<Value> tmp = stack;
+  while (!tmp.empty()) {
+    Value v = tmp.top();
+    tmp.pop();
+    markValue(v);
+  }
+}
+
+void VirtualMachine::sweep() {
+  for (auto &objPtr : heap) {
+    if (objPtr) {
+      if (!objPtr->marked) {
+        objPtr.reset();
+      }
+    }
+  }
+  heap.erase(
+    std::remove_if(heap.begin(), heap.end(),
+                   [](auto &p){ return p == nullptr; }),
+    heap.end()
+  );
+}
+
+void VirtualMachine::markValue(const Value &v) {
+  if (!v.isHeapRef()) return;
+  HeapValue *ref = v.asHeapRef();
+  if (!ref) return;
+  if (!ref->marked) {
+    ref->marked = true;
+    ref->markChildren();
+  }
+}
+
+void VirtualMachine::markScope(Scope *scope) {
+  if (!scope) return;
+  for (auto &[fst, snd]: scope->values) {
+    markValue(snd);
+  }
+  markScope(scope->previous_);
+}
+
+HeapValue *VirtualMachine::allocHeap(HeapValue *hv) {
+  heap.emplace_back(hv);
+  return hv;
 }
 
 Value VirtualMachine::loadVar(const std::string &name) const {
@@ -170,9 +221,11 @@ void VirtualMachine::enterScope() {
 }
 
 void VirtualMachine::exitScope() {
-  Scope *old = scope_;
+  const Scope *old = scope_;
   scope_ = scope_->previous_;
   delete old;
+
+  gc();
 }
 
 void VirtualMachine::doCall(const std::string &funcName) {
@@ -186,19 +239,19 @@ void VirtualMachine::doCall(const std::string &funcName) {
     return;
   }
 
-    if (funcName == "__size") {
-        builtInSize();
-        return;
-    }
+  if (funcName == "__size") {
+    builtInSize();
+    return;
+  }
 
-    if (isOptimized && optimized_functions.find(funcName) == optimized_functions.end()) {
-        optimizeFunction(funcName);
-    }
+  if (isOptimized && optimized_functions.find(funcName) == optimized_functions.end()) {
+    optimizeFunction(funcName);
+  }
 
-    auto it = functionTable.find(funcName);
-    if (it == functionTable.end()) {
-        throw std::runtime_error("Function not found: " + code[ip].toStr());
-    }
+  auto it = functionTable.find(funcName);
+  if (it == functionTable.end()) {
+    throw std::runtime_error("Function not found: " + code[ip].toStr());
+  }
 
   const auto &[name, params, address] = it->second;
   const auto newScope = new Scope(nullptr);
@@ -267,8 +320,8 @@ void VirtualMachine::run() {
         ++ip;
         break;
       case InstructionType::PUSH_STRING: {
-        auto hv = std::make_unique<StringValue>(inst.strOperand);
-        HeapValue *ref = allocHeap(std::move(hv));
+        auto hv = new StringValue(inst.strOperand);
+        HeapValue *ref = allocHeap(hv);
         push(Value(ref));
         ++ip;
         break;
@@ -407,7 +460,7 @@ void VirtualMachine::run() {
       }
       case InstructionType::PRINT: {
         if (!stack.empty()) {
-          Value v = pop();
+          const Value v = pop();
           if (v.getType() == ValueType::INT) {
             std::cout << v.asInt() << "\n";
           } else if (v.getType() == ValueType::BOOL) {
@@ -449,8 +502,8 @@ void VirtualMachine::run() {
           throw std::runtime_error("NEW_ARRAY: negative size is not allowed");
         }
 
-        auto arrPtr = std::make_unique<ArrayValue>(size);
-        HeapValue *ref = allocHeap(std::move(arrPtr));
+        auto arrPtr = new ArrayValue(size);
+        HeapValue *ref = allocHeap(arrPtr);
 
         push(Value(ref));
 
@@ -526,6 +579,12 @@ void VirtualMachine::run() {
   }
 }
 
+void VirtualMachine::gc() {
+  unmarkAll();
+  markAll();
+  sweep();
+}
+
 void VirtualMachine::fromFile(const std::string &path) {
   std::ifstream inFile(path);
   if (!inFile.is_open()) {
@@ -574,8 +633,8 @@ void VirtualMachine::fromFile(const std::string &path) {
     code.push_back(Instruction::fromStr(line));
   }
 
-    start_adress = ip;
-    waitFile = false;
+  start_address = ip;
+  waitFile = false;
 }
 
 std::vector<Instruction> VirtualMachine::getInstructions() {
@@ -583,56 +642,56 @@ std::vector<Instruction> VirtualMachine::getInstructions() {
 }
 
 void VirtualMachine::optimize(bool optimizeOn = true) {
-    isOptimized = optimizeOn;
+  isOptimized = optimizeOn;
 }
 
 void VirtualMachine::optimizeFunction(const std::string &function_name) {
-    auto iter = functionTable.find(function_name);
-    if (iter == functionTable.end()) {
-        throw std::runtime_error("Function not found: " + code[ip].toStr());
-    }
+  auto iter = functionTable.find(function_name);
+  if (iter == functionTable.end()) {
+    throw std::runtime_error("Function not found: " + code[ip].toStr());
+  }
 
-    int64_t address = iter->second.address;
-    int64_t next_function_adress = start_adress;
-    for (auto &p: functionTable) {
-        if (p.second.address > address) {
-            next_function_adress = std::min(next_function_adress, p.second.address);
+  int64_t address = iter->second.address;
+  int64_t next_function_adress = start_address;
+  for (auto &p: functionTable) {
+    if (p.second.address > address) {
+      next_function_adress = std::min(next_function_adress, p.second.address);
+    }
+  }
+
+  std::unordered_set<std::string> usedVariables;
+
+  for (int64_t i = next_function_adress - 1; i >= address; i--) {
+    if (code[i].op == InstructionType::RET || code[i].op == InstructionType::PUSH_VAR) {
+      usedVariables.insert(code[i].strOperand);
+    } else if (code[i].op == InstructionType::STORE_VAR) {
+      if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
+        int64_t k = 1;
+        --i;
+        while (code[i].op == InstructionType::ADD
+               || code[i].op == InstructionType::MUL
+               || code[i].op == InstructionType::SUB
+               || code[i].op == InstructionType::DIV
+               || code[i].op == InstructionType::PUSH_INT
+               || code[i].op == InstructionType::PUSH_BOOL
+               || code[i].op == InstructionType::PUSH_STRING
+               || code[i].op == InstructionType::PUSH_VAR) {
+          --i;
+          k++;
         }
-    }
-
-    std::unordered_set<std::string> usedVariables;
-
-    for (int64_t i = next_function_adress - 1; i >= address; i--) {
-        if (code[i].op == InstructionType::RET || code[i].op == InstructionType::PUSH_VAR) {
-            usedVariables.insert(code[i].strOperand);
-        } else if (code[i].op == InstructionType::STORE_VAR) {
-            if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
-                int64_t k = 1;
-                --i;
-                while (code[i].op == InstructionType::ADD
-                       || code[i].op == InstructionType::MUL
-                       || code[i].op == InstructionType::SUB
-                       || code[i].op == InstructionType::DIV
-                       || code[i].op == InstructionType::PUSH_INT
-                       || code[i].op == InstructionType::PUSH_BOOL
-                       || code[i].op == InstructionType::PUSH_STRING
-                       || code[i].op == InstructionType::PUSH_VAR) {
-                    --i;
-                    k++;
-                }
-                ++i;
-                code[i] = Instruction(InstructionType::JMP, k + i);
-                while (code[i + k].op == InstructionType::JMP) {
-                    k = code[i + k].intOperand - i;
-                    code[i] = Instruction(InstructionType::JMP, k + i);
-                }
-                continue;
-            }
+        ++i;
+        code[i] = Instruction(InstructionType::JMP, k + i);
+        while (code[i + k].op == InstructionType::JMP) {
+          k = code[i + k].intOperand - i;
+          code[i] = Instruction(InstructionType::JMP, k + i);
         }
+        continue;
+      }
     }
+  }
 
-//    for (int64_t i = address; i < next_function_adress; i++) {
-//        std::cout << code[i].toStr() << '\n';
-//    }
-    optimized_functions.insert(function_name);
+  //    for (int64_t i = address; i < next_function_adress; i++) {
+  //        std::cout << code[i].toStr() << '\n';
+  //    }
+  optimized_functions.insert(function_name);
 }

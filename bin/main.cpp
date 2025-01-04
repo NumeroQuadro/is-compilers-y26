@@ -203,25 +203,16 @@ int main() {
     )";
 
   std::string experiment = R"(
-func test(left: num, right: num) {
-var res = left + right
-var a = (5 == 5)
-if (a == true) {
-    print(a)
-}
-var c = 3
-var z = (3 + c + 4) * 3
-var b = 2
-return res
-}
-{
-    var value = test(62, 54)
-    var value = test(1, 2)
-    print(value)
-  }
+    func test() {
+      var ref = [..3]
+    }
+    {
+      test()
+      print("finish")
+    }
   )";
 
-  antlr4::ANTLRInputStream inputStream(mergeSort);
+  antlr4::ANTLRInputStream inputStream(experiment);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
@@ -246,7 +237,7 @@ return res
   // vm.run();
 
   VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-  vm.optimize(true);
+  // vm.optimize(true);
   vm.run();
 
   return 0;

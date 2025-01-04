@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <fstream>
-#include <sstream>
 
 #include "Scope.h"
 #include "Value.h"
@@ -18,67 +17,76 @@
 
 class VirtualMachine {
 public:
-    VirtualMachine();
+  VirtualMachine();
 
-    explicit VirtualMachine(const std::vector<Instruction> &code,
-                            const std::unordered_map<std::string, FunctionInfo> &functions);
+  explicit VirtualMachine(const std::vector<Instruction> &code,
+                          const std::unordered_map<std::string, FunctionInfo> &functions);
 
-    explicit VirtualMachine(const std::vector<Instruction> &code,
-                            const std::unordered_map<std::string, FunctionInfo> &functions,
-                            int64_t startPos);
+  explicit VirtualMachine(const std::vector<Instruction> &code,
+                          const std::unordered_map<std::string, FunctionInfo> &functions,
+                          int64_t startPos);
 
-    void run();
+  void run();
 
-    [[nodiscard]] std::vector<Instruction> getInstructions() const;
+  void gc();
 
-    void fromFile(const std::string &path);
+  [[nodiscard]] std::vector<Instruction> getInstructions() const;
 
-    std::vector<Instruction> getInstructions();
+  void fromFile(const std::string &path);
 
-    void optimize(bool optimizeOn);
+  std::vector<Instruction> getInstructions();
+
+  void optimize(bool optimizeOn);
 
 private:
-    Scope *scope_ = nullptr;
+  Scope *scope_ = nullptr;
 
-    std::unordered_map<std::string, FunctionInfo> functionTable;
-    std::vector<Instruction> code;
-    std::stack<Value> stack;
-    std::vector<std::unique_ptr<HeapValue> > heap;
-    std::stack<CallFrame> callStack;
-    bool waitFile = true;
-    bool isOptimized = false;
-    std::unordered_set<std::string> optimized_functions;
-    int64_t start_adress;
+  std::unordered_map<std::string, FunctionInfo> functionTable;
+  std::vector<Instruction> code;
+  std::stack<Value> stack;
+  std::vector<std::unique_ptr<HeapValue> > heap;
+  std::stack<CallFrame> callStack;
+  bool waitFile = true;
+  bool isOptimized = false;
+  std::unordered_set<std::string> optimized_functions;
+  int64_t start_address{};
 
-    int64_t ip = 0;
+  int64_t ip = 0;
 
-    Value pop();
+  Value pop();
 
-    Value top();
+  Value top();
 
   void push(const Value &v);
 
-    HeapValue *allocHeap(std::unique_ptr<HeapValue> hv);
+  void unmarkAll();
+  void markAll();
+  void sweep();
 
-    Value loadVar(const std::string &name) const;
+  void markValue(const Value &v);
+  void markScope(Scope* scope);
 
-    void createVar(const std::string &name, const Value &val) const;
+  HeapValue *allocHeap(HeapValue *hv);
 
-    void storeVar(const std::string &name, const Value &val) const;
+  Value loadVar(const std::string &name) const;
 
-    void enterScope();
+  void createVar(const std::string &name, const Value &val) const;
 
-    void exitScope();
+  void storeVar(const std::string &name, const Value &val) const;
 
-    void doCall(const std::string &funcName);
+  void enterScope();
 
-    void doRet();
+  void exitScope();
 
-    void builtInPushBack();
+  void doCall(const std::string &funcName);
 
-    void builtInPopBack();
+  void doRet();
 
-    void builtInSize();
+  void builtInPushBack();
 
-    void optimizeFunction(const std::string &function_name);
+  void builtInPopBack();
+
+  void builtInSize();
+
+  void optimizeFunction(const std::string &function_name);
 };
