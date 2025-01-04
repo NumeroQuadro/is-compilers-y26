@@ -170,7 +170,7 @@ struct Instruction {
                 oss << "OR";
                 break;
         }
-        oss << " " << std::to_string(intOperand) << " " << strOperand << " " << (boolOperand ? "true" : "false");
+        oss << " " << std::to_string(doubleOperand) << " " << std::to_string(intOperand) << " " << strOperand << " " << (boolOperand ? "true" : "false");
 
         return oss.str();
     }
@@ -178,7 +178,7 @@ struct Instruction {
     static Instruction fromStr(const std::string &str) {
         auto tokens = split(str);
 
-        if (tokens.size() < 3) {
+        if (tokens.size() < 4) {
             throw std::runtime_error("Invalid instruction format: " + str);
         }
 
@@ -220,12 +220,14 @@ struct Instruction {
         else if (opStr == "DIV_REM") operation = InstructionType::DIV_REM;
         else throw std::runtime_error("Unknown instruction type: " + opStr);
 
-        int64_t intOperand = std::stoll(tokens[1]);
-        bool boolOperand = (tokens[3] == "true");
+        double doubleOperand = std::stod(tokens[1]);
+        int64_t intOperand = std::stoll(tokens[2]);
+        bool boolOperand = (tokens[4] == "true");
 
-        std::string strOperand = tokens[2];
+        std::string strOperand = tokens[3];
 
         Instruction instruction(operation);
+        instruction.doubleOperand = doubleOperand;
         instruction.intOperand = intOperand;
         instruction.boolOperand = boolOperand;
         instruction.strOperand = strOperand;

@@ -212,7 +212,7 @@ int main() {
     }
   )";
 
-  antlr4::ANTLRInputStream inputStream(mergeSort);
+  antlr4::ANTLRInputStream inputStream(experiment);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
