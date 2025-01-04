@@ -203,7 +203,7 @@ int main() {
     )";
 
   std::string experiment = R"(
-func test(left: int, right: int) {
+func test(left: num, right: num) {
 var res = left + right
 var a = (5 == 5)
 if (a == true) {
@@ -221,32 +221,33 @@ return res
   }
   )";
 
-  antlr4::ANTLRInputStream inputStream(experiment);
+  antlr4::ANTLRInputStream inputStream(mergeSort);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
 
-  GrammarParser::ScriptContext* tree = parser.script();
+  GrammarParser::ScriptContext *tree = parser.script();
 
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
-  visitor.toFile("test.txt");
+  // visitor.toFile("test.txt");
 
-  VirtualMachine vm;
+  // VirtualMachine vm;
+  // vm.optimize(true);
+  // vm.fromFile("test.txt");
+  // auto code = vm.getInstructions();
+  // for (int i = 0; i < code.size(); i++) {
+  //     if (code[i] != visitor.code[i]) {
+  //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
+  //         std::cout << code[i].toStr() << "\n";
+  //         std::cout << visitor.code[i].toStr() << "\n";
+  //     }
+  // }
+  // vm.run();
+
+  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
   vm.optimize(true);
-  vm.fromFile("test.txt");
-  auto code = vm.getInstructions();
-  for (int i = 0; i < code.size(); i++) {
-      if (code[i] != visitor.code[i]) {
-          std::cout << "Error in instruction " + std::to_string(i) + "\n";
-          std::cout << code[i].toStr() << "\n";
-          std::cout << visitor.code[i].toStr() << "\n";
-      }
-  }
   vm.run();
-
-//    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-//    vm.run();
 
   return 0;
 }
@@ -254,7 +255,6 @@ return res
 using namespace std;
 
 int partition(vector<int> &vec, int low, int high) {
-
   // Selecting last element as the pivot
   int pivot = vec[high];
 
@@ -263,7 +263,6 @@ int partition(vector<int> &vec, int low, int high) {
   int i = (low - 1);
 
   for (int j = low; j <= high - 1; j++) {
-
     // If current element is smaller than or
     // equal to pivot
     if (vec[j] <= pivot) {
@@ -280,13 +279,11 @@ int partition(vector<int> &vec, int low, int high) {
 }
 
 void quickSort(vector<int> &vec, int low, int high) {
-
   // Base case: This part will be executed till the starting
   // index low is lesser than the ending index high
   cout << low;
   cout << high;
   if (low < high) {
-
     // pi is Partitioning Index, arr[p] is now at
     // right place
     int pi = partition(vec, low, high);
@@ -305,7 +302,7 @@ int main2() {
   // Calling quicksort for the vector vec
   quickSort(vec, 0, n - 1);
 
-  for (auto i : vec) {
+  for (auto i: vec) {
     cout << i << " ";
   }
   return 0;
