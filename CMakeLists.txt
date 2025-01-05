@@ -4,7 +4,6 @@ project(yal)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Поиск Java для ANTLR
 find_package(Java 1.11 COMPONENTS Runtime REQUIRED)
 
 include(FetchContent)
@@ -75,7 +74,6 @@ target_link_libraries(Grammar_lib PUBLIC antlr4_static)
 add_library(Core_lib STATIC
         include/GrammarASTInterpreter.cpp
         include/Value.cpp
-        include/Interpreter.cpp
         include/VirtualMachine.cpp
         include/Scope.cpp
 )
@@ -88,11 +86,9 @@ target_include_directories(Core_lib PUBLIC
 
 target_link_libraries(Core_lib PUBLIC Grammar_lib)
 
-# Подключаем подпроекты
 add_subdirectory(bin)
 add_subdirectory(tests)
 
-# Печатаем сообщение
 set(MESSAGE "
 ************************************
 *                                  *

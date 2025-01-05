@@ -8,6 +8,7 @@
 
 enum class InstructionType {
     PUSH_INT,
+    PUSH_DOUBLE,
     PUSH_BOOL,
     PUSH_STRING,
     PUSH_VAR,

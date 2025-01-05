@@ -327,6 +327,12 @@ antlrcpp::Any GrammarASTInterpreter::visitInteger(GrammarParser::IntegerContext 
   return nullptr;
 }
 
+antlrcpp::Any GrammarASTInterpreter::visitFloat(GrammarParser::FloatContext *ctx) {
+  double val = std::stod(ctx->FLOAT()->getText());
+  code.emplace_back(InstructionType::PUSH_DOUBLE, val);
+  return nullptr;
+}
+
 antlrcpp::Any GrammarASTInterpreter::visitString(GrammarParser::StringContext *ctx) {
   std::string str = ctx->STRING()->getText();
   str = str.substr(1, str.size() - 2);

@@ -38,6 +38,7 @@ public:
 
   void optimize(bool optimizeOn);
 
+  size_t getHeapSize();
 private:
   Scope *scope_ = nullptr;
 

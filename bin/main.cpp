@@ -163,8 +163,8 @@ int main() {
     }
 
     {
-        var n = 4
-        var vec = [1, 3, 2, -5]
+        var n = 5
+        var vec = [1, 3, 2.5, 2.4, -5]
 //        for (var i = 0; i < n; i = i + 1) {
 //            vec[i] = n
 //        }
@@ -203,16 +203,14 @@ int main() {
     )";
 
   std::string experiment = R"(
-    func test() {
-      var ref = [..3]
-    }
     {
-      test()
-      print("finish")
+      var a = 1
+      var b = "3.2"
+      print(a + b)
     }
   )";
 
-  antlr4::ANTLRInputStream inputStream(experiment);
+  antlr4::ANTLRInputStream inputStream(mergeSort);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
@@ -221,24 +219,24 @@ int main() {
 
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
-   visitor.toFile("test.txt");
+   // visitor.toFile("test.txt");
+   //
+   // VirtualMachine vm;
+   // vm.optimize(true);
+   // vm.fromFile("test.txt");
+   // auto code = vm.getInstructions();
+   // for (int i = 0; i < code.size(); i++) {
+   //     if (code[i] != visitor.code[i]) {
+   //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
+   //         std::cout << code[i].toStr() << "\n";
+   //         std::cout << visitor.code[i].toStr() << "\n";
+   //     }
+   // }
+   // vm.run();
 
-   VirtualMachine vm;
-   vm.optimize(true);
-   vm.fromFile("test.txt");
-   auto code = vm.getInstructions();
-   for (int i = 0; i < code.size(); i++) {
-       if (code[i] != visitor.code[i]) {
-           std::cout << "Error in instruction " + std::to_string(i) + "\n";
-           std::cout << code[i].toStr() << "\n";
-           std::cout << visitor.code[i].toStr() << "\n";
-       }
-   }
-   vm.run();
-
-//  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
 //   vm.optimize(true);
-//  vm.run();
+  vm.run();
 
   return 0;
 }

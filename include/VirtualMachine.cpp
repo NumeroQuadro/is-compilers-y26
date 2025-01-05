@@ -312,14 +312,21 @@ void VirtualMachine::run() {
       case InstructionType::JMP:
         ip = inst.intOperand;
         break;
-      case InstructionType::PUSH_INT:
+      case InstructionType::PUSH_INT: {
         push(Value(inst.intOperand));
         ++ip;
         break;
-      case InstructionType::PUSH_BOOL:
+      }
+      case InstructionType::PUSH_DOUBLE: {
+        push(Value(inst.doubleOperand));
+        ++ip;
+        break;
+      }
+      case InstructionType::PUSH_BOOL: {
         push(Value(inst.boolOperand));
         ++ip;
         break;
+      }
       case InstructionType::PUSH_STRING: {
         auto hv = new StringValue(inst.strOperand);
         HeapValue *ref = allocHeap(hv);
@@ -455,7 +462,7 @@ void VirtualMachine::run() {
         if (const bool val = v.asBool(); !val) {
           ip = inst.intOperand;
         } else {
-          ip++;
+          ++ip;
         }
         break;
       }
@@ -464,6 +471,8 @@ void VirtualMachine::run() {
           const Value v = pop();
           if (v.getType() == ValueType::INT) {
             std::cout << v.asInt() << "\n";
+          } else if (v.getType() == ValueType::DOUBLE) {
+            std::cout << v.asDouble() << "\n";
           } else if (v.getType() == ValueType::BOOL) {
             std::cout << (v.asBool() ? "true" : "false") << "\n";
           } else if (v.getType() == ValueType::REF) {
@@ -484,7 +493,7 @@ void VirtualMachine::run() {
         } else {
           std::cout << "\n";
         }
-        ip++;
+        ++ip;
         break;
       }
       case InstructionType::NEW_ARRAY: {
@@ -508,7 +517,7 @@ void VirtualMachine::run() {
 
         push(Value(ref));
 
-        ip++;
+        ++ip;
         break;
 
         // auto arr = std::make_unique<ArrayValue>(inst.intOperand);
@@ -525,7 +534,7 @@ void VirtualMachine::run() {
         if (!arr) throw std::runtime_error("Not an array");
         if (idx < 0 || idx >= arr->elements.size()) throw std::runtime_error("Array index out of bounds");
         push(arr->elements[idx]);
-        ip++;
+        ++ip;
         break;
       }
       case InstructionType::SET_ELEMENT: {
@@ -539,21 +548,21 @@ void VirtualMachine::run() {
           throw std::runtime_error(
             "Array index out of bounds" + code[ip].toStr());
         arr2->elements[idx2] = val;
-        ip++;
+        ++ip;
         break;
       }
       case InstructionType::ENTER_SCOPE:
         enterScope();
-        ip++;
+        ++ip;
         break;
       case InstructionType::EXIT_SCOPE:
         exitScope();
-        ip++;
+        ++ip;
         break;
       case InstructionType::DUP_TOP: {
         Value v = top();
         push(v);
-        ip++;
+        ++ip;
         break;
       }
       case InstructionType::SWAP: {
@@ -561,7 +570,7 @@ void VirtualMachine::run() {
         Value b = pop();
         push(a);
         push(b);
-        ip++;
+        ++ip;
         break;
       }
       case InstructionType::CALL: {
@@ -664,6 +673,10 @@ std::vector<Instruction> VirtualMachine::getInstructions() {
 
 void VirtualMachine::optimize(bool optimizeOn = true) {
   isOptimized = optimizeOn;
+}
+
+size_t VirtualMachine::getHeapSize() {
+  return heap.size();
 }
 
 void VirtualMachine::optimizeFunction(const std::string &function_name) {

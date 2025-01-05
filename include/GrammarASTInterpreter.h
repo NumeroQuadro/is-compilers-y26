@@ -61,6 +61,8 @@ private:
 
     antlrcpp::Any visitInteger(GrammarParser::IntegerContext *ctx) override;
 
+    antlrcpp::Any visitFloat(GrammarParser::FloatContext *ctx) override;
+
     antlrcpp::Any visitString(GrammarParser::StringContext *ctx) override;
 
     antlrcpp::Any visitTrueLiteral(GrammarParser::TrueLiteralContext *ctx) override;
