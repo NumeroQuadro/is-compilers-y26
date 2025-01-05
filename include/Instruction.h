@@ -74,6 +74,9 @@ struct Instruction {
             case InstructionType::PUSH_INT:
                 oss << "PUSH_INT";
                 break;
+            case InstructionType::PUSH_DOUBLE:
+                oss << "PUSH_DOUBLE";
+                break;
             case InstructionType::PUSH_BOOL:
                 oss << "PUSH_BOOL";
                 break;
@@ -188,6 +191,7 @@ struct Instruction {
 
         if (opStr == "PUSH_INT") operation = InstructionType::PUSH_INT;
         else if (opStr == "PUSH_BOOL") operation = InstructionType::PUSH_BOOL;
+        else if (opStr == "PUSH_DOUBLE") operation = InstructionType::PUSH_DOUBLE;
         else if (opStr == "PUSH_STRING") operation = InstructionType::PUSH_STRING;
         else if (opStr == "PUSH_VAR") operation = InstructionType::PUSH_VAR;
         else if (opStr == "STORE_VAR") operation = InstructionType::STORE_VAR;

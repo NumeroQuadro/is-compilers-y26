@@ -802,9 +802,9 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
             case InstructionType::JMP:
                 optimizedBody.push_back(code[i]);
                 if (instr.intOperand > i) {
-                    for (int64_t j = i + 1; j < instr.intOperand; j++) {
+                    /*for (int64_t j = i + 1; j < instr.intOperand; j++) {
                         optimizedBody.push_back(code[j]);
-                    }
+                    }*/
                     i = instr.intOperand - 1;
                 }
                 break;
@@ -844,6 +844,7 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
                         if (result.getType() == ValueType::DOUBLE)
                             optimizedBody.emplace_back(Instruction(InstructionType::PUSH_INT, result.asDouble()));
                     } else {
+                        stack.push_back({Value(), false, ""});
                         optimizedBody.push_back(instr);
                     }
                 }
@@ -868,6 +869,7 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
                         optimizedBody.pop_back();
                         optimizedBody.emplace_back(Instruction(InstructionType::PUSH_BOOL, result));
                     } else {
+                        stack.push_back({Value(), false, ""});
                         optimizedBody.push_back(instr);
                     }
                 }
@@ -889,6 +891,7 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
                         if (result.getType() == ValueType::DOUBLE)
                             optimizedBody.emplace_back(Instruction(InstructionType::PUSH_INT, result.asDouble()));
                     } else {
+                        stack.push_back({Value(), false, ""});
                         optimizedBody.push_back(instr);
                     }
                 }
@@ -905,33 +908,45 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
                 break;
         }
     }
-
-//    std::cout << "\n After constant folding:\n";
+//
+//    std::cout << "\n Optimized commands:\n";
 //    for (int i = 0; i < optimizedBody.size(); i++) {
 //        std::cout << i << " " << optimizedBody[i].toStr() << '\n';
 //    }
+//    std::cout << " Optimized commands end\n";
 
-    int j = 0;
-    bool flag = false;
+    int64_t j = start;
     for (int64_t i = 0; i < optimizedBody.size();) {
-        if (optimizedBody[i] == code[j]) {
-            j++;
+        if (optimizedBody[i] == code[j] && !(i + 1 < optimizedBody.size()
+        && (optimizedBody[i + 1].op == InstructionType::STORE_VAR || optimizedBody[i + 1].op == InstructionType::JMZ || optimizedBody[i + 1].op == InstructionType::PRINT))) {
             i++;
-        } else {
-            code[j] = optimizedBody[i];
-            j++; i++;
-            code[j] = optimizedBody[i];
-            i++;
-            j++;
-            while (code[j].op != InstructionType::STORE_VAR) {
-                j++;
+            if (code[j].op == InstructionType::JMP && code[j].intOperand > j) {
+                j = code[j].intOperand;
+                continue;
             }
             j++;
-            code[i] = Instruction(InstructionType::JMP, (int64_t) j);
-            i = j;
+        } else {
+            if (code[j] == optimizedBody[i] && code[j + 1] == optimizedBody[i + 1]) {
+                j += 2;
+                i += 2;
+                continue;
+            }
+            code[j] = optimizedBody[i];
+            j++; i++;
+           // if (optimizedBody[i].op == InstructionType::STORE_VAR) {
+                code[j] = optimizedBody[i];
+                i++;
+                j++;
+                int64_t place_to_jump = j;
+                while (code[j].op != InstructionType::STORE_VAR && code[j].op != InstructionType::JMZ && code[j].op != InstructionType::PRINT) {
+                    j++;
+                }
+                j++;
+                code[place_to_jump] = Instruction(InstructionType::JMP, (int64_t) j);
         };
     }
 
+//    std::cout << "\nAFTER OPTIMIZATIONS\n";
 //    for (int64_t i = start; i < finish; i++) {
 //        std::cout << i << " " << code[i].toStr() << '\n';
 //    }

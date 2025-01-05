@@ -163,8 +163,9 @@ int main() {
     }
 
     {
-        var n = 4
+        var n = 5
         var vec = [1, 3, 2.5, 2.4, -5]
+
 //        for (var i = 0; i < n; i = i + 1) {
 //            vec[i] = n
 //        }
@@ -202,13 +203,27 @@ int main() {
     }
     )";
 
-  std::string experiment = R"(
-     if (2.1 > 2.5) {
-        print(1)
-     }
+    std::string experiment = R"(
+    func test(in: num) {
+        var r = in + 3
+        var e = 2 + 4 - 1
+      var d = !true or (!true or false) and true or (5 > 3) and (7 == 9) or false
+      var c = a + 2
+      print(d)
+    if (true or false) {
+        print(5)
+        print(r)
+    }
+        print(e)
+print(8 + 1)
+    }
+    {
+      test(34)
+      print("finish")
+    }
   )";
 
-  antlr4::ANTLRInputStream inputStream(mergeSort);
+  antlr4::ANTLRInputStream inputStream(experiment);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
@@ -233,8 +248,16 @@ int main() {
    // vm.run();
 
   VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-   // vm.optimize(true);
+  vm.optimize(true);
+    auto instructions = vm.getInstructions();
+    for (int i = 0; i < instructions.size(); i++) {
+        std::cout << i << " " << instructions[i].toStr() << '\n';
+    }
   vm.run();
+//   instructions = vm.getInstructions();
+//  for (int i = 0; i < instructions.size(); i++) {
+//      std::cout << i << " " << instructions[i].toStr() << '\n';
+//  }
 
   return 0;
 }
