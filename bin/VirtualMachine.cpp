@@ -700,14 +700,24 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
       if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
         int64_t k = 1;
         --i;
-        while (code[i].op == InstructionType::ADD
+        while ((code[i].op == InstructionType::ADD
                || code[i].op == InstructionType::MUL
                || code[i].op == InstructionType::SUB
                || code[i].op == InstructionType::DIV
                || code[i].op == InstructionType::PUSH_INT
                || code[i].op == InstructionType::PUSH_BOOL
                || code[i].op == InstructionType::PUSH_STRING
-               || code[i].op == InstructionType::PUSH_VAR) {
+               || code[i].op == InstructionType::PUSH_VAR
+               || code[i].op == InstructionType::AND
+               || code[i].op == InstructionType::OR
+               || code[i].op == InstructionType::EQ
+               || code[i].op == InstructionType::NEQ
+                || code[i].op == InstructionType::LT
+                || code[i].op == InstructionType::LE
+                || code[i].op == InstructionType::GT
+                || code[i].op == InstructionType::GE
+                || code[i].op == InstructionType::NOT
+                || code[i].op == InstructionType::NEG) && i >= 0) {
           --i;
           k++;
         }
@@ -722,8 +732,197 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
     }
   }
 
-  //    for (int64_t i = address; i < next_function_adress; i++) {
-  //        std::cout << code[i].toStr() << '\n';
-  //    }
+//  std::cout << "\n After Dead code ellumination:\n";
+//    for (int64_t i = address; i < next_function_adress; i++) {
+//        std::cout << i << " " << code[i].toStr() << '\n';
+//    }
+    foldConstants(address, next_function_adress);
+
   optimized_functions.insert(function_name);
 }
+
+struct StackEntry {
+    Value value;
+    bool isConstant;
+    std::string varName;
+};
+
+Value calcArithmetic(InstructionType op, Value a, Value b) {
+    switch (op) {
+        case InstructionType::ADD: return a + b;
+        case InstructionType::SUB: return a - b;
+        case InstructionType::MUL: return a * b;
+        case InstructionType::DIV: return a / b;
+        default: throw std::runtime_error("Unsupported arithmetic operation!");
+    }
+}
+
+bool calcComparison(InstructionType op, Value a, Value b) {
+    switch (op) {
+        case InstructionType::EQ:  return a == b;
+        case InstructionType::NEQ: return a != b;
+        case InstructionType::LT:  return a < b;
+        case InstructionType::LE:  return a <= b;
+        case InstructionType::GT:  return a > b;
+        case InstructionType::GE:  return a >= b;
+        case InstructionType::AND:  return a && b;
+        case InstructionType::OR:  return a || b;
+        default: throw std::runtime_error("Unsupported comparison operation!");
+    }
+}
+
+Value calcUnary(InstructionType op, Value a) {
+    switch (op) {
+        case InstructionType::NEG: return -a;
+        case InstructionType::NOT: return !a;
+        default: throw std::runtime_error("Unsupported unary operation!");
+    }
+}
+
+std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t finish) {
+    std::vector<Instruction> optimizedBody;
+    std::vector<StackEntry> stack;
+
+    for (int64_t i = start; i < finish; i++) {
+        Instruction instr = code[i];
+        switch (instr.op) {
+            case InstructionType::JMP:
+                optimizedBody.push_back(code[i]);
+                if (instr.intOperand > i) {
+                    for (int64_t j = i + 1; j < instr.intOperand; j++) {
+                        optimizedBody.push_back(code[j]);
+                    }
+                    i = instr.intOperand - 1;
+                }
+                break;
+            case InstructionType::PUSH_INT:
+                stack.push_back({Value(instr.intOperand), true, ""});
+                optimizedBody.push_back(instr);
+                break;
+            case InstructionType::PUSH_STRING:
+                stack.push_back({Value(new StringValue(instr.strOperand)), true, ""});
+                optimizedBody.push_back(instr);
+                break;
+            case InstructionType::PUSH_BOOL:
+                stack.push_back({Value(instr.boolOperand), true, ""});
+                optimizedBody.push_back(instr);
+                break;
+            case InstructionType::PUSH_VAR:
+                stack.push_back({Value(), false, instr.strOperand});
+                optimizedBody.push_back(instr);
+                break;
+            case InstructionType::ADD:
+            case InstructionType::SUB:
+            case InstructionType::MUL:
+            case InstructionType::DIV: {
+                if (stack.size() >= 2) {
+                    auto b = stack.back(); stack.pop_back();
+                    auto a = stack.back(); stack.pop_back();
+
+                    if (a.isConstant && b.isConstant) {
+                        Value result = calcArithmetic(instr.op, a.value, b.value);
+                        stack.push_back({result, true, ""});
+                        optimizedBody.pop_back();
+                        optimizedBody.pop_back();
+                        if (result.getType() == ValueType::INT)
+                            optimizedBody.emplace_back(Instruction(InstructionType::PUSH_INT, result.asInt()));
+                        if (result.getType() == ValueType::BOOL)
+                            optimizedBody.emplace_back(Instruction(InstructionType::PUSH_BOOL, result.asBool()));
+                        if (result.getType() == ValueType::DOUBLE)
+                            optimizedBody.emplace_back(Instruction(InstructionType::PUSH_INT, result.asDouble()));
+                    } else {
+                        optimizedBody.push_back(instr);
+                    }
+                }
+                break;
+            }
+            case InstructionType::EQ:
+            case InstructionType::NEQ:
+            case InstructionType::LT:
+            case InstructionType::LE:
+            case InstructionType::GT:
+            case InstructionType::GE:
+            case InstructionType::AND:
+            case InstructionType::OR:{
+                if (stack.size() >= 2) {
+                    auto b = stack.back(); stack.pop_back();
+                    auto a = stack.back(); stack.pop_back();
+
+                    if (a.isConstant && b.isConstant) {
+                        bool result = calcComparison(instr.op, a.value, b.value);
+                        stack.push_back({Value(result), true, ""});
+                        optimizedBody.pop_back();
+                        optimizedBody.pop_back();
+                        optimizedBody.emplace_back(Instruction(InstructionType::PUSH_BOOL, result));
+                    } else {
+                        optimizedBody.push_back(instr);
+                    }
+                }
+                break;
+            }
+            case InstructionType::NEG:
+            case InstructionType::NOT: {
+                if (!stack.empty()) {
+                    auto a = stack.back(); stack.pop_back();
+
+                    if (a.isConstant) {
+                        Value result = calcUnary(instr.op, a.value);
+                        stack.push_back({result, true, ""});
+                        optimizedBody.pop_back();
+                        if (result.getType() == ValueType::INT)
+                            optimizedBody.emplace_back(Instruction(InstructionType::PUSH_INT, result.asInt()));
+                        if (result.getType() == ValueType::BOOL)
+                            optimizedBody.emplace_back(Instruction(InstructionType::PUSH_BOOL, result.asBool()));
+                        if (result.getType() == ValueType::DOUBLE)
+                            optimizedBody.emplace_back(Instruction(InstructionType::PUSH_INT, result.asDouble()));
+                    } else {
+                        optimizedBody.push_back(instr);
+                    }
+                }
+                break;
+            }
+            case InstructionType::STORE_VAR:
+                if (!stack.empty()) {
+                    stack.pop_back();
+                }
+                optimizedBody.push_back(instr);
+                break;
+            default:
+                optimizedBody.push_back(instr);
+                break;
+        }
+    }
+
+//    std::cout << "\n After constant folding:\n";
+//    for (int i = 0; i < optimizedBody.size(); i++) {
+//        std::cout << i << " " << optimizedBody[i].toStr() << '\n';
+//    }
+
+    int j = 0;
+    bool flag = false;
+    for (int64_t i = 0; i < optimizedBody.size();) {
+        if (optimizedBody[i] == code[j]) {
+            j++;
+            i++;
+        } else {
+            code[j] = optimizedBody[i];
+            j++; i++;
+            code[j] = optimizedBody[i];
+            i++;
+            j++;
+            while (code[j].op != InstructionType::STORE_VAR) {
+                j++;
+            }
+            j++;
+            code[i] = Instruction(InstructionType::JMP, (int64_t) j);
+            i = j;
+        };
+    }
+
+//    for (int64_t i = start; i < finish; i++) {
+//        std::cout << i << " " << code[i].toStr() << '\n';
+//    }
+
+    return optimizedBody;
+}
+

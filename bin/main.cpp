@@ -203,16 +203,24 @@ int main() {
     )";
 
   std::string experiment = R"(
-    func test() {
-      var ref = [..3]
+    func test(in: num) {
+var r = in + 3
+        var e = 2 + 4 - 1
+      var d = !true or (!true or false) and true or (5 > 3) and (7 == 9) or false
+      var c = a + 2
+      print(d)
+if (true or false) {
+print(5)
+print(r)
+}
     }
     {
-      test()
+      test(34)
       print("finish")
     }
   )";
 
-  antlr4::ANTLRInputStream inputStream(experiment);
+  antlr4::ANTLRInputStream inputStream(mergeSort);
   GrammarLexer lexer(&inputStream);
   antlr4::CommonTokenStream tokens(&lexer);
   GrammarParser parser(&tokens);
