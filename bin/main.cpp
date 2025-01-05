@@ -163,7 +163,7 @@ int main() {
     }
 
     {
-        var n = 5
+        var n = 4
         var vec = [1, 3, 2.5, 2.4, -5]
 //        for (var i = 0; i < n; i = i + 1) {
 //            vec[i] = n
@@ -203,21 +203,9 @@ int main() {
     )";
 
   std::string experiment = R"(
-    func test(in: num) {
-var r = in + 3
-        var e = 2 + 4 - 1
-      var d = !true or (!true or false) and true or (5 > 3) and (7 == 9) or false
-      var c = a + 2
-      print(d)
-if (true or false) {
-print(5)
-print(r)
-}
-    }
-    {
-      test(34)
-      print("finish")
-    }
+     if (2.1 > 2.5) {
+        print(1)
+     }
   )";
 
   antlr4::ANTLRInputStream inputStream(mergeSort);
@@ -229,24 +217,24 @@ print(r)
 
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
-   visitor.toFile("test.txt");
+   // visitor.toFile("test.txt");
+   //
+   // VirtualMachine vm;
+   // vm.optimize(true);
+   // vm.fromFile("test.txt");
+   // auto code = vm.getInstructions();
+   // for (int i = 0; i < code.size(); i++) {
+   //     if (code[i] != visitor.code[i]) {
+   //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
+   //         std::cout << code[i].toStr() << "\n";
+   //         std::cout << visitor.code[i].toStr() << "\n";
+   //     }
+   // }
+   // vm.run();
 
-   VirtualMachine vm;
-   vm.optimize(true);
-   vm.fromFile("test.txt");
-   auto code = vm.getInstructions();
-   for (int i = 0; i < code.size(); i++) {
-       if (code[i] != visitor.code[i]) {
-           std::cout << "Error in instruction " + std::to_string(i) + "\n";
-           std::cout << code[i].toStr() << "\n";
-           std::cout << visitor.code[i].toStr() << "\n";
-       }
-   }
-   vm.run();
-
-//  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-//   vm.optimize(true);
-//  vm.run();
+  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+   // vm.optimize(true);
+  vm.run();
 
   return 0;
 }

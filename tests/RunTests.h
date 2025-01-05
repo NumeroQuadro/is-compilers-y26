@@ -9,7 +9,7 @@
 #include "GrammarASTInterpreter.h"
 #include "VirtualMachine.h"
 
-std::string runCode(const std::string& codeStr) {
+std::string runCode(const std::string& codeStr, bool withOptimisation = false) {
   std::stringstream buffer;
   std::streambuf* oldCoutBuffer = std::cout.rdbuf(buffer.rdbuf());
 
@@ -24,7 +24,7 @@ std::string runCode(const std::string& codeStr) {
   visitor.visit(tree);
 
   VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-  vm.optimize(true);
+  vm.optimize(withOptimisation);
   vm.run();
 
   std::cout.rdbuf(oldCoutBuffer);

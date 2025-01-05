@@ -2,7 +2,11 @@
 
 #include "RunTests.h"
 
-TEST(LanguageTests, FactorialTest) {
+class LanguageTests : public ::testing::TestWithParam<bool> {
+};
+
+TEST_P(LanguageTests, FactorialTest) {
+  bool isOptimised = GetParam();
   std::string factorialCode = R"(
     {
         var value = 1
@@ -15,11 +19,12 @@ TEST(LanguageTests, FactorialTest) {
     )";
 
   std::string expectedOutput = "2432902008176640000\n"; // 20!
-  std::string actualOutput = runCode(factorialCode);
+  std::string actualOutput = runCode(factorialCode, isOptimised);
   EXPECT_EQ(actualOutput, expectedOutput);
 }
 
-TEST(LanguageTests, MergeSortTest) {
+TEST_P(LanguageTests, MergeSortTest) {
+  bool isOptimised = GetParam();
   std::string mergeSortCode = R"(
             func merge (arr: [], left: num, mid: num, right: num) {
         var n1 = mid - left + 1
@@ -87,11 +92,12 @@ TEST(LanguageTests, MergeSortTest) {
     )";
 
   std::string expectedOutput = "-5\n1\n2.4\n2.5\n3\n";
-  std::string actualOutput = runCode(mergeSortCode);
+  std::string actualOutput = runCode(mergeSortCode, isOptimised);
   EXPECT_EQ(actualOutput, expectedOutput);
 }
 
-TEST(LanguageTests, SieveOfEratosthenesTest) {
+TEST_P(LanguageTests, SieveOfEratosthenesTest) {
+  bool isOptimised = GetParam();
   std::string sieveCode = R"(
         func sieveOfEratosthenes(n: num) {
             var prime = [..n + 1]
@@ -120,11 +126,12 @@ TEST(LanguageTests, SieveOfEratosthenesTest) {
     )";
 
   std::string expectedOutput = "2\n3\n5\n7\n";
-  std::string actualOutput = runCode(sieveCode);
+  std::string actualOutput = runCode(sieveCode, isOptimised);
   EXPECT_EQ(actualOutput, expectedOutput);
 }
 
-TEST(LanguageTests, OperationPriority) {
+TEST_P(LanguageTests, OperationPriority) {
+  bool isOptimised = GetParam();
   std::string experimentCode = R"(
         {
           print(2 + 2 * 2)
@@ -132,11 +139,12 @@ TEST(LanguageTests, OperationPriority) {
     )";
 
   std::string expectedOutput = "6\n";
-  std::string actualOutput = runCode(experimentCode);
+  std::string actualOutput = runCode(experimentCode, isOptimised);
   EXPECT_EQ(actualOutput, expectedOutput);
 }
 
-TEST(LanguageTests, GarbageCollectorWithGlobalValues) {
+TEST_P(LanguageTests, GarbageCollectorWithGlobalValues) {
+  bool isOptimised = GetParam();
   std::string experimentCode = R"(
         var a = [1, 2, 3]
     )";
@@ -152,38 +160,40 @@ TEST(LanguageTests, GarbageCollectorWithGlobalValues) {
   visitor.visit(tree);
 
   VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-  vm.optimize(true);
+  vm.optimize(isOptimised);
   vm.run();
 
   EXPECT_EQ(vm.getHeapSize(), 0);
 }
 
-TEST(LanguageTests, GarbageCollector) {
-    std::string experimentCode = R"(
+TEST_P(LanguageTests, GarbageCollector) {
+  bool isOptimised = GetParam();
+  std::string experimentCode = R"(
     {
         var a = [1, 2, 3]
     }
     )";
 
-    antlr4::ANTLRInputStream inputStream(experimentCode);
-    GrammarLexer lexer(&inputStream);
-    antlr4::CommonTokenStream tokens(&lexer);
-    GrammarParser parser(&tokens);
+  antlr4::ANTLRInputStream inputStream(experimentCode);
+  GrammarLexer lexer(&inputStream);
+  antlr4::CommonTokenStream tokens(&lexer);
+  GrammarParser parser(&tokens);
 
-    GrammarParser::ScriptContext *tree = parser.script();
+  GrammarParser::ScriptContext *tree = parser.script();
 
-    GrammarASTInterpreter visitor;
-    visitor.visit(tree);
+  GrammarASTInterpreter visitor;
+  visitor.visit(tree);
 
-    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-    vm.optimize(true);
-    vm.run();
+  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+  vm.optimize(isOptimised);
+  vm.run();
 
-    EXPECT_EQ(vm.getHeapSize(), 0);
+  EXPECT_EQ(vm.getHeapSize(), 0);
 }
 
-TEST(LanguageTests, SumWithDifferenceType) {
-    std::string experimentCode = R"(
+TEST_P(LanguageTests, SumWithDifferenceType) {
+  bool isOptimised = GetParam();
+  std::string experimentCode = R"(
     {
         var a = 1
         var b = 3.2
@@ -191,8 +201,18 @@ TEST(LanguageTests, SumWithDifferenceType) {
     }
     )";
 
-    std::string expectedOutput = "4.2\n";
-    std::string actualOutput = runCode(experimentCode);
-    EXPECT_EQ(actualOutput, expectedOutput);
+  std::string expectedOutput = "4.2\n";
+  std::string actualOutput = runCode(experimentCode, isOptimised);
+  EXPECT_EQ(actualOutput, expectedOutput);
 }
 
+INSTANTIATE_TEST_SUITE_P(
+  FlagOnOff,
+  LanguageTests,
+  ::testing::Bool()
+);
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

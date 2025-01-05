@@ -38,19 +38,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: zusammen versions">
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/GrammarASTInterpreter.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/GrammarASTInterpreter.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/GrammarASTInterpreter.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/GrammarASTInterpreter.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Instruction.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Instruction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Interpreter.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Interpreter.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/MyStack.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/tests/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/RunTests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/RunTests.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -195,11 +188,14 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;CMake Application.run_tests.executor&quot;: &quot;Run&quot;,
     &quot;CMake Application.yal.executor&quot;: &quot;Run&quot;,
     &quot;Google Test.All in Antrl4Tests.cpp.executor&quot;: &quot;Run&quot;,
     &quot;Google Test.LanguageTests.FactorialTest.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.LanguageTests.FlagOnOff.executor&quot;: &quot;Run&quot;,
     &quot;Google Test.LanguageTests.GarbageCollector.executor&quot;: &quot;Run&quot;,
     &quot;Google Test.LanguageTests.GarbageCollectorWithGlobalValues.executor&quot;: &quot;Run&quot;,
+    &quot;Google Test.LanguageTests.MergeSortTest.executor&quot;: &quot;Run&quot;,
     &quot;Google Test.SampleTest.Example.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
@@ -224,7 +220,12 @@
       <recent name="\\wsl.localhost\Ubuntu\home\mityaiii\new\include" />
     </key>
   </component>
-  <component name="RunManager" selected="Google Test.All in Antrl4Tests.cpp">
+  <component name="RunManager" selected="CMake Application.run_tests">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="All in Antrl4Tests.cpp" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_PATTERN="all-tests(file://$PROJECT_DIR$/tests/Antrl4Tests.cpp)" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -237,19 +238,13 @@
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="LanguageTests.GarbageCollector" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="GarbageCollector" TEST_MODE="SUITE_TEST">
+    <configuration name="LanguageTests.FlagOnOff" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="FlagOnOff" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="LanguageTests.GarbageCollectorWithGlobalValues" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="GarbageCollectorWithGlobalValues" TEST_MODE="SUITE_TEST">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-        <option name="BeforeTestRunTask" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="LanguageTests.OperationPrioruty" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="OperationPrioruty" TEST_MODE="SUITE_TEST">
+    <configuration name="LanguageTests.MergeSortTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="MergeSortTest" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -311,6 +306,11 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="run_tests" type="CMakeRunConfiguration" factoryName="Application" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="yal" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="yal" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="yal">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -323,12 +323,6 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Google Test.All in Antrl4Tests.cpp" />
-      <item itemvalue="Google Test.LanguageTests.FactorialTest" />
-      <item itemvalue="Google Test.LanguageTests.GarbageCollectorWithGlobalValues" />
-      <item itemvalue="Google Test.LanguageTests.GarbageCollector" />
-      <item itemvalue="Google Test.LanguageTests.OperationPrioruty" />
-      <item itemvalue="Google Test.antlr4_tests" />
       <item itemvalue="CMake Application.Core_lib" />
       <item itemvalue="CMake Application.Grammar_lib" />
       <item itemvalue="CMake Application.MyGrammar_antlr4" />
@@ -340,14 +334,20 @@
       <item itemvalue="CMake Application.gtest" />
       <item itemvalue="CMake Application.gtest_main" />
       <item itemvalue="CMake Application.yal" />
+      <item itemvalue="CMake Application.run_tests" />
       <item itemvalue="CTest Application.All CTest" />
+      <item itemvalue="Google Test.antlr4_tests" />
+      <item itemvalue="Google Test.All in Antrl4Tests.cpp" />
+      <item itemvalue="Google Test.LanguageTests.FactorialTest" />
+      <item itemvalue="Google Test.LanguageTests.FlagOnOff" />
+      <item itemvalue="Google Test.LanguageTests.MergeSortTest" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="CMake Application.run_tests" />
+        <item itemvalue="Google Test.LanguageTests.FlagOnOff" />
         <item itemvalue="Google Test.All in Antrl4Tests.cpp" />
-        <item itemvalue="Google Test.LanguageTests.GarbageCollector" />
-        <item itemvalue="Google Test.LanguageTests.GarbageCollectorWithGlobalValues" />
-        <item itemvalue="Google Test.LanguageTests.OperationPrioruty" />
+        <item itemvalue="Google Test.LanguageTests.MergeSortTest" />
         <item itemvalue="Google Test.LanguageTests.FactorialTest" />
       </list>
     </recent_temporary>
@@ -366,6 +366,7 @@
       <workItem from="1735935048187" duration="9972000" />
       <workItem from="1736011789415" duration="4533000" />
       <workItem from="1736098567591" duration="6000" />
+      <workItem from="1736101031872" duration="5000" />
     </task>
     <task id="LOCAL-00001" summary="feat">
       <option name="closed" value="true" />
@@ -428,11 +429,6 @@
           <url>file://$PROJECT_DIR$/include/Value.cpp</url>
           <line>79</line>
           <option name="timeStamp" value="65" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>310</line>
-          <option name="timeStamp" value="66" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
