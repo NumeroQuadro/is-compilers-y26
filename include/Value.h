@@ -94,6 +94,14 @@ public:
 
   friend bool operator>=(const Value &lhs, const Value &rhs);
 
+  friend bool operator&&(const Value &lhs, const Value &rhs);
+
+  friend bool operator||(const Value &lhs, const Value &rhs);
+
+  friend  Value operator!(const Value& val);
+
+  friend Value operator-(const Value& val);
+
   bool isHeapRef() const;
 
     static std::string valueTypeToStr(ValueType type) {

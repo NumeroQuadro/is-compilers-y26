@@ -17,10 +17,12 @@
       <config projectName="yal" targetName="Grammar_lib" />
       <config projectName="yal" targetName="antlr4_shared" />
       <config projectName="yal" targetName="antlr4_static" />
+      <config projectName="yal" targetName="acc_gen" />
       <config projectName="yal" targetName="MyGrammar_antlr4" />
       <config projectName="yal" targetName="antlr4_tests" />
       <config projectName="yal" targetName="gtest" />
       <config projectName="yal" targetName="gtest_main" />
+      <config projectName="yal" targetName="gmock_main" />
       <config projectName="yal" targetName="MyGrammar_lib" />
       <config projectName="yal" targetName="gmock_main" />
       <config projectName="yal" targetName="yal" />

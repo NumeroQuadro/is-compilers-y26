@@ -90,4 +90,6 @@ private:
   void builtInSize();
 
   void optimizeFunction(const std::string &function_name);
+
+  std::vector<Instruction> foldConstants(int64_t start, int64_t finish);
 };

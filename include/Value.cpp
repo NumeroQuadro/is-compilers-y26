@@ -215,3 +215,22 @@ bool operator>(const Value &lhs, const Value &rhs) {
 bool operator>=(const Value &lhs, const Value &rhs) {
   return !(lhs < rhs);
 }
+
+Value operator!(const Value& val) {
+    return Value(!val.asBool());
+}
+
+Value operator-(const Value& val) {
+    if (val.getType() == ValueType::INT) {
+        return Value(-val.asInt());
+    }
+    return Value(-val.asDouble());
+}
+
+bool operator&&(const Value &lhs, const Value &rhs) {
+    return lhs.asBool() && rhs.asBool();
+}
+
+bool operator||(const Value &lhs, const Value &rhs) {
+    return lhs.asBool() || rhs.asBool();
+}
