@@ -766,6 +766,7 @@ Value calcArithmetic(InstructionType op, Value a, Value b) {
         case InstructionType::SUB: return a - b;
         case InstructionType::MUL: return a * b;
         case InstructionType::DIV: return a / b;
+        case InstructionType::DIV_REM: return a % b;
         default: throw std::runtime_error("Unsupported arithmetic operation!");
     }
 }
@@ -827,7 +828,8 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
             case InstructionType::ADD:
             case InstructionType::SUB:
             case InstructionType::MUL:
-            case InstructionType::DIV: {
+            case InstructionType::DIV:
+            case InstructionType::DIV_REM: {
                 if (stack.size() >= 2) {
                     auto b = stack.back(); stack.pop_back();
                     auto a = stack.back(); stack.pop_back();

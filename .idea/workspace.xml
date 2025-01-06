@@ -36,9 +36,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix2: constant folding - errors fixing">
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix3: constant folding - other errors fixing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -257,7 +256,7 @@
       <workItem from="1736011789415" duration="4533000" />
       <workItem from="1736098567591" duration="6000" />
       <workItem from="1736101031872" duration="5000" />
-      <workItem from="1736145666054" duration="6664000" />
+      <workItem from="1736145666054" duration="7443000" />
     </task>
     <task id="LOCAL-00001" summary="feat">
       <option name="closed" value="true" />
@@ -295,7 +294,14 @@
       <option name="project" value="LOCAL" />
       <updated>1736146168129</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="fix3: constant folding - other errors fixing">
+      <created>1736196746829</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1736196746829</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -323,7 +329,8 @@
     <MESSAGE value="fix: zusammen versions" />
     <MESSAGE value="fix: constant folding - errors fixing" />
     <MESSAGE value="fix2: constant folding - errors fixing" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix2: constant folding - errors fixing" />
+    <MESSAGE value="fix3: constant folding - other errors fixing" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix3: constant folding - other errors fixing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
