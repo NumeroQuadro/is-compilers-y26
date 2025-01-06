@@ -931,8 +931,13 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
                 i += 2;
                 continue;
             }
-            code[j] = optimizedBody[i];
-            j++; i++;
+            while (optimizedBody[i].op != InstructionType::STORE_VAR && optimizedBody[i].op != InstructionType::JMZ &&
+                   optimizedBody[i].op != InstructionType::PRINT) {
+                code[j] = optimizedBody[i];
+            j++;
+            i++;
+        }
+
            // if (optimizedBody[i].op == InstructionType::STORE_VAR) {
                 code[j] = optimizedBody[i];
                 i++;
