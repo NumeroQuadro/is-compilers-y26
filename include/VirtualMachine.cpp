@@ -918,7 +918,13 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
     int64_t j = start;
     for (int64_t i = 0; i < optimizedBody.size();) {
         if (optimizedBody[i] == code[j] && !(i + 1 < optimizedBody.size()
-        && (optimizedBody[i + 1].op == InstructionType::STORE_VAR || optimizedBody[i + 1].op == InstructionType::JMZ || optimizedBody[i + 1].op == InstructionType::PRINT))) {
+        && (optimizedBody[i + 1].op == InstructionType::STORE_VAR
+        || optimizedBody[i + 1].op == InstructionType::JMZ
+        || optimizedBody[i + 1].op == InstructionType::PRINT
+        || optimizedBody[i + 1].op == InstructionType::SET_ELEMENT
+           || optimizedBody[i + 1].op == InstructionType::RET
+              || optimizedBody[i + 1].op == InstructionType::NEW_ARRAY
+                 || optimizedBody[i + 1].op == InstructionType::CALL))) {
             i++;
             if (code[j].op == InstructionType::JMP && code[j].intOperand > j) {
                 j = code[j].intOperand;
@@ -931,8 +937,13 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
                 i += 2;
                 continue;
             }
-            while (optimizedBody[i].op != InstructionType::STORE_VAR && optimizedBody[i].op != InstructionType::JMZ &&
-                   optimizedBody[i].op != InstructionType::PRINT) {
+            while (optimizedBody[i].op != InstructionType::STORE_VAR
+                   && optimizedBody[i].op != InstructionType::JMZ
+                   && optimizedBody[i].op != InstructionType::PRINT
+                   && optimizedBody[i].op != InstructionType::SET_ELEMENT
+                      && optimizedBody[i].op != InstructionType::RET
+                         && optimizedBody[i].op != InstructionType::NEW_ARRAY
+                            && optimizedBody[i].op != InstructionType::CALL) {
                 code[j] = optimizedBody[i];
             j++;
             i++;
@@ -943,7 +954,13 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
                 i++;
                 j++;
                 int64_t place_to_jump = j;
-                while (code[j].op != InstructionType::STORE_VAR && code[j].op != InstructionType::JMZ && code[j].op != InstructionType::PRINT) {
+                while (code[j].op != InstructionType::STORE_VAR
+                && code[j].op != InstructionType::JMZ
+                && code[j].op != InstructionType::PRINT
+                && code[j].op != InstructionType::SET_ELEMENT
+                   && code[j].op != InstructionType::RET
+                      && code[j].op != InstructionType::NEW_ARRAY
+                         && code[j].op != InstructionType::CALL) {
                     j++;
                 }
                 j++;

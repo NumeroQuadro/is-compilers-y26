@@ -72,30 +72,30 @@
 #include "VirtualMachine.h"
 
 void getTimeScoreOfLanguage(const std::string &code) {
-  using namespace std::chrono;
-  auto start = high_resolution_clock::now();
+    using namespace std::chrono;
+    auto start = high_resolution_clock::now();
 
-  antlr4::ANTLRInputStream inputStream(code);
-  GrammarLexer lexer(&inputStream);
-  antlr4::CommonTokenStream tokens(&lexer);
-  GrammarParser parser(&tokens);
-  GrammarParser::ScriptContext *tree = parser.script();
+    antlr4::ANTLRInputStream inputStream(code);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
+    GrammarParser::ScriptContext *tree = parser.script();
 
-  GrammarASTInterpreter visitor;
-  visitor.visit(tree);
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-  vm.run();
+    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+    vm.run();
 
-  auto end = high_resolution_clock::now();
-  auto duration = duration_cast<milliseconds>(end - start);
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
 
-  std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
+    std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
 }
 
 
 int main() {
-  std::string factorial = R"(
+    std::string factorial = R"(
   {
     var value = 1
     for (var i = 2; i <= 20; i = i + 1) {
@@ -106,7 +106,7 @@ int main() {
   }
   )";
 
-  const std::string mergeSort = R"(
+    const std::string mergeSort = R"(
     func merge (arr: [], left: num, mid: num, right: num) {
         var n1 = mid - left + 1
         var n2 = right - mid
@@ -176,7 +176,7 @@ int main() {
     }
     )";
 
-  const std::string sieveOfEratosthenes = R"(
+    const std::string sieveOfEratosthenes = R"(
     func sieveOfEratosthenes(n: num) {
         var prime = [..n + 1]
         for (var i = 0; i < __size(prime); i = i + 1) {
@@ -226,98 +226,178 @@ print(8 + 1)
       print("finish")
     }
   )";
-
-  antlr4::ANTLRInputStream inputStream(experiment);
-  GrammarLexer lexer(&inputStream);
-  antlr4::CommonTokenStream tokens(&lexer);
-  GrammarParser parser(&tokens);
-
-  GrammarParser::ScriptContext *tree = parser.script();
-
-  GrammarASTInterpreter visitor;
-  visitor.visit(tree);
-   // visitor.toFile("test.txt");
-   //
-   // VirtualMachine vm;
-   // vm.optimize(true);
-   // vm.fromFile("test.txt");
-   // auto code = vm.getInstructions();
-   // for (int i = 0; i < code.size(); i++) {
-   //     if (code[i] != visitor.code[i]) {
-   //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
-   //         std::cout << code[i].toStr() << "\n";
-   //         std::cout << visitor.code[i].toStr() << "\n";
-   //     }
-   // }
-   // vm.run();
-
-  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-  vm.optimize(true);
-    auto instructions = vm.getInstructions();
-    for (int i = 0; i < instructions.size(); i++) {
-        std::cout << i << " " << instructions[i].toStr() << '\n';
+    std::string experiment2 = R"(
+    func red() {
+        print (9 * 7 + 1)
+        print("gol")
     }
-  vm.run();
-//   instructions = vm.getInstructions();
+    func test(in: num) {
+        while (false or false and true) {
+            print(6 * 8 + 9)
+            return true
+        }
+if (in > 0) {
+print((8 * 3 + 1) + in + (5 * 3))
+}
+        for (var i = 8 + 7 * 8 - 7; i < 100 - 1 + (-3); i = i + 1) {
+            print(i)
+        }
+
+        var prime = [..10 + 4]
+        for (var i = 0; i < __size(prime); i = i + 1) {
+            prime[i] = 1 + 3 + 4 + in + 5
+        }
+print(in)
+for (var i = 0; i < __size(prime); i = i + 1) {
+            print(prime[i])
+        }
+    }
+    {
+      test(34)
+        red()
+      print("finish")
+    }
+  )";
+
+    std::string experiment3 = R"(
+    func red() {
+        print (9 * 7 + 1)
+        print("gol")
+    }
+    func test(in: num, out: num) {
+        return 5 + 3 * 2
+    }
+    {
+      print(test(34 + 2 * 3, 3 + 2))
+        red()
+      print("finish")
+    }
+  )";
+
+    std::string factorial2 = R"(
+    func factorial(a: num) {
+        if (a == 1 or a == 0) {
+            return 1
+        }
+        return a * factorial(a - 1)
+    }
+    {
+      print(factorial(19))
+    }
+  )";
+    std::string experiment4 = R"(
+    func red() {
+        print (9 * 7 + 1)
+        print("gol")
+    }
+    func test(z: num, in: num, out: num) {
+        if (z < 12 and in == 10 and out == 11) {
+            return 4
+        }
+        print(in)
+        test(z - 1, in + 1, 2 * 5 + 1)
+        print(z)
+    }
+    {
+        test(0, 2 * 3, 3 + 2)
+        red()
+        print("finish")
+    }
+    )";
+
+
+    antlr4::ANTLRInputStream inputStream(factorial2);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
+
+    GrammarParser::ScriptContext *tree = parser.script();
+
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
+    // visitor.toFile("test.txt");
+    //
+    // VirtualMachine vm;
+    // vm.optimize(true);
+    // vm.fromFile("test.txt");
+    // auto code = vm.getInstructions();
+    // for (int i = 0; i < code.size(); i++) {
+    //     if (code[i] != visitor.code[i]) {
+    //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
+    //         std::cout << code[i].toStr() << "\n";
+    //         std::cout << visitor.code[i].toStr() << "\n";
+    //     }
+    // }
+    // vm.run();
+
+    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+    vm.optimize(true);
+    auto instructions = vm.getInstructions();
+//    for (int i = 0; i < instructions.size(); i++) {
+//        std::cout << i << " " << instructions[i].toStr() << '\n';
+//    }
+    vm.run();
+ //   std::cout << "\nOptimized:\n";
+   instructions = vm.getInstructions();
 //  for (int i = 0; i < instructions.size(); i++) {
 //      std::cout << i << " " << instructions[i].toStr() << '\n';
 //  }
 
-  return 0;
+    return 0;
 }
 
 using namespace std;
 
 int partition(vector<int> &vec, int low, int high) {
-  // Selecting last element as the pivot
-  int pivot = vec[high];
+    // Selecting last element as the pivot
+    int pivot = vec[high];
 
-  // Index of elemment just before the last element
-  // It is used for swapping
-  int i = (low - 1);
+    // Index of elemment just before the last element
+    // It is used for swapping
+    int i = (low - 1);
 
-  for (int j = low; j <= high - 1; j++) {
-    // If current element is smaller than or
-    // equal to pivot
-    if (vec[j] <= pivot) {
-      i++;
-      swap(vec[i], vec[j]);
+    for (int j = low; j <= high - 1; j++) {
+        // If current element is smaller than or
+        // equal to pivot
+        if (vec[j] <= pivot) {
+            i++;
+            swap(vec[i], vec[j]);
+        }
     }
-  }
 
-  // Put pivot to its position
-  swap(vec[i + 1], vec[high]);
+    // Put pivot to its position
+    swap(vec[i + 1], vec[high]);
 
-  // Return the point of partition
-  return (i + 1);
+    // Return the point of partition
+    return (i + 1);
 }
 
 void quickSort(vector<int> &vec, int low, int high) {
-  // Base case: This part will be executed till the starting
-  // index low is lesser than the ending index high
-  cout << low;
-  cout << high;
-  if (low < high) {
-    // pi is Partitioning Index, arr[p] is now at
-    // right place
-    int pi = partition(vec, low, high);
-    cout << pi;
-    // Separately sort elements before and after the
-    // Partition Index pi
-    quickSort(vec, low, pi - 1);
-    quickSort(vec, pi + 1, high);
-  }
+    // Base case: This part will be executed till the starting
+    // index low is lesser than the ending index high
+    cout << low;
+    cout << high;
+    if (low < high) {
+        // pi is Partitioning Index, arr[p] is now at
+        // right place
+        int pi = partition(vec, low, high);
+        cout << pi;
+        // Separately sort elements before and after the
+        // Partition Index pi
+        quickSort(vec, low, pi - 1);
+        quickSort(vec, pi + 1, high);
+    }
 }
 
 int main2() {
-  vector<int> vec = {4, 3, 2, 1};
-  int n = vec.size();
+    vector<int> vec = {4, 3, 2, 1};
+    int n = vec.size();
 
-  // Calling quicksort for the vector vec
-  quickSort(vec, 0, n - 1);
+    // Calling quicksort for the vector vec
+    quickSort(vec, 0, n - 1);
 
-  for (auto i: vec) {
-    cout << i << " ";
-  }
-  return 0;
+    for (auto i: vec) {
+        cout << i << " ";
+    }
+    return 0;
 }
