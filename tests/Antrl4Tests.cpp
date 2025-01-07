@@ -695,6 +695,23 @@ TEST(JITTests, SpeedTest_ShoudWorkFaster) {
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
+TEST(JITTests, SpeedTest_ShoudWorkFaster2) {
+    std::string experimentCode = R"(
+    func red(left: num, right: num) {
+        return left + right
+    }
+    {
+        print(red(3, 4))
+        print(red(3, 4))
+        print(red(3, 4))
+    }
+    )";
+
+    size_t operationWithoutOptimizations = getTimeScoreOfLanguage(experimentCode, false);
+    size_t operationWithOptimizations = getTimeScoreOfLanguage(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
 INSTANTIATE_TEST_SUITE_P(
         FlagOnOff,
         LanguageTests,

@@ -36,16 +36,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: some tests + optimization???">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/FunctionInfo.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/FunctionInfo.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Value.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Value.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Value.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Value.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
-    </list>
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: cache optimization new test" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -115,16 +106,10 @@
       <recent name="\\wsl.localhost\Ubuntu\home\mityaiii\new\include" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.run_tests">
+  <component name="RunManager" selected="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Print_Hard">
     <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="All in Antrl4Tests.cpp" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_PATTERN="all-tests(file://$PROJECT_DIR$/tests/Antrl4Tests.cpp)" TEST_MODE="PATTERN">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-        <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="JITTests.CasheForFunctions_ShouldNotSave_Call" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="CasheForFunctions_ShouldNotSave_Call" TEST_MODE="SUITE_TEST">
@@ -134,6 +119,12 @@
       </method>
     </configuration>
     <configuration name="JITTests.CasheForFunctions_ShouldNotSave_OtherArguments" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="CasheForFunctions_ShouldNotSave_OtherArguments" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JITTests.CasheForFunctions_ShouldNotSave_Print_Hard" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="CasheForFunctions_ShouldNotSave_Print_Hard" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -232,18 +223,18 @@
       <item itemvalue="CMake Application.run_tests" />
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.antlr4_tests" />
-      <item itemvalue="Google Test.All in Antrl4Tests.cpp" />
       <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Call" />
       <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_OtherArguments" />
+      <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Print_Hard" />
       <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldSave" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Print_Hard" />
         <item itemvalue="CMake Application.run_tests" />
         <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_OtherArguments" />
         <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Call" />
         <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldSave" />
-        <item itemvalue="Google Test.All in Antrl4Tests.cpp" />
       </list>
     </recent_temporary>
   </component>
@@ -294,7 +285,21 @@
       <option name="project" value="LOCAL" />
       <updated>1736290247294</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="feat: cache optimization done!">
+      <created>1736293096370</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1736293096370</updated>
+    </task>
+    <task id="LOCAL-00006" summary="feat: cache optimization new test">
+      <created>1736293235505</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1736293235505</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -321,7 +326,9 @@
     <MESSAGE value="fix: start_address" />
     <MESSAGE value="fix: zusammen versions" />
     <MESSAGE value="feat: some tests + optimization???" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: some tests + optimization???" />
+    <MESSAGE value="feat: cache optimization done!" />
+    <MESSAGE value="feat: cache optimization new test" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: cache optimization new test" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
