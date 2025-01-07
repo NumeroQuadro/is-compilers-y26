@@ -5,6 +5,8 @@
 class LanguageTests : public ::testing::TestWithParam<bool> {
 };
 
+
+
 TEST_P(LanguageTests, FactorialTest) {
   bool isOptimised = GetParam();
   std::string factorialCode = R"(
@@ -21,6 +23,25 @@ TEST_P(LanguageTests, FactorialTest) {
   std::string expectedOutput = "2432902008176640000\n"; // 20!
   std::string actualOutput = runCode(factorialCode, isOptimised);
   EXPECT_EQ(actualOutput, expectedOutput);
+}
+
+TEST_P(LanguageTests, Factorial2Test) {
+    bool isOptimised = GetParam();
+    std::string factorialCode = R"(
+    func factorial(a: num) {
+        if (a == 1 or a == 0) {
+            return 1
+        }
+        return a * factorial(a - 1)
+    }
+    {
+      print(factorial(20))
+    }
+    )";
+
+    std::string expectedOutput = "2432902008176640000\n"; // 20!
+    std::string actualOutput = runCode(factorialCode, isOptimised);
+    EXPECT_EQ(actualOutput, expectedOutput);
 }
 
 TEST_P(LanguageTests, MergeSortTest) {
@@ -210,11 +231,380 @@ TEST_P(LanguageTests, SumWithDifferenceType) {
   EXPECT_EQ(actualOutput, expectedOutput);
 }
 
+TEST(JITTests, DeadCodeEllumination_HasNotDeadCode_ShouldHaveSameOperationsCount) {
+    std::string experimentCode = R"(
+    func test() {
+        var a = 1
+        var b = 3.2
+        print(a + b)
+    }
+    {
+        test()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_EQ(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, DeadCodeEllumination_HasDeadCode_ShouldDoLessOperations) {
+    std::string experimentCode = R"(
+    func test() {
+        var a = 1
+        var b = 3.2
+    }
+    {
+        test()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, DeadCodeEllumination_HasDeadCodeDifficultCase_ShouldDoLessOperations) {
+    std::string experimentCode = R"(
+    func test() {
+        var a = 1
+        var b = a + 3.2
+    }
+    {
+        test()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, ConstantFolding_VariablesCreating_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func test() {
+        var a = 1 + 1
+        print(a)
+    }
+    {
+        test()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, ConstantFolding_If_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func test() {
+        if (true or false) {
+            print(true)
+        }
+        print(4)
+    }
+    {
+        test()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, ConstantFolding_While_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func test() {
+        while (true or false) {
+            return 0
+        }
+        print(4)
+    }
+    {
+        print(test())
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, ConstantFolding_For_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func test() {
+        for (var i = 0; i < 5 * 8 + 1; i = i + 1) {
+            print(i)
+        }
+    }
+    {
+        test()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, ConstantFolding_Return_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func test() {
+        return 5 * 8 + 1 - 3
+    }
+    {
+        print(test())
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "38\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, ConstantFolding_FunctionCall_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func test(a: num, b: num, c: boolean) {
+        print(a)
+        print(b)
+        print(c)
+    }
+    func b() {
+        test(5 * 6 + 1, (4 / 2 + 7) * 10, !true)
+        print(1)
+    }
+    {
+        b()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "31\n90\nfalse\n1\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, ConstantFolding_ArrayCreating_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func b() {
+        a = [..10 + 6]
+        print(__size(a))
+    }
+    {
+        b()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "16\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, ConstantFolding_ArraySet_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func b() {
+        a = [..10 + 6]
+        a[4] = (5 + 7 * 8) * 2 + 8
+        print(a[4])
+    }
+    {
+        b()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "130\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, ConstantFolding_Print_ShouldHaveOperationsCount) {
+    std::string experimentCode = R"(
+    func b() {
+        print((-11 + 3 + 2 * 12) % 5)
+    }
+    {
+        b()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "1\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, Experiment1) {
+    std::string experimentCode = R"(
+    func test(in: num) {
+        var r = in + 3
+        var e = 2 + 4 - 1
+        var d = !true or (!true or false) and true or (5 > 3) and (7 < in) or false
+        var m = 3 + 2 + in + 8
+        var w = 8 * 3 + in
+        print(w)
+        print(d)
+        if (true or false) {
+            print(5)
+            print(r)
+        }
+        print(m)
+        print(e)
+        print(8 + 1)
+    }
+    {
+      test(34)
+      print("finish")
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "58\ntrue\n5\n37\n47\n5\n9\n\"finish\"\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, Experiment2) {
+    std::string experimentCode = R"(
+    func red() {
+        print (9 * 7 + 1)
+        print("gol")
+    }
+    func test(in: num, out: num) {
+        return 5 + 3 * 2
+    }
+    {
+      print(test(34 + 2 * 3, 3 + 2))
+      red()
+      print("finish")
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "11\n64\n\"gol\"\n\"finish\"\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, Experiment3) {
+    std::string experimentCode = R"(
+    func red() {
+        print (9 * 7 + 1)
+        print("gol")
+    }
+    func test(z: num, in: num, out: num) {
+        if (z < 12 and in == 10 and out == 11) {
+            return 4
+        }
+        print(in)
+        test(z - 1, in + 1, 2 * 5 + 1)
+        print(z)
+    }
+    {
+    test(0, 2 * 3, 3 + 2)
+    red()
+    print("finish")
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "6\n7\n8\n9\n-3\n-2\n-1\n0\n64\n\"gol\"\n\"finish\"\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, CasheForFunctions_ShouldSave) {
+    std::string experimentCode = R"(
+    func red(left: num, right: num) {
+        return left + right
+    }
+    {
+        print(red(3, 4))
+        print(red(3, 4))
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "7\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, SpeedTest_ShoudWorkFaster) {
+    std::string experimentCode = R"(
+    func test(z: num) {
+        var a = 4 + 1
+        var b = 3 * 2 + 5 + 9
+        if (z == 10 * 10 * 10 * 10 * 10 * 10) {
+            return 0
+        }
+        test(z + 1)
+    }
+    {
+        test(0)
+    }
+    )";
+
+    size_t operationWithoutOptimizations = getTimeScoreOfLanguage(experimentCode, false);
+    size_t operationWithOptimizations = getTimeScoreOfLanguage(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
 INSTANTIATE_TEST_SUITE_P(
   FlagOnOff,
   LanguageTests,
   ::testing::Bool()
 );
+
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

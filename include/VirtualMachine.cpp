@@ -152,7 +152,7 @@ void print(const Value &value) {
       break;
     }
     case ValueType::BOOL: {
-      std::cout << value.asBool() ? "true" : "false";
+      std::cout << (value.asBool() ? "true" : "false");
       break;
     }
     case ValueType::DOUBLE: {
@@ -351,6 +351,7 @@ void VirtualMachine::run() {
   }
 
   while (ip >= 0 && ip < code.size()) {
+    ++runnedOperationsCount;
     switch (const Instruction &inst = code[ip]; inst.op) {
       case InstructionType::JMP:
         ip = inst.intOperand;
@@ -703,27 +704,27 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
   }
 
   int64_t address = iter->second.address;
-  int64_t next_function_adress = start_address;
+  int64_t next_function_address = start_address;
   for (auto &p: functionTable) {
     if (p.second.address > address) {
-      next_function_adress = std::min(next_function_adress, p.second.address);
+        next_function_address = std::min(next_function_address, p.second.address);
     }
   }
 
-  std::unordered_set<std::string> usedVariables;
-  std::unordered_map<std::string, int64_t> save_usages;
-  for (int64_t i = next_function_adress - 1; i >= address; i--) {
-    if (code[i].op == InstructionType::STORE_VAR) {
-      save_usages[code[i].strOperand]++;
+    std::unordered_set<std::string> usedVariables;
+    std::unordered_map<std::string, int64_t> save_usages;
+    for (int64_t i = next_function_address - 1; i >= address; i--) {
+        if (code[i].op == InstructionType::STORE_VAR) {
+            save_usages[code[i].strOperand]++;
+        }
     }
-  }
-  for (auto &p: save_usages) {
-    if (p.second > 1) {
-      usedVariables.insert(p.first);
+    for (auto& p : save_usages) {
+        if (p.second > 1) {
+            usedVariables.insert(p.first);
+        }
     }
-  }
 
-  for (int64_t i = next_function_adress - 1; i >= address; i--) {
+  for (int64_t i = next_function_address - 1; i >= address; i--) {
     if (code[i].op == InstructionType::RET || code[i].op == InstructionType::PUSH_VAR) {
       usedVariables.insert(code[i].strOperand);
     } else if (code[i].op == InstructionType::STORE_VAR) {
@@ -731,17 +732,19 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
         int64_t k = 1;
         --i;
         while ((code[i].op == InstructionType::ADD
-                || code[i].op == InstructionType::MUL
-                || code[i].op == InstructionType::SUB
-                || code[i].op == InstructionType::DIV
-                || code[i].op == InstructionType::PUSH_INT
-                || code[i].op == InstructionType::PUSH_BOOL
-                || code[i].op == InstructionType::PUSH_STRING
-                || code[i].op == InstructionType::PUSH_VAR
-                || code[i].op == InstructionType::AND
-                || code[i].op == InstructionType::OR
-                || code[i].op == InstructionType::EQ
-                || code[i].op == InstructionType::NEQ
+               || code[i].op == InstructionType::MUL
+               || code[i].op == InstructionType::SUB
+               || code[i].op == InstructionType::DIV
+               || code[i].op == InstructionType::DIV_REM
+               || code[i].op == InstructionType::PUSH_INT
+               || code[i].op == InstructionType::PUSH_BOOL
+               || code[i].op == InstructionType::PUSH_DOUBLE
+               || code[i].op == InstructionType::PUSH_STRING
+               || code[i].op == InstructionType::PUSH_VAR
+               || code[i].op == InstructionType::AND
+               || code[i].op == InstructionType::OR
+               || code[i].op == InstructionType::EQ
+               || code[i].op == InstructionType::NEQ
                 || code[i].op == InstructionType::LT
                 || code[i].op == InstructionType::LE
                 || code[i].op == InstructionType::GT
@@ -762,11 +765,11 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
     }
   }
 
-  //  std::cout << "\n After Dead code ellumination:\n";
-  //    for (int64_t i = address; i < next_function_adress; i++) {
-  //        std::cout << i << " " << code[i].toStr() << '\n';
-  //    }
-  foldConstants(address, next_function_adress);
+//  std::cout << "\n After Dead code ellumination:\n";
+//    for (int64_t i = address; i < next_function_address; i++) {
+//        std::cout << i << " " << code[i].toStr() << '\n';
+//    }
+    foldConstants(address, next_function_address);
 
   optimized_functions.insert(function_name);
 }
@@ -999,3 +1002,8 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
 
   return optimizedBody;
 }
+
+size_t VirtualMachine::getRunnedOperationsCount() {
+    return runnedOperationsCount;
+}
+

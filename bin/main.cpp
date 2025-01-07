@@ -72,31 +72,33 @@
 #include "GrammarASTInterpreter.h"
 #include "VirtualMachine.h"
 
-// void getTimeScoreOfLanguage(const std::string &code) {
-//   using namespace std::chrono;
-//   auto start = high_resolution_clock::now();
-//
-//   antlr4::ANTLRInputStream inputStream(code);
-//   GrammarLexer lexer(&inputStream);
-//   antlr4::CommonTokenStream tokens(&lexer);
-//   GrammarParser parser(&tokens);
-//   GrammarParser::ScriptContext *tree = parser.script();
-//
-//   GrammarASTInterpreter visitor;
-//   visitor.visit(tree);
-//
-//   VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-//   vm.run();
-//
-//   auto end = high_resolution_clock::now();
-//   auto duration = duration_cast<milliseconds>(end - start);
-//
-//   std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
-// }
+ void getTimeScoreOfLanguage(const std::string &code) {
+   using namespace std::chrono;
+   auto start = high_resolution_clock::now();
+
+   antlr4::ANTLRInputStream inputStream(code);
+   GrammarLexer lexer(&inputStream);
+   antlr4::CommonTokenStream tokens(&lexer);
+   GrammarParser parser(&tokens);
+   GrammarParser::ScriptContext *tree = parser.script();
+
+   GrammarASTInterpreter visitor;
+   visitor.visit(tree);
+     GarbageCollector gc;
+
+     VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+     //vm.optimize(true);
+     vm.run();
+
+   auto end = high_resolution_clock::now();
+   auto duration = duration_cast<milliseconds>(end - start);
+
+   std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
+ }
 
 
 int main() {
-  std::string factorial = R"(
+    std::string factorial = R"(
   {
     var value = 1
     for (var i = 2; i <= 20; i = i + 1) {
@@ -107,7 +109,7 @@ int main() {
   }
   )";
 
-  const std::string mergeSort = R"(
+    const std::string mergeSort = R"(
     func merge (arr: [], left: num, mid: num, right: num) {
         var n1 = mid - left + 1
         var n2 = right - mid
@@ -177,7 +179,7 @@ int main() {
     }
     )";
 
-  const std::string sieveOfEratosthenes = R"(
+    const std::string sieveOfEratosthenes = R"(
     func sieveOfEratosthenes(n: num) {
         var prime = [..n + 1]
         for (var i = 0; i < __size(prime); i = i + 1) {
@@ -204,7 +206,7 @@ int main() {
     }
     )";
 
-  std::string experiment = R"(
+    std::string experiment = R"(
     func test(in: num) {
         var r = in + 3
         var e = 2 + 4 - 1
@@ -227,7 +229,7 @@ print(8 + 1)
       print("finish")
     }
   )";
-  std::string experiment2 = R"(
+    std::string experiment2 = R"(
     func red() {
         print (9 * 7 + 1)
         print("gol")
@@ -260,7 +262,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     }
   )";
 
-  std::string experiment3 = R"(
+    std::string experiment3 = R"(
     func red() {
         print (9 * 7 + 1)
         print("gol")
@@ -275,7 +277,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     }
   )";
 
-  std::string factorial2 = R"(
+    std::string factorial2 = R"(
     func factorial(a: num) {
         if (a == 1 or a == 0) {
             return 1
@@ -286,46 +288,73 @@ for (var i = 0; i < __size(prime); i = i + 1) {
       print(factorial(19))
     }
   )";
-  std::string experiment4 = R"(
-    func red(left: num, right: num) {
-        return left + right
+    std::string experiment4 = R"(
+    func red() {
+
+        print (9 * 7 + 1)
+        print("gol")
+    }
+    func test(z: num, in: num, out: num) {
+        if (z < 12 and in == 10 and out == 11) {
+            return 4
+        }
+        print(in)
+        test(z - 1, in + 1, 2 * 5 + 1)
+        print(z)
     }
     {
-        print(red(3, 4))
-        print(red(3, 4))
+        test(0, 2 * 3, 3 + 2)
+        red()
+        print("finish")
+    }
+    )";
+
+    std::string experiment5 = R"(
+    func test(z: num) {
+        var a = 4 + 1
+        var b = 3 * 2 + 5 + 9
+        if (z == 10 * 10 * 10 * 10 * 10 * 10) {
+            return 0
+        }
+        test(z + 1)
+    }
+    {
+        test(0)
     }
     )";
 
 
-  antlr4::ANTLRInputStream inputStream(experiment4);
-  GrammarLexer lexer(&inputStream);
-  antlr4::CommonTokenStream tokens(&lexer);
-  GrammarParser parser(&tokens);
+//    antlr4::ANTLRInputStream inputStream(mergeSort);
+//    GrammarLexer lexer(&inputStream);
+//    antlr4::CommonTokenStream tokens(&lexer);
+//    GrammarParser parser(&tokens);
+//
+//    GrammarParser::ScriptContext *tree = parser.script();
+//
+//    GrammarASTInterpreter visitor;
+//    visitor.visit(tree);
+//    // visitor.toFile("test.txt");
+//    //
+//    // VirtualMachine vm;
+//    // vm.optimize(true);
+//    // vm.fromFile("test.txt");
+//    // auto code = vm.getInstructions();
+//    // for (int i = 0; i < code.size(); i++) {
+//    //     if (code[i] != visitor.code[i]) {
+//    //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
+//    //         std::cout << code[i].toStr() << "\n";
+//    //         std::cout << visitor.code[i].toStr() << "\n";
+//    //     }
+//    // }
+//    // vm.run();
+//
+//  GarbageCollector gc;
+//
+//  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+//  vm.optimize(true);
+//  vm.run();
 
-  GrammarParser::ScriptContext *tree = parser.script();
+    getTimeScoreOfLanguage(experiment5);
 
-  GrammarASTInterpreter visitor;
-  visitor.visit(tree);
-  // visitor.toFile("test.txt");
-  //
-  // VirtualMachine vm;
-  // vm.optimize(true);
-  // vm.fromFile("test.txt");
-  // auto code = vm.getInstructions();
-  // for (int i = 0; i < code.size(); i++) {
-  //     if (code[i] != visitor.code[i]) {
-  //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
-  //         std::cout << code[i].toStr() << "\n";
-  //         std::cout << visitor.code[i].toStr() << "\n";
-  //     }
-  // }
-  // vm.run();
-
-  GarbageCollector gc;
-
-  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
-  vm.optimize(true);
-  vm.run();
-
-  return 0;
+    return 0;
 }

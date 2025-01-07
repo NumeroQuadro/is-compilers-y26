@@ -34,6 +34,8 @@ public:
 
   void run();
 
+  size_t getRunnedOperationsCount();
+
   Scope *getCurrentScope() const;
 
   std::stack<Value> &getStackRef();
@@ -60,6 +62,7 @@ private:
   bool isOptimized = false;
   std::unordered_set<std::string> optimized_functions;
   int64_t start_address{};
+  size_t runnedOperationsCount = 0;
 
   int64_t ip = 0;
 

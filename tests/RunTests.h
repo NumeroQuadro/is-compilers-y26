@@ -34,3 +34,48 @@ std::string runCode(const std::string& codeStr, bool withOptimisation = false) {
 
   return buffer.str();
 }
+
+size_t runCodeAndGetOperationsCount(const std::string& codeStr, bool withOptimisation = false) {
+
+    antlr4::ANTLRInputStream inputStream(codeStr);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
+
+    GrammarParser::ScriptContext *tree = parser.script();
+
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
+
+    GarbageCollector gc;
+
+    VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+    vm.optimize(withOptimisation);
+    vm.run();
+
+    return vm.getRunnedOperationsCount();
+}
+
+size_t getTimeScoreOfLanguage(const std::string &code, bool optimize) {
+    using namespace std::chrono;
+    auto start = high_resolution_clock::now();
+
+    antlr4::ANTLRInputStream inputStream(code);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
+    GrammarParser::ScriptContext *tree = parser.script();
+
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
+    GarbageCollector gc;
+
+    VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+    vm.optimize(optimize);
+    vm.run();
+
+    auto end = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(end - start);
+
+    return duration.count();
+}
