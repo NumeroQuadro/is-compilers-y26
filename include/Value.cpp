@@ -266,3 +266,16 @@ bool operator&&(const Value &lhs, const Value &rhs) {
 bool operator||(const Value &lhs, const Value &rhs) {
   return lhs.asBool() || rhs.asBool();
 }
+
+std::string Value::toStr() {
+    if (_type == ValueType::INT) {
+        return std::to_string(std::get<int64_t>(_data));
+    }
+    if (_type == ValueType::BOOL) {
+        return std::to_string(std::get<bool>(_data));
+    }
+    if (_type == ValueType::DOUBLE) {
+        return std::to_string(std::get<double>(_data));
+    }
+    return "REF";
+}

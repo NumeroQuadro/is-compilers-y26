@@ -225,22 +225,26 @@ void VirtualMachine::exitScope() {
   scope_ = old->previous_;
 }
 
-bool VirtualMachine::hasPrint(const std::string &funcName) const {
-  const auto func = functionTable.find(funcName);
-  if (func == functionTable.end()) {
-    throw std::runtime_error("Function not found: " + funcName);
-  }
-
-  const auto &[name, params, address] = func->second;
-
-  size_t i = address;
-  while (i < code.size() && code[i].op != InstructionType::RET) {
-    if (code[i].op == InstructionType::PRINT) {
-      return true;
+bool VirtualMachine::hasPrintOrCall(const std::string &funcName) const {
+    auto iter = functionTable.find(funcName);
+    if (iter == functionTable.end()) {
+        throw std::runtime_error("Function not found: " + funcName);
     }
-    ++i;
-  }
-  return false;
+
+    int64_t address = iter->second.address;
+    int64_t next_function_address = start_address;
+    for (auto &p: functionTable) {
+        if (p.second.address > address) {
+            next_function_address = std::min(next_function_address, p.second.address);
+        }
+    }
+
+    for (int64_t i = address; i < next_function_address; i++) {
+        if (code[i].op == InstructionType::PRINT || code[i].op == InstructionType::CALL) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void VirtualMachine::doCall(const std::string &funcName) {
@@ -283,14 +287,17 @@ void VirtualMachine::doCall(const std::string &funcName) {
     paramValues.emplace_back(params[i].name, argVal);
   }
 
+  FunctionCacheParams functionCacheParams = {name, paramValues};
+  function_cache_params_stack.push(functionCacheParams);
+
   auto frame = CallFrame{
     ip + 1,
     scope_,
     true
   };
 
-  if (isOptimized && !hasPrint(funcName) && !hasRefParam) {
-    if (const auto &funcCache = functionsCallCache.find(funcName); funcCache != functionsCallCache.end()) {
+  if (isOptimized && !hasPrintOrCall(funcName) && !hasRefParam) {
+    if (const auto &funcCache = functionsCallCache.find(functionCacheParams.toStr()); funcCache != functionsCallCache.end()) {
       frame.funcName = funcName;
       callStack.push(frame);
       stack.emplace(funcCache->second);
@@ -321,9 +328,10 @@ void VirtualMachine::doRet() {
   }
 
   const auto [returnIp, prevScope, hasReturnValue, funcName] = callStack.top();
-  if (isOptimized && !funcName.empty()) {
-    functionsCallCache[funcName] = retVal;
+  if (isOptimized && functionsCallCache.find(function_cache_params_stack.top().toStr()) == functionsCallCache.end()) {
+    functionsCallCache[function_cache_params_stack.top().toStr()] = retVal;
   }
+  function_cache_params_stack.pop();
   callStack.pop();
 
   delete scope_;

@@ -123,6 +123,8 @@ public:
             return "REF";
         }
     }
+
+    std::string toStr();
 private:
   std::variant<int64_t, double, bool, HeapValue *> _data;
   ValueType _type;

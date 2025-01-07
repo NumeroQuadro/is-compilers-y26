@@ -6,10 +6,9 @@ class LanguageTests : public ::testing::TestWithParam<bool> {
 };
 
 
-
 TEST_P(LanguageTests, FactorialTest) {
-  bool isOptimised = GetParam();
-  std::string factorialCode = R"(
+    bool isOptimised = GetParam();
+    std::string factorialCode = R"(
     {
         var value = 1
         for (var i = 2; i <= 20; i = i + 1) {
@@ -20,9 +19,9 @@ TEST_P(LanguageTests, FactorialTest) {
     }
     )";
 
-  std::string expectedOutput = "2432902008176640000\n"; // 20!
-  std::string actualOutput = runCode(factorialCode, isOptimised);
-  EXPECT_EQ(actualOutput, expectedOutput);
+    std::string expectedOutput = "2432902008176640000\n"; // 20!
+    std::string actualOutput = runCode(factorialCode, isOptimised);
+    EXPECT_EQ(actualOutput, expectedOutput);
 }
 
 TEST_P(LanguageTests, Factorial2Test) {
@@ -45,8 +44,8 @@ TEST_P(LanguageTests, Factorial2Test) {
 }
 
 TEST_P(LanguageTests, MergeSortTest) {
-  bool isOptimised = GetParam();
-  std::string mergeSortCode = R"(
+    bool isOptimised = GetParam();
+    std::string mergeSortCode = R"(
             func merge (arr: [], left: num, mid: num, right: num) {
         var n1 = mid - left + 1
         var n2 = right - mid
@@ -112,14 +111,14 @@ TEST_P(LanguageTests, MergeSortTest) {
     }
     )";
 
-  std::string expectedOutput = "-5\n1\n2.4\n2.5\n3\n";
-  std::string actualOutput = runCode(mergeSortCode, isOptimised);
-  EXPECT_EQ(actualOutput, expectedOutput);
+    std::string expectedOutput = "-5\n1\n2.4\n2.5\n3\n";
+    std::string actualOutput = runCode(mergeSortCode, isOptimised);
+    EXPECT_EQ(actualOutput, expectedOutput);
 }
 
 TEST_P(LanguageTests, SieveOfEratosthenesTest) {
-  bool isOptimised = GetParam();
-  std::string sieveCode = R"(
+    bool isOptimised = GetParam();
+    std::string sieveCode = R"(
         func sieveOfEratosthenes(n: num) {
             var prime = [..n + 1]
             for (var i = 0; i < __size(prime); i = i + 1) {
@@ -146,79 +145,79 @@ TEST_P(LanguageTests, SieveOfEratosthenesTest) {
         }
     )";
 
-  std::string expectedOutput = "2\n3\n5\n7\n";
-  std::string actualOutput = runCode(sieveCode, isOptimised);
-  EXPECT_EQ(actualOutput, expectedOutput);
+    std::string expectedOutput = "2\n3\n5\n7\n";
+    std::string actualOutput = runCode(sieveCode, isOptimised);
+    EXPECT_EQ(actualOutput, expectedOutput);
 }
 
 TEST_P(LanguageTests, OperationPriority) {
-  bool isOptimised = GetParam();
-  std::string experimentCode = R"(
+    bool isOptimised = GetParam();
+    std::string experimentCode = R"(
         {
           print(2 + 2 * 2)
         }
     )";
 
-  std::string expectedOutput = "6\n";
-  std::string actualOutput = runCode(experimentCode, isOptimised);
-  EXPECT_EQ(actualOutput, expectedOutput);
+    std::string expectedOutput = "6\n";
+    std::string actualOutput = runCode(experimentCode, isOptimised);
+    EXPECT_EQ(actualOutput, expectedOutput);
 }
 
 TEST_P(LanguageTests, GarbageCollectorWithGlobalValues) {
-  bool isOptimised = GetParam();
-  std::string experimentCode = R"(
+    bool isOptimised = GetParam();
+    std::string experimentCode = R"(
         var a = [1, 2, 3]
     )";
 
-  antlr4::ANTLRInputStream inputStream(experimentCode);
-  GrammarLexer lexer(&inputStream);
-  antlr4::CommonTokenStream tokens(&lexer);
-  GrammarParser parser(&tokens);
+    antlr4::ANTLRInputStream inputStream(experimentCode);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
 
-  GrammarParser::ScriptContext *tree = parser.script();
+    GrammarParser::ScriptContext *tree = parser.script();
 
-  GrammarASTInterpreter visitor;
-  visitor.visit(tree);
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
 
-  GarbageCollector gc;
+    GarbageCollector gc;
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
-  vm.optimize(isOptimised);
-  vm.run();
+    VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+    vm.optimize(isOptimised);
+    vm.run();
 
-  EXPECT_EQ(vm.getHeapSize(), 0);
+    EXPECT_EQ(vm.getHeapSize(), 0);
 }
 
 TEST_P(LanguageTests, GarbageCollector) {
-  bool isOptimised = GetParam();
-  std::string experimentCode = R"(
+    bool isOptimised = GetParam();
+    std::string experimentCode = R"(
     {
         var a = [1, 2, 3]
     }
     )";
 
-  antlr4::ANTLRInputStream inputStream(experimentCode);
-  GrammarLexer lexer(&inputStream);
-  antlr4::CommonTokenStream tokens(&lexer);
-  GrammarParser parser(&tokens);
+    antlr4::ANTLRInputStream inputStream(experimentCode);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
 
-  GrammarParser::ScriptContext *tree = parser.script();
+    GrammarParser::ScriptContext *tree = parser.script();
 
-  GrammarASTInterpreter visitor;
-  visitor.visit(tree);
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
 
-  GarbageCollector gc;
+    GarbageCollector gc;
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
-  vm.optimize(isOptimised);
-  vm.run();
+    VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+    vm.optimize(isOptimised);
+    vm.run();
 
-  EXPECT_EQ(vm.getHeapSize(), 0);
+    EXPECT_EQ(vm.getHeapSize(), 0);
 }
 
 TEST_P(LanguageTests, SumWithDifferenceType) {
-  bool isOptimised = GetParam();
-  std::string experimentCode = R"(
+    bool isOptimised = GetParam();
+    std::string experimentCode = R"(
     {
         var a = 1
         var b = 3.2
@@ -226,9 +225,9 @@ TEST_P(LanguageTests, SumWithDifferenceType) {
     }
     )";
 
-  std::string expectedOutput = "4.2\n";
-  std::string actualOutput = runCode(experimentCode, isOptimised);
-  EXPECT_EQ(actualOutput, expectedOutput);
+    std::string expectedOutput = "4.2\n";
+    std::string actualOutput = runCode(experimentCode, isOptimised);
+    EXPECT_EQ(actualOutput, expectedOutput);
 }
 
 TEST(JITTests, DeadCodeEllumination_HasNotDeadCode_ShouldHaveSameOperationsCount) {
@@ -572,7 +571,78 @@ TEST(JITTests, CasheForFunctions_ShouldSave) {
     size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 
-    std::string expectedOutput = "7\n";
+    std::string expectedOutput = "7\n7\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, CasheForFunctions_ShouldNotSave_OtherArguments) {
+    std::string experimentCode = R"(
+    func red(left: num, right: num) {
+        return left + right
+    }
+    {
+        print(red(3, 4))
+        print(red(3, 5))
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_EQ(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "7\n8\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, CasheForFunctions_ShouldNotSave_Print) {
+    std::string experimentCode = R"(
+    func red(left: num, right: num) {
+        print(left + right)
+        return left + right
+    }
+    {
+        print(red(3, 4))
+        print(red(3, 4))
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_EQ(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "7\n7\n7\n7\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
+TEST(JITTests, CasheForFunctions_ShouldNotSave_Call) {
+    std::string experimentCode = R"(
+    func tree() {
+        print(5)
+    }
+    func red(left: num, right: num) {
+        tree()
+        return left + right
+    }
+    {
+        print(red(3, 4))
+        print(red(3, 4))
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_EQ(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "5\n7\n5\n7\n";
     std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
     std::string actualOutputWithOptimization = runCode(experimentCode, true);
     EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
@@ -600,13 +670,13 @@ TEST(JITTests, SpeedTest_ShoudWorkFaster) {
 }
 
 INSTANTIATE_TEST_SUITE_P(
-  FlagOnOff,
-  LanguageTests,
-  ::testing::Bool()
+        FlagOnOff,
+        LanguageTests,
+        ::testing::Bool()
 );
 
 
 int main(int argc, char **argv) {
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

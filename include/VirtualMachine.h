@@ -63,6 +63,7 @@ private:
   std::unordered_set<std::string> optimized_functions;
   int64_t start_address{};
   size_t runnedOperationsCount = 0;
+  std::stack<FunctionCacheParams> function_cache_params_stack;
 
   int64_t ip = 0;
 
@@ -90,7 +91,7 @@ private:
 
   void exitScope();
 
-  bool hasPrint(const std::string &funcName) const;
+  bool hasPrintOrCall(const std::string &funcName) const;
 
   void doCall(const std::string &funcName);
 
