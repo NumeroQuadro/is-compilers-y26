@@ -10,6 +10,7 @@ antlrcpp::Any GrammarASTInterpreter::visitScript(GrammarParser::ScriptContext *c
   for (const auto f: ctx->function()) {
     visit(f);
   }
+
   startPos = code.size();
 
   for (const auto s: ctx->statement()) {
@@ -21,11 +22,9 @@ antlrcpp::Any GrammarASTInterpreter::visitScript(GrammarParser::ScriptContext *c
 }
 
 antlrcpp::Any GrammarASTInterpreter::visitBlock(GrammarParser::BlockContext *ctx) {
-  for (auto c: ctx->children) {
-    auto stmt = dynamic_cast<GrammarParser::StatementContext *>(c);
-    if (stmt) visit(stmt);
-    auto vd = dynamic_cast<GrammarParser::VardefContext *>(c);
-    if (vd) visit(vd);
+  for (const auto &c: ctx->children) {
+    if (const auto stmt = dynamic_cast<GrammarParser::StatementContext *>(c)) visit(stmt);
+    if (const auto vd = dynamic_cast<GrammarParser::VardefContext *>(c)) visit(vd);
   }
   return nullptr;
 }

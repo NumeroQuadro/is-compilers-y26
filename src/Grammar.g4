@@ -22,15 +22,15 @@ block
 	:  '{' (statement|vardef)* '}';
 
 statement
-	:	'if' '(' expr ')' statement ('else' statement)?		# If
-	|	'while' '(' expr ')' statement						# While
-	|   'for' '(' forInit? ';' forCondition? ';' forIncrement? ')' statement                  # For
-	|	assign											    # AssignStmt
-	|	ID '[' expr ']' '=' expr							# ElementAssign
-	|	call_expr											# CallStatement
-	|	'print' '(' expr? ')'								# Print
-	|	'return' expr										# Return
-	|	block				 								# BlockStatement
+	:	'if' '(' expr ')' statement ('else' statement)?		                                    # If
+	|	'while' '(' expr ')' statement						                                    # While
+	|   'for' '(' forInit? ';' forCondition? ';' forIncrement? ')' statement                    # For
+	|	assign											                                        # AssignStmt
+	|	ID '[' expr ']' '=' expr							                                    # ElementAssign
+	|	call_expr											                                    # CallStatement
+	|	'print' '(' expr? ')'								                                    # Print
+	|	'return' expr										                                    # Return
+	|	block				 								                                    # BlockStatement
 	;
 
 /** Присваивание */

@@ -78,6 +78,8 @@ add_library(Core_lib STATIC
         include/Scope.cpp
         include/GarbageCollector.cpp
         include/GarbageCollector.h
+        include/HeapValue.cpp
+        include/HeapValue.h
 )
 
 target_include_directories(Core_lib PUBLIC

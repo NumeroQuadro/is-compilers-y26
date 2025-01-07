@@ -19,15 +19,14 @@ void ArrayValue::setValue(const size_t index, const Value &value) {
   }
   Value &oldVal = elements[index];
   const bool wasRef = oldVal.isHeapRef();
-  const bool isRef  = value.isHeapRef();
+  const bool isRef = value.isHeapRef();
 
   oldVal = value;
   if (wasRef && !isRef) {
     if (const auto it = std::find(refIndices.begin(), refIndices.end(), index); it != refIndices.end()) {
       refIndices.erase(it);
     }
-  }
-  else if (!wasRef && isRef) {
+  } else if (!wasRef && isRef) {
     refIndices.emplace_back(index);
   }
 }
@@ -40,8 +39,8 @@ void ArrayValue::pushValue(const Value &value) {
 }
 
 void ArrayValue::markChildren() {
-  for (const auto& index : refIndices) {
-    HeapValue* ref = elements[index].asHeapRef();
+  for (const auto &index: refIndices) {
+    HeapValue *ref = elements[index].asHeapRef();
     ref->marked = true;
     ref->markChildren();
   }
@@ -249,21 +248,21 @@ bool operator>=(const Value &lhs, const Value &rhs) {
   return !(lhs < rhs);
 }
 
-Value operator!(const Value& val) {
-    return Value(!val.asBool());
+Value operator!(const Value &val) {
+  return Value(!val.asBool());
 }
 
-Value operator-(const Value& val) {
-    if (val.getType() == ValueType::INT) {
-        return Value(-val.asInt());
-    }
-    return Value(-val.asDouble());
+Value operator-(const Value &val) {
+  if (val.getType() == ValueType::INT) {
+    return Value(-val.asInt());
+  }
+  return Value(-val.asDouble());
 }
 
 bool operator&&(const Value &lhs, const Value &rhs) {
-    return lhs.asBool() && rhs.asBool();
+  return lhs.asBool() && rhs.asBool();
 }
 
 bool operator||(const Value &lhs, const Value &rhs) {
-    return lhs.asBool() || rhs.asBool();
+  return lhs.asBool() || rhs.asBool();
 }

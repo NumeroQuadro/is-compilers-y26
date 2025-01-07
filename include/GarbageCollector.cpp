@@ -1,22 +1,19 @@
 #include "GarbageCollector.h"
 #include <algorithm>
 
-HeapValue *GarbageCollector::allocObject(std::unique_ptr<HeapValue> hv, Scope *scope) {
+HeapValue *GarbageCollector::allocObject(std::unique_ptr<HeapValue> hv) {
   HeapValue *raw = hv.get();
   globalHeap.push_back(std::move(hv));
-  if (scope && !scope->isClosed) {
-    scope->objectsInThisScope.push_back(raw);
-  }
   return raw;
 }
 
-void GarbageCollector::collectGarbage(const std::vector<HeapValue *> &heapRefs,Scope *topScope) {
+void GarbageCollector::collectGarbage(const std::vector<HeapValue *> &heapRefs, const Scope *topScope) {
   mark(heapRefs, topScope);
   sweep();
 }
 
 
-void GarbageCollector::mark(const std::vector<HeapValue *> &heapRefs, Scope *topScope) {
+void GarbageCollector::mark(const std::vector<HeapValue *> &heapRefs, const Scope *topScope) {
   const Scope *s = topScope;
   while (s) {
     for (const auto &[fst, snd]: s->values) {

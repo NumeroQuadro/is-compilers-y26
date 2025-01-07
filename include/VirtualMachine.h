@@ -36,7 +36,7 @@ public:
 
   Scope *getCurrentScope() const;
 
-  std::stack<Value>& getStackRef();
+  std::stack<Value> &getStackRef();
 
   [[nodiscard]] std::vector<Instruction> getInstructions() const;
 
@@ -50,10 +50,11 @@ private:
   Scope *scope_ = nullptr;
   GarbageCollector *gc;
 
+  std::unordered_map<std::string, FunctionInfo> functionsCallCache;
   std::unordered_map<std::string, FunctionInfo> functionTable;
   std::vector<Instruction> code;
   std::stack<Value> stack;
-  std::vector<HeapValue*> heapRefs;
+  std::vector<HeapValue *> heapRefs;
   std::stack<CallFrame> callStack;
   bool waitFile = true;
   bool isOptimized = false;
@@ -85,6 +86,8 @@ private:
   void enterScope();
 
   void exitScope();
+
+  Value tryOptimizeFunctionCall(const std::string &funcName);
 
   void doCall(const std::string &funcName);
 

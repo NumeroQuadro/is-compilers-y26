@@ -96,7 +96,7 @@
 
 
 int main() {
-    std::string factorial = R"(
+  std::string factorial = R"(
   {
     var value = 1
     for (var i = 2; i <= 20; i = i + 1) {
@@ -107,7 +107,7 @@ int main() {
   }
   )";
 
-    const std::string mergeSort = R"(
+  const std::string mergeSort = R"(
     func merge (arr: [], left: num, mid: num, right: num) {
         var n1 = mid - left + 1
         var n2 = right - mid
@@ -177,7 +177,7 @@ int main() {
     }
     )";
 
-    const std::string sieveOfEratosthenes = R"(
+  const std::string sieveOfEratosthenes = R"(
     func sieveOfEratosthenes(n: num) {
         var prime = [..n + 1]
         for (var i = 0; i < __size(prime); i = i + 1) {
@@ -204,7 +204,7 @@ int main() {
     }
     )";
 
-    std::string experiment = R"(
+  std::string experiment = R"(
     func test(in: num) {
         var r = in + 3
         var e = 2 + 4 - 1
@@ -227,7 +227,7 @@ print(8 + 1)
       print("finish")
     }
   )";
-    std::string experiment2 = R"(
+  std::string experiment2 = R"(
     func red() {
         print (9 * 7 + 1)
         print("gol")
@@ -260,7 +260,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     }
   )";
 
-    std::string experiment3 = R"(
+  std::string experiment3 = R"(
     func red() {
         print (9 * 7 + 1)
         print("gol")
@@ -275,7 +275,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     }
   )";
 
-    std::string factorial2 = R"(
+  std::string factorial2 = R"(
     func factorial(a: num) {
         if (a == 1 or a == 0) {
             return 1
@@ -286,7 +286,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
       print(factorial(19))
     }
   )";
-    std::string experiment4 = R"(
+  std::string experiment4 = R"(
     func red() {
         print (9 * 7 + 1)
         print("gol")
@@ -300,36 +300,39 @@ for (var i = 0; i < __size(prime); i = i + 1) {
         print(z)
     }
     {
-        test(0, 2 * 3, 3 + 2)
-        red()
-        print("finish")
+//        test(0, 2 * 3, 3 + 2)
+//        red()
+//        print("finish")
+
+        var arr = ["2", 1, [1, 2 + 3, 3.1 + 1], "i lox"]
+        print(arr)
     }
     )";
 
 
-    antlr4::ANTLRInputStream inputStream(mergeSort);
-    GrammarLexer lexer(&inputStream);
-    antlr4::CommonTokenStream tokens(&lexer);
-    GrammarParser parser(&tokens);
+  antlr4::ANTLRInputStream inputStream(experiment4);
+  GrammarLexer lexer(&inputStream);
+  antlr4::CommonTokenStream tokens(&lexer);
+  GrammarParser parser(&tokens);
 
-    GrammarParser::ScriptContext *tree = parser.script();
+  GrammarParser::ScriptContext *tree = parser.script();
 
-    GrammarASTInterpreter visitor;
-    visitor.visit(tree);
-    // visitor.toFile("test.txt");
-    //
-    // VirtualMachine vm;
-    // vm.optimize(true);
-    // vm.fromFile("test.txt");
-    // auto code = vm.getInstructions();
-    // for (int i = 0; i < code.size(); i++) {
-    //     if (code[i] != visitor.code[i]) {
-    //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
-    //         std::cout << code[i].toStr() << "\n";
-    //         std::cout << visitor.code[i].toStr() << "\n";
-    //     }
-    // }
-    // vm.run();
+  GrammarASTInterpreter visitor;
+  visitor.visit(tree);
+  // visitor.toFile("test.txt");
+  //
+  // VirtualMachine vm;
+  // vm.optimize(true);
+  // vm.fromFile("test.txt");
+  // auto code = vm.getInstructions();
+  // for (int i = 0; i < code.size(); i++) {
+  //     if (code[i] != visitor.code[i]) {
+  //         std::cout << "Error in instruction " + std::to_string(i) + "\n";
+  //         std::cout << code[i].toStr() << "\n";
+  //         std::cout << visitor.code[i].toStr() << "\n";
+  //     }
+  // }
+  // vm.run();
 
   GarbageCollector gc;
 
@@ -337,5 +340,5 @@ for (var i = 0; i < __size(prime); i = i + 1) {
   vm.optimize(true);
   vm.run();
 
-    return 0;
+  return 0;
 }
