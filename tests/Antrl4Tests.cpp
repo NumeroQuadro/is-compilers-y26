@@ -623,6 +623,32 @@ TEST(JITTests, CasheForFunctions_ShouldNotSave_Print) {
     EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
 }
 
+TEST(JITTests, CasheForFunctions_ShouldNotSave_Print_Hard) {
+    std::string experimentCode = R"(
+    func red(left: num, right: num) {
+        if (left > 3) {
+            return 9
+        }
+        print(left + right)
+        return left + right
+    }
+    {
+        print(red(3, 4))
+        print(red(3, 4))
+    }
+  )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_EQ(operationWithOptimizations, operationWithoutOptimizations);
+
+    std::string expectedOutput = "7\n7\n7\n7\n";
+    std::string actualOutputWithoutOptimization = runCode(experimentCode, false);
+    std::string actualOutputWithOptimization = runCode(experimentCode, true);
+    EXPECT_EQ(expectedOutput, actualOutputWithoutOptimization);
+    EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
+}
+
 TEST(JITTests, CasheForFunctions_ShouldNotSave_Call) {
     std::string experimentCode = R"(
     func tree() {
