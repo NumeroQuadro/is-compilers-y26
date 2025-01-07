@@ -76,6 +76,8 @@ add_library(Core_lib STATIC
         include/Value.cpp
         include/VirtualMachine.cpp
         include/Scope.cpp
+        include/GarbageCollector.cpp
+        include/GarbageCollector.h
 )
 
 target_include_directories(Core_lib PUBLIC

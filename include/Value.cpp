@@ -1,16 +1,49 @@
 #include "Value.h"
 
+#include <algorithm>
 #include <cmath>
 #include <stdexcept>
+#include <strings.h>
+
+Value ArrayValue::getValue(const size_t index) const {
+  if (index >= elements.size()) {
+    throw std::out_of_range("Value index out of range");
+  }
+
+  return elements[index];
+}
+
+void ArrayValue::setValue(const size_t index, const Value &value) {
+  if (index >= elements.size()) {
+    throw std::runtime_error("Index out of range");
+  }
+  Value &oldVal = elements[index];
+  const bool wasRef = oldVal.isHeapRef();
+  const bool isRef  = value.isHeapRef();
+
+  oldVal = value;
+  if (wasRef && !isRef) {
+    if (const auto it = std::find(refIndices.begin(), refIndices.end(), index); it != refIndices.end()) {
+      refIndices.erase(it);
+    }
+  }
+  else if (!wasRef && isRef) {
+    refIndices.emplace_back(index);
+  }
+}
+
+void ArrayValue::pushValue(const Value &value) {
+  elements.emplace_back(value);
+  if (value.isHeapRef()) {
+    refIndices.emplace_back(elements.size() - 1);
+  }
+}
 
 void ArrayValue::markChildren() {
-  for (auto &val : elements) {
-    if (val.isHeapRef()) {
-      if (HeapValue* ref = val.asHeapRef(); ref && val.asHeapRef()) {
-        ref->marked = true;
-        ref->markChildren();
-      }
-    }
+  for (const auto& index : refIndices) {
+    HeapValue* ref = elements[index].asHeapRef();
+    ref->marked = true;
+    ref->markChildren();
   }
 }
 

@@ -38,7 +38,6 @@ enum class InstructionType {
     ENTER_SCOPE,
     EXIT_SCOPE,
     DUP_TOP,
-    SWAP,
     CALL,
     RET
 };

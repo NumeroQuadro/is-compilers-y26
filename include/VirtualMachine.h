@@ -15,37 +15,45 @@
 #include "CallFrame.h"
 #include "FunctionInfo.h"
 
+class GarbageCollector;
+
 class VirtualMachine {
 public:
   VirtualMachine();
 
   explicit VirtualMachine(const std::vector<Instruction> &code,
-                          const std::unordered_map<std::string, FunctionInfo> &functions);
+                          const std::unordered_map<std::string, FunctionInfo> &functions,
+                          GarbageCollector *garbageCollector);
 
   explicit VirtualMachine(const std::vector<Instruction> &code,
                           const std::unordered_map<std::string, FunctionInfo> &functions,
+                          GarbageCollector *garbageCollector,
                           int64_t startPos);
+
+  ~VirtualMachine();
 
   void run();
 
-  void gc();
+  Scope *getCurrentScope() const;
+
+  std::stack<Value>& getStackRef();
 
   [[nodiscard]] std::vector<Instruction> getInstructions() const;
 
   void fromFile(const std::string &path);
 
-  std::vector<Instruction> getInstructions();
-
   void optimize(bool optimizeOn);
 
-  size_t getHeapSize();
+  size_t getHeapSize() const;
+
 private:
   Scope *scope_ = nullptr;
+  GarbageCollector *gc;
 
   std::unordered_map<std::string, FunctionInfo> functionTable;
   std::vector<Instruction> code;
   std::stack<Value> stack;
-  std::vector<std::unique_ptr<HeapValue> > heap;
+  std::vector<HeapValue*> heapRefs;
   std::stack<CallFrame> callStack;
   bool waitFile = true;
   bool isOptimized = false;
@@ -56,18 +64,17 @@ private:
 
   Value pop();
 
-  Value top();
+  Value top() const;
 
   void push(const Value &v);
 
-  void unmarkAll();
-  void markAll();
-  void sweep();
+  void partialGC(Scope *scope);
 
   void markValue(const Value &v);
-  void markScope(Scope* scope);
 
-  HeapValue *allocHeap(HeapValue *hv);
+  void markScope(Scope *scope);
+
+  HeapValue *allocHeap(std::unique_ptr<HeapValue> hv) const;
 
   Value loadVar(const std::string &name) const;
 

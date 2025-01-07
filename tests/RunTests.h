@@ -4,6 +4,7 @@
 #include <sstream>
 #include <iostream>
 #include "antlr4-runtime.h"
+#include "GarbageCollector.h"
 #include "GrammarLexer.h"
 #include "GrammarParser.h"
 #include "GrammarASTInterpreter.h"
@@ -23,7 +24,9 @@ std::string runCode(const std::string& codeStr, bool withOptimisation = false) {
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+  GarbageCollector gc;
+
+  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
   vm.optimize(withOptimisation);
   vm.run();
 

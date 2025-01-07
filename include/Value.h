@@ -21,8 +21,16 @@ class ArrayValue final : public HeapValue {
 public:
   std::vector<Value> elements;
 
+  std::vector<size_t> refIndices;
+
   explicit ArrayValue(const size_t size): elements(size) {
   }
+
+  Value getValue(size_t index) const;
+
+  void setValue(size_t index, const Value& value);
+
+  void pushValue(const Value& value);
 
   void markChildren() override;
 };

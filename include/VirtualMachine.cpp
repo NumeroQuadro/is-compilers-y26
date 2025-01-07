@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "FunctionInfo.h"
+#include "GarbageCollector.h"
 
 
 VirtualMachine::VirtualMachine() {
@@ -29,8 +30,9 @@ VirtualMachine::VirtualMachine() {
 }
 
 VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
-                               const std::unordered_map<std::string, FunctionInfo> &functions)
-  : functionTable(functions), code(code) {
+                               const std::unordered_map<std::string, FunctionInfo> &functions,
+                               GarbageCollector *garbageCollector)
+  : gc(garbageCollector), functionTable(functions), code(code) {
   scope_ = new Scope(nullptr);
 
   functionTable["__pushBack"] = FunctionInfo{
@@ -120,83 +122,38 @@ void VirtualMachine::builtInSize() {
 }
 
 VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
-                               const std::unordered_map<std::string, FunctionInfo> &functions, const int64_t startPos)
-  : VirtualMachine(code, functions) {
+                               const std::unordered_map<std::string, FunctionInfo> &functions,
+                               GarbageCollector* garbageCollector,
+                               const int64_t startPos)
+  : VirtualMachine(code, functions, garbageCollector) {
   ip = startPos;
-    start_address = ip;
+  start_address = ip;
 }
 
 Value VirtualMachine::pop() {
   if (stack.empty()) throw std::runtime_error("Stack underflow");
   const Value v = stack.top();
   stack.pop();
+  if (v.isHeapRef() && !heapRefs.empty()) {
+    heapRefs.pop_back();
+  }
   return v;
 }
 
-Value VirtualMachine::top() {
+Value VirtualMachine::top() const {
   if (stack.empty()) throw std::runtime_error("Stack underflow");
   return stack.top();
 }
 
 void VirtualMachine::push(const Value &v) {
   stack.emplace(v);
-}
-
-void VirtualMachine::unmarkAll() {
-  for (auto &objPtr: heap) {
-    if (objPtr) {
-      objPtr->marked = false;
-    }
+  if (v.isHeapRef()) {
+    heapRefs.emplace_back(v.asHeapRef());
   }
 }
 
-void VirtualMachine::markAll() {
-  markScope(scope_);
-
-  std::stack<Value> tmp = stack;
-  while (!tmp.empty()) {
-    Value v = tmp.top();
-    tmp.pop();
-    markValue(v);
-  }
-}
-
-void VirtualMachine::sweep() {
-  for (auto &objPtr : heap) {
-    if (objPtr) {
-      if (!objPtr->marked) {
-        objPtr.reset();
-      }
-    }
-  }
-  heap.erase(
-    std::remove_if(heap.begin(), heap.end(),
-                   [](auto &p){ return p == nullptr; }),
-    heap.end()
-  );
-}
-
-void VirtualMachine::markValue(const Value &v) {
-  if (!v.isHeapRef()) return;
-  HeapValue *ref = v.asHeapRef();
-  if (!ref) return;
-  if (!ref->marked) {
-    ref->marked = true;
-    ref->markChildren();
-  }
-}
-
-void VirtualMachine::markScope(Scope *scope) {
-  if (!scope) return;
-  for (auto &[fst, snd]: scope->values) {
-    markValue(snd);
-  }
-  markScope(scope->previous_);
-}
-
-HeapValue *VirtualMachine::allocHeap(HeapValue *hv) {
-  heap.emplace_back(hv);
-  return hv;
+HeapValue *VirtualMachine::allocHeap(std::unique_ptr<HeapValue> hv) const {
+  return gc->allocObject(std::move(hv), scope_);
 }
 
 Value VirtualMachine::loadVar(const std::string &name) const {
@@ -222,11 +179,12 @@ void VirtualMachine::enterScope() {
 }
 
 void VirtualMachine::exitScope() {
-  const Scope *old = scope_;
-  scope_ = scope_->previous_;
-  delete old;
+  scope_->isClosed = true;
 
-  gc();
+  gc->collectGarbage(heapRefs, scope_);
+
+  const Scope* old = scope_;
+  scope_ = old->previous_;
 }
 
 void VirtualMachine::doCall(const std::string &funcName) {
@@ -301,6 +259,14 @@ void VirtualMachine::doRet() {
   ip = returnIp;
 }
 
+VirtualMachine::~VirtualMachine() {
+  while (scope_) {
+    const auto p = scope_->previous_;
+    delete scope_;
+    scope_ = p;
+  }
+}
+
 void VirtualMachine::run() {
   if (waitFile) {
     std::cerr << "There was no instructions loaded! Use for example fromFile to do it!\n";
@@ -328,8 +294,8 @@ void VirtualMachine::run() {
         break;
       }
       case InstructionType::PUSH_STRING: {
-        auto hv = new StringValue(inst.strOperand);
-        HeapValue *ref = allocHeap(hv);
+        auto hv = std::make_unique<StringValue>(inst.strOperand);
+        HeapValue *ref = allocHeap(std::move(hv));
         push(Value(ref));
         ++ip;
         break;
@@ -512,8 +478,8 @@ void VirtualMachine::run() {
           throw std::runtime_error("NEW_ARRAY: negative size is not allowed");
         }
 
-        auto arrPtr = new ArrayValue(size);
-        HeapValue *ref = allocHeap(arrPtr);
+        auto arrPtr = std::make_unique<ArrayValue>(size);
+        HeapValue *ref = allocHeap(std::move(arrPtr));
 
         push(Value(ref));
 
@@ -533,7 +499,7 @@ void VirtualMachine::run() {
         auto *arr = dynamic_cast<ArrayValue *>(arrVal.asHeapRef());
         if (!arr) throw std::runtime_error("Not an array");
         if (idx < 0 || idx >= arr->elements.size()) throw std::runtime_error("Array index out of bounds");
-        push(arr->elements[idx]);
+        push(arr->getValue(idx));
         ++ip;
         break;
       }
@@ -547,7 +513,7 @@ void VirtualMachine::run() {
         if (idx2 < 0 || idx2 >= arr2->elements.size())
           throw std::runtime_error(
             "Array index out of bounds" + code[ip].toStr());
-        arr2->elements[idx2] = val;
+        arr2->setValue(idx2, val);
         ++ip;
         break;
       }
@@ -565,14 +531,6 @@ void VirtualMachine::run() {
         ++ip;
         break;
       }
-      case InstructionType::SWAP: {
-        Value a = pop();
-        Value b = pop();
-        push(a);
-        push(b);
-        ++ip;
-        break;
-      }
       case InstructionType::CALL: {
         doCall(inst.strOperand);
         break;
@@ -584,15 +542,17 @@ void VirtualMachine::run() {
       case InstructionType::HALT:
         return;
       default:
-        throw std::runtime_error("Unknown instruction");
+        throw std::runtime_error("Unknown instruction at ip " + std::to_string(ip));
     }
   }
 }
 
-void VirtualMachine::gc() {
-  unmarkAll();
-  markAll();
-  sweep();
+Scope * VirtualMachine::getCurrentScope() const {
+  return scope_;
+}
+
+std::stack<Value>& VirtualMachine::getStackRef() {
+  return stack;
 }
 
 void VirtualMachine::fromFile(const std::string &path) {
@@ -667,7 +627,7 @@ void VirtualMachine::fromFile(const std::string &path) {
   waitFile = false;
 }
 
-std::vector<Instruction> VirtualMachine::getInstructions() {
+std::vector<Instruction> VirtualMachine::getInstructions() const {
   return code;
 }
 
@@ -675,8 +635,8 @@ void VirtualMachine::optimize(bool optimizeOn = true) {
   isOptimized = optimizeOn;
 }
 
-size_t VirtualMachine::getHeapSize() {
-  return heap.size();
+size_t VirtualMachine::getHeapSize() const {
+  return heapRefs.size();
 }
 
 void VirtualMachine::optimizeFunction(const std::string &function_name) {

@@ -66,32 +66,33 @@
 
 #include <iostream>
 #include "antlr4-runtime.h"
+#include "GarbageCollector.h"
 #include "GrammarLexer.h"
 #include "GrammarParser.h"
 #include "GrammarASTInterpreter.h"
 #include "VirtualMachine.h"
 
-void getTimeScoreOfLanguage(const std::string &code) {
-    using namespace std::chrono;
-    auto start = high_resolution_clock::now();
-
-    antlr4::ANTLRInputStream inputStream(code);
-    GrammarLexer lexer(&inputStream);
-    antlr4::CommonTokenStream tokens(&lexer);
-    GrammarParser parser(&tokens);
-    GrammarParser::ScriptContext *tree = parser.script();
-
-    GrammarASTInterpreter visitor;
-    visitor.visit(tree);
-
-    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-    vm.run();
-
-    auto end = high_resolution_clock::now();
-    auto duration = duration_cast<milliseconds>(end - start);
-
-    std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
-}
+// void getTimeScoreOfLanguage(const std::string &code) {
+//   using namespace std::chrono;
+//   auto start = high_resolution_clock::now();
+//
+//   antlr4::ANTLRInputStream inputStream(code);
+//   GrammarLexer lexer(&inputStream);
+//   antlr4::CommonTokenStream tokens(&lexer);
+//   GrammarParser parser(&tokens);
+//   GrammarParser::ScriptContext *tree = parser.script();
+//
+//   GrammarASTInterpreter visitor;
+//   visitor.visit(tree);
+//
+//   VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+//   vm.run();
+//
+//   auto end = high_resolution_clock::now();
+//   auto duration = duration_cast<milliseconds>(end - start);
+//
+//   std::cout << "Execution time: " << duration.count() << " ms" << std::endl;
+// }
 
 
 int main() {
@@ -330,74 +331,11 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     // }
     // vm.run();
 
-    VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
-    vm.optimize(true);
-    auto instructions = vm.getInstructions();
-//    for (int i = 0; i < instructions.size(); i++) {
-//        std::cout << i << " " << instructions[i].toStr() << '\n';
-//    }
-    vm.run();
- //   std::cout << "\nOptimized:\n";
-   instructions = vm.getInstructions();
-//  for (int i = 0; i < instructions.size(); i++) {
-//      std::cout << i << " " << instructions[i].toStr() << '\n';
-//  }
+  GarbageCollector gc;
 
-    return 0;
-}
+  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+  vm.optimize(true);
+  vm.run();
 
-using namespace std;
-
-int partition(vector<int> &vec, int low, int high) {
-    // Selecting last element as the pivot
-    int pivot = vec[high];
-
-    // Index of elemment just before the last element
-    // It is used for swapping
-    int i = (low - 1);
-
-    for (int j = low; j <= high - 1; j++) {
-        // If current element is smaller than or
-        // equal to pivot
-        if (vec[j] <= pivot) {
-            i++;
-            swap(vec[i], vec[j]);
-        }
-    }
-
-    // Put pivot to its position
-    swap(vec[i + 1], vec[high]);
-
-    // Return the point of partition
-    return (i + 1);
-}
-
-void quickSort(vector<int> &vec, int low, int high) {
-    // Base case: This part will be executed till the starting
-    // index low is lesser than the ending index high
-    cout << low;
-    cout << high;
-    if (low < high) {
-        // pi is Partitioning Index, arr[p] is now at
-        // right place
-        int pi = partition(vec, low, high);
-        cout << pi;
-        // Separately sort elements before and after the
-        // Partition Index pi
-        quickSort(vec, low, pi - 1);
-        quickSort(vec, pi + 1, high);
-    }
-}
-
-int main2() {
-    vector<int> vec = {4, 3, 2, 1};
-    int n = vec.size();
-
-    // Calling quicksort for the vector vec
-    quickSort(vec, 0, n - 1);
-
-    for (auto i: vec) {
-        cout << i << " ";
-    }
     return 0;
 }

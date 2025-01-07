@@ -159,7 +159,9 @@ TEST_P(LanguageTests, GarbageCollectorWithGlobalValues) {
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+  GarbageCollector gc;
+
+  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
   vm.optimize(isOptimised);
   vm.run();
 
@@ -184,7 +186,9 @@ TEST_P(LanguageTests, GarbageCollector) {
   GrammarASTInterpreter visitor;
   visitor.visit(tree);
 
-  VirtualMachine vm(visitor.code, visitor.functionTable, visitor.startPos);
+  GarbageCollector gc;
+
+  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
   vm.optimize(isOptimised);
   vm.run();
 
@@ -213,6 +217,6 @@ INSTANTIATE_TEST_SUITE_P(
 );
 
 int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
