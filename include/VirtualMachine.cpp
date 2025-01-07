@@ -7,7 +7,7 @@
 #include "GarbageCollector.h"
 
 
-VirtualMachine::VirtualMachine() {
+VirtualMachine::VirtualMachine(): gc(nullptr) {
   scope_ = new Scope(nullptr);
 
   functionTable["__pushBack"] = FunctionInfo{
@@ -225,6 +225,24 @@ void VirtualMachine::exitScope() {
   scope_ = old->previous_;
 }
 
+bool VirtualMachine::hasPrint(const std::string &funcName) const {
+  const auto func = functionTable.find(funcName);
+  if (func == functionTable.end()) {
+    throw std::runtime_error("Function not found: " + funcName);
+  }
+
+  const auto &[name, params, address] = func->second;
+
+  size_t i = address;
+  while (i < code.size() && code[i].op != InstructionType::RET) {
+    if (code[i].op == InstructionType::PRINT) {
+      return true;
+    }
+    ++i;
+  }
+  return false;
+}
+
 void VirtualMachine::doCall(const std::string &funcName) {
   if (funcName == "__pushBack") {
     builtInPushBack();
@@ -245,27 +263,45 @@ void VirtualMachine::doCall(const std::string &funcName) {
     optimizeFunction(funcName);
   }
 
-  const auto it = functionTable.find(funcName);
-  if (it == functionTable.end()) {
+  const auto funcInfo = functionTable.find(funcName);
+  if (funcInfo == functionTable.end()) {
     throw std::runtime_error("Function not found: " + code[ip].toStr());
   }
 
-  const auto &[name, params, address] = it->second;
+  const auto &[name, params, address] = funcInfo->second;
   const auto newScope = new Scope(nullptr);
 
-  for (int64_t i = params.size() - 1; i >= 0; i--) {
+  std::vector<std::pair<std::string, Value> > paramValues;
+  bool hasRefParam = false;
+  for (int64_t i = params.size() - 1; i >= 0; --i) {
     Value argVal = pop();
     if (argVal.getType() != params[i].type) {
       throw std::runtime_error("Parameter type mismatch");
     }
-    newScope->createVar(params[i].name, argVal);
+
+    hasRefParam = hasRefParam || argVal.isHeapRef();
+    paramValues.emplace_back(params[i].name, argVal);
   }
 
-  const auto frame = CallFrame{
+  auto frame = CallFrame{
     ip + 1,
     scope_,
     true
   };
+
+  if (isOptimized && !hasPrint(funcName) && !hasRefParam) {
+    if (const auto &funcCache = functionsCallCache.find(funcName); funcCache != functionsCallCache.end()) {
+      frame.funcName = funcName;
+      callStack.push(frame);
+      stack.emplace(funcCache->second);
+      doRet();
+      return;
+    }
+  }
+
+  for (const auto &[name, value]: paramValues) {
+    newScope->createVar(name, value);
+  }
 
   callStack.push(frame);
 
@@ -284,7 +320,10 @@ void VirtualMachine::doRet() {
     return;
   }
 
-  const auto [returnIp, prevScope, hasReturnValue] = callStack.top();
+  const auto [returnIp, prevScope, hasReturnValue, funcName] = callStack.top();
+  if (isOptimized && !funcName.empty()) {
+    functionsCallCache[funcName] = retVal;
+  }
   callStack.pop();
 
   delete scope_;

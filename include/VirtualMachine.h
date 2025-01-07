@@ -50,7 +50,7 @@ private:
   Scope *scope_ = nullptr;
   GarbageCollector *gc;
 
-  std::unordered_map<std::string, FunctionInfo> functionsCallCache;
+  std::unordered_map<std::string, Value> functionsCallCache;
   std::unordered_map<std::string, FunctionInfo> functionTable;
   std::vector<Instruction> code;
   std::stack<Value> stack;
@@ -87,7 +87,7 @@ private:
 
   void exitScope();
 
-  Value tryOptimizeFunctionCall(const std::string &funcName);
+  bool hasPrint(const std::string &funcName) const;
 
   void doCall(const std::string &funcName);
 

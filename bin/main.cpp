@@ -287,25 +287,12 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     }
   )";
   std::string experiment4 = R"(
-    func red() {
-        print (9 * 7 + 1)
-        print("gol")
-    }
-    func test(z: num, in: num, out: num) {
-        if (z < 12 and in == 10 and out == 11) {
-            return 4
-        }
-        print(in)
-        test(z - 1, in + 1, 2 * 5 + 1)
-        print(z)
+    func red(left: num, right: num) {
+        return left + right
     }
     {
-//        test(0, 2 * 3, 3 + 2)
-//        red()
-//        print("finish")
-
-        var arr = ["2", 1, [1, 2 + 3, 3.1 + 1], "i lox"]
-        print(arr)
+        print(red(3, 4))
+        print(red(3, 4))
     }
     )";
 
