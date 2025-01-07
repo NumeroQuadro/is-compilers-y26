@@ -22,12 +22,12 @@
       <config projectName="yal" targetName="antlr4_tests" />
       <config projectName="yal" targetName="gtest" />
       <config projectName="yal" targetName="gtest_main" />
-      <config projectName="yal" targetName="gmock_main" />
       <config projectName="yal" targetName="MyGrammar_lib" />
+      <config projectName="yal" targetName="gmock_main" />
       <config projectName="yal" targetName="yal" />
       <config projectName="yal" targetName="gmock" />
-      <config projectName="yal" targetName="Core_lib" />
       <config projectName="yal" targetName="run_tests" />
+      <config projectName="yal" targetName="Core_lib" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -37,20 +37,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: zusammen versions">
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/Instruction.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Instruction.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Scope.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Scope.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Value.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/Value.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/Value.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Value.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/RunTests.h" beforeDir="false" afterPath="$PROJECT_DIR$/tests/RunTests.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -475,6 +465,11 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.yal">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="All in Antrl4Tests.cpp" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_PATTERN="all-tests(file://$PROJECT_DIR$/tests/Antrl4Tests.cpp)" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -576,13 +571,13 @@
       <item itemvalue="CMake Application.Grammar_lib" />
       <item itemvalue="CMake Application.MyGrammar_antlr4" />
       <item itemvalue="CMake Application.MyGrammar_lib" />
+      <item itemvalue="CMake Application.yal" />
       <item itemvalue="CMake Application.antlr4_shared" />
       <item itemvalue="CMake Application.antlr4_static" />
       <item itemvalue="CMake Application.gmock" />
       <item itemvalue="CMake Application.gmock_main" />
       <item itemvalue="CMake Application.gtest" />
       <item itemvalue="CMake Application.gtest_main" />
-      <item itemvalue="CMake Application.yal" />
       <item itemvalue="CMake Application.run_tests" />
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.antlr4_tests" />

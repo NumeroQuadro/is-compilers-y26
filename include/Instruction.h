@@ -154,9 +154,6 @@ struct Instruction {
             case InstructionType::DUP_TOP:
                 oss << "DUP_TOP";
                 break;
-            case InstructionType::SWAP:
-                oss << "SWAP";
-                break;
             case InstructionType::CALL:
                 oss << "CALL";
                 break;
@@ -216,7 +213,6 @@ struct Instruction {
         else if (opStr == "ENTER_SCOPE") operation = InstructionType::ENTER_SCOPE;
         else if (opStr == "EXIT_SCOPE") operation = InstructionType::EXIT_SCOPE;
         else if (opStr == "DUP_TOP") operation = InstructionType::DUP_TOP;
-        else if (opStr == "SWAP") operation = InstructionType::SWAP;
         else if (opStr == "CALL") operation = InstructionType::CALL;
         else if (opStr == "RET") operation = InstructionType::RET;
         else if (opStr == "AND") operation = InstructionType::AND;

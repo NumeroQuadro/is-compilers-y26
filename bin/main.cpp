@@ -164,12 +164,12 @@ int main() {
     }
 
     {
-        var n = 5
-        var vec = [1, 3, 2.5, 2.4, -5]
+        var n = 10000
+        var vec = [..n]
 
-//        for (var i = 0; i < n; i = i + 1) {
-//            vec[i] = n
-//        }
+        for (var i = 0; i < n; i = i + 1) {
+          vec[i] = (n - i) % 100
+        }
         mergeSort(vec, 0, n - 1)
         for (var i = 0; i < __size(vec); i = i + 1) {
             print(vec[i])
@@ -307,7 +307,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     )";
 
 
-    antlr4::ANTLRInputStream inputStream(factorial2);
+    antlr4::ANTLRInputStream inputStream(mergeSort);
     GrammarLexer lexer(&inputStream);
     antlr4::CommonTokenStream tokens(&lexer);
     GrammarParser parser(&tokens);
