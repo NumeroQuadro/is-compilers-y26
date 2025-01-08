@@ -293,29 +293,24 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     )";
 
     std::string experiment5 = R"(
-    func test(z: num) {
-        var a = 4 + 1
-        var b = 3 * 2 + 5 + 9
-        if (z == 10 * 10 * 10 * 10 * 10 * 10) {
-            return 0
-        }
-        test(z + 1)
-    }
     {
-        test(0)
+        var vec = [1, 2, 3]
+        var arr = vec
+        vec[0] = 5
+        print(arr)
     }
     )";
 
 
-//    antlr4::ANTLRInputStream inputStream(mergeSort);
-//    GrammarLexer lexer(&inputStream);
-//    antlr4::CommonTokenStream tokens(&lexer);
-//    GrammarParser parser(&tokens);
-//
-//    GrammarParser::ScriptContext *tree = parser.script();
-//
-//    GrammarASTInterpreter visitor;
-//    visitor.visit(tree);
+    antlr4::ANTLRInputStream inputStream(experiment5);
+    GrammarLexer lexer(&inputStream);
+    antlr4::CommonTokenStream tokens(&lexer);
+    GrammarParser parser(&tokens);
+
+    GrammarParser::ScriptContext *tree = parser.script();
+
+    GrammarASTInterpreter visitor;
+    visitor.visit(tree);
 //    // visitor.toFile("test.txt");
 //    //
 //    // VirtualMachine vm;
@@ -331,13 +326,13 @@ for (var i = 0; i < __size(prime); i = i + 1) {
 //    // }
 //    // vm.run();
 //
-//  GarbageCollector gc;
-//
-//  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
-//  vm.optimize(true);
-//  vm.run();
+  GarbageCollector gc;
 
-    getTimeScoreOfLanguage(experiment5);
+  VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
+  vm.optimize(true);
+  vm.run();
+
+    // getTimeScoreOfLanguage(experiment5);
 
     return 0;
 }

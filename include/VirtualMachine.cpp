@@ -145,7 +145,7 @@ Value VirtualMachine::top() const {
   return stack.top();
 }
 
-void print(const Value &value) {
+void print(const Value &value, const bool needNewLine = true) {
   switch (value.getType()) {
     case ValueType::INT: {
       std::cout << std::to_string(value.asInt());
@@ -167,7 +167,7 @@ void print(const Value &value) {
       if (const auto arr = dynamic_cast<ArrayValue *>(value.asHeapRef())) {
         std::cout << "[";
         for (size_t i = 0; i < arr->elements.size(); ++i) {
-          print(arr->elements[i]);
+          print(arr->elements[i], false);
           if (i != arr->elements.size() - 1) {
             std::cout << ", ";
           }
@@ -180,7 +180,9 @@ void print(const Value &value) {
       throw std::runtime_error("Value has not supported type");
     }
   }
-  std::cout << "\n";
+  if (needNewLine) {
+    std::cout << "\n";
+  }
 }
 
 void VirtualMachine::push(const Value &v) {
@@ -329,7 +331,18 @@ void VirtualMachine::doRet() {
 
   const auto [returnIp, prevScope, hasReturnValue, funcName] = callStack.top();
   if (isOptimized && functionsCallCache.find(function_cache_params_stack.top().toStr()) == functionsCallCache.end()) {
-    functionsCallCache[function_cache_params_stack.top().toStr()] = retVal;
+    if (retVal.isHeapRef()) {
+      auto heapValueCopy = retVal.asHeapRef();
+      HeapValue* value;
+      if (const auto str = dynamic_cast<StringValue*>(heapValueCopy)) {
+        value = gc->allocObject(std::make_unique<StringValue>(*str));
+      } else if (const auto arr = dynamic_cast<ArrayValue*>(heapValueCopy)) {
+        value = gc->allocObject(std::make_unique<ArrayValue>(*arr));
+      }
+      functionsCallCache.emplace(function_cache_params_stack.top().toStr(), value);
+    } else {
+      functionsCallCache[function_cache_params_stack.top().toStr()] = retVal;
+    }
   }
   function_cache_params_stack.pop();
   callStack.pop();
