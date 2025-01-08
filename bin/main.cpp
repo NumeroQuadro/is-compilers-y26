@@ -202,7 +202,7 @@ int main() {
     }
 
     {
-        sieveOfEratosthenes(10000)
+        sieveOfEratosthenes(100000)
     }
     )";
 
@@ -302,7 +302,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     )";
 
 
-    antlr4::ANTLRInputStream inputStream(experiment5);
+    antlr4::ANTLRInputStream inputStream(sieveOfEratosthenes);
     GrammarLexer lexer(&inputStream);
     antlr4::CommonTokenStream tokens(&lexer);
     GrammarParser parser(&tokens);

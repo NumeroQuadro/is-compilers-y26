@@ -36,8 +36,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: cache optimization new test - speed">
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: cache optimization new tests + scope bug fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
     </list>
@@ -110,26 +111,26 @@
       <recent name="\\wsl.localhost\Ubuntu\home\mityaiii\new\include" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.run_tests">
-    <configuration name="JITTests.SpeedTest_ShoudWorkFaster" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="SpeedTest_ShoudWorkFaster" TEST_MODE="SUITE_TEST">
+  <component name="RunManager" selected="CMake Application.yal">
+    <configuration name="All in Antrl4Tests.cpp" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_PATTERN="all-tests(file://$PROJECT_DIR$/tests/Antrl4Tests.cpp)" TEST_MODE="PATTERN">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.SpeedTest_ShoudWorkFaster2" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="SpeedTest_ShoudWorkFaster2" TEST_MODE="SUITE_TEST">
+    <configuration name="JITTests.DeadCodeEllumination_HasNotDeadCode_ShouldHaveSameOperationsCount" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_HasNotDeadCode_ShouldHaveSameOperationsCount" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.SpeedTest_ShoudWorkFaster3" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="SpeedTest_ShoudWorkFaster3" TEST_MODE="SUITE_TEST">
+    <configuration name="LanguageTests.MergeSortTest_BigArray" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="MergeSortTest_BigArray" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="LanguageTests.MergeSortTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="MergeSortTest" TEST_MODE="SUITE_TEST">
+    <configuration name="LanguageTests.SieveOfEratosthenesTest_Big" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="SieveOfEratosthenesTest_Big" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -222,18 +223,18 @@
       <item itemvalue="CMake Application.run_tests" />
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.antlr4_tests" />
-      <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster3" />
-      <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster" />
-      <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster2" />
-      <item itemvalue="Google Test.LanguageTests.MergeSortTest" />
+      <item itemvalue="Google Test.All in Antrl4Tests.cpp" />
+      <item itemvalue="Google Test.JITTests.DeadCodeEllumination_HasNotDeadCode_ShouldHaveSameOperationsCount" />
+      <item itemvalue="Google Test.LanguageTests.MergeSortTest_BigArray" />
+      <item itemvalue="Google Test.LanguageTests.SieveOfEratosthenesTest_Big" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Google Test.LanguageTests.SieveOfEratosthenesTest_Big" />
+        <item itemvalue="Google Test.LanguageTests.MergeSortTest_BigArray" />
         <item itemvalue="CMake Application.run_tests" />
-        <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster3" />
-        <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster2" />
-        <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster" />
-        <item itemvalue="Google Test.LanguageTests.MergeSortTest" />
+        <item itemvalue="Google Test.All in Antrl4Tests.cpp" />
+        <item itemvalue="Google Test.JITTests.DeadCodeEllumination_HasNotDeadCode_ShouldHaveSameOperationsCount" />
       </list>
     </recent_temporary>
   </component>
@@ -306,7 +307,14 @@
       <option name="project" value="LOCAL" />
       <updated>1736293508762</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="feat: cache optimization new tests + scope bug fix">
+      <created>1736331103251</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1736331103251</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -336,14 +344,15 @@
     <MESSAGE value="feat: cache optimization done!" />
     <MESSAGE value="feat: cache optimization new test" />
     <MESSAGE value="feat: cache optimization new test - speed" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: cache optimization new test - speed" />
+    <MESSAGE value="feat: cache optimization new tests + scope bug fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: cache optimization new tests + scope bug fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/tests/Antrl4Tests.cpp</url>
-          <line>276</line>
+          <line>391</line>
           <option name="timeStamp" value="63" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
@@ -353,8 +362,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/tests/Antrl4Tests.cpp</url>
-          <line>570</line>
+          <line>685</line>
           <option name="timeStamp" value="70" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
+          <line>955</line>
+          <option name="timeStamp" value="75" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

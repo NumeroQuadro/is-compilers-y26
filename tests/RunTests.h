@@ -79,3 +79,22 @@ size_t getTimeScoreOfLanguage(const std::string &code, bool optimize) {
 
     return duration.count();
 }
+
+std::string getPrimes(int n) {
+    std::vector<char> prime(n + 1, true);
+    prime[0] = prime[1] = false;
+    for (int i = 2; i <= n; ++i)
+        if (prime[i])
+            if (i * 1ll * i <= n)
+                for (int j = i * i; j <= n; j += i)
+                    prime[j] = false;
+
+    std::string str;
+    for (int i = 0; i < n; i++) {
+        if (prime[i]) {
+            str += std::to_string(i) + "\n";
+        }
+    }
+
+    return str;
+}
