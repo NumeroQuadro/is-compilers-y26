@@ -242,7 +242,7 @@ bool VirtualMachine::hasPrintOrCall(const std::string &funcName) const {
     }
 
     for (int64_t i = address; i < next_function_address; i++) {
-        if (code[i].op == InstructionType::PRINT || code[i].op == InstructionType::CALL) {
+        if (code[i].op == InstructionType::PRINT || (code[i].op == InstructionType::CALL && code[i].strOperand != funcName)) {
             return true;
         }
     }
@@ -303,6 +303,7 @@ void VirtualMachine::doCall(const std::string &funcName) {
       frame.funcName = funcName;
       callStack.push(frame);
       stack.emplace(funcCache->second);
+      scope_ = newScope;
       doRet();
       return;
     }

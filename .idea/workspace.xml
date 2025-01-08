@@ -36,7 +36,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: cache optimization new test" />
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: cache optimization new test - speed">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -106,31 +110,26 @@
       <recent name="\\wsl.localhost\Ubuntu\home\mityaiii\new\include" />
     </key>
   </component>
-  <component name="RunManager" selected="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Print_Hard">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="JITTests.CasheForFunctions_ShouldNotSave_Call" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="CasheForFunctions_ShouldNotSave_Call" TEST_MODE="SUITE_TEST">
+  <component name="RunManager" selected="CMake Application.run_tests">
+    <configuration name="JITTests.SpeedTest_ShoudWorkFaster" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="SpeedTest_ShoudWorkFaster" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.CasheForFunctions_ShouldNotSave_OtherArguments" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="CasheForFunctions_ShouldNotSave_OtherArguments" TEST_MODE="SUITE_TEST">
+    <configuration name="JITTests.SpeedTest_ShoudWorkFaster2" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="SpeedTest_ShoudWorkFaster2" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.CasheForFunctions_ShouldNotSave_Print_Hard" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="CasheForFunctions_ShouldNotSave_Print_Hard" TEST_MODE="SUITE_TEST">
+    <configuration name="JITTests.SpeedTest_ShoudWorkFaster3" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="SpeedTest_ShoudWorkFaster3" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.CasheForFunctions_ShouldSave" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="CasheForFunctions_ShouldSave" TEST_MODE="SUITE_TEST">
+    <configuration name="LanguageTests.MergeSortTest" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="LanguageTests" TEST_METHOD="MergeSortTest" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -223,18 +222,18 @@
       <item itemvalue="CMake Application.run_tests" />
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.antlr4_tests" />
-      <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Call" />
-      <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_OtherArguments" />
-      <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Print_Hard" />
-      <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldSave" />
+      <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster3" />
+      <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster" />
+      <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster2" />
+      <item itemvalue="Google Test.LanguageTests.MergeSortTest" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Print_Hard" />
         <item itemvalue="CMake Application.run_tests" />
-        <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_OtherArguments" />
-        <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldNotSave_Call" />
-        <item itemvalue="Google Test.JITTests.CasheForFunctions_ShouldSave" />
+        <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster3" />
+        <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster2" />
+        <item itemvalue="Google Test.JITTests.SpeedTest_ShoudWorkFaster" />
+        <item itemvalue="Google Test.LanguageTests.MergeSortTest" />
       </list>
     </recent_temporary>
   </component>
@@ -255,6 +254,7 @@
       <workItem from="1736101031872" duration="5000" />
       <workItem from="1736193600842" duration="5603000" />
       <workItem from="1736267793460" duration="3000" />
+      <workItem from="1736329041620" duration="4000" />
     </task>
     <task id="LOCAL-00001" summary="feat">
       <option name="closed" value="true" />
@@ -299,7 +299,14 @@
       <option name="project" value="LOCAL" />
       <updated>1736293235505</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="feat: cache optimization new test - speed">
+      <created>1736293508762</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1736293508762</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -328,7 +335,8 @@
     <MESSAGE value="feat: some tests + optimization???" />
     <MESSAGE value="feat: cache optimization done!" />
     <MESSAGE value="feat: cache optimization new test" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: cache optimization new test" />
+    <MESSAGE value="feat: cache optimization new test - speed" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: cache optimization new test - speed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -344,24 +352,9 @@
           <option name="timeStamp" value="65" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>300</line>
-          <option name="timeStamp" value="69" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/tests/Antrl4Tests.cpp</url>
           <line>570</line>
           <option name="timeStamp" value="70" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>299</line>
-          <option name="timeStamp" value="71" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>331</line>
-          <option name="timeStamp" value="72" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

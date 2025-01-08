@@ -679,7 +679,7 @@ TEST(JITTests, SpeedTest_ShoudWorkFaster) {
     std::string experimentCode = R"(
     func test(z: num) {
         var a = 4 + 1
-        var b = 3 * 2 + 5 + 9
+        var b = 3 * 2 + 5 + 9 * 100
         if (z == 10 * 10 * 10 * 10 * 10 * 10) {
             return 0
         }
@@ -709,6 +709,27 @@ TEST(JITTests, SpeedTest_ShoudWorkFaster2) {
 
     size_t operationWithoutOptimizations = getTimeScoreOfLanguage(experimentCode, false);
     size_t operationWithOptimizations = getTimeScoreOfLanguage(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, SpeedTest_ShoudWorkFaster3) {
+    std::string experimentCode = R"(
+    func factorial(a: num) {
+        if (a == 1 or a == 0) {
+            return 1
+        }
+        return a * factorial(a - 1)
+    }
+    {
+    for(var i = 20; i >= 0; i = i - 1) {
+          print(factorial(i))
+    }
+    }
+    )";
+
+    size_t operationWithoutOptimizations = getTimeScoreOfLanguage(experimentCode, false);
+    size_t operationWithOptimizations = getTimeScoreOfLanguage(experimentCode, true);
+    std::cout << operationWithoutOptimizations << " " << operationWithOptimizations << '\n';
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
