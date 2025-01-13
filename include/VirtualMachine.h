@@ -105,5 +105,9 @@ private:
 
   void optimizeFunction(const std::string &function_name);
 
-  std::vector<Instruction> foldConstants(int64_t start, int64_t finish);
+  void optimizeMain();
+
+ void foldConstants(int64_t start, int64_t finish);
+
+ void deleteDeadCode(int64_t start, int64_t finish);
 };

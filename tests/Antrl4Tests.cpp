@@ -378,11 +378,10 @@ TEST(JITTests, DeadCodeEllumination_HasDeadCode_ShouldDoLessOperations) {
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
-TEST(JITTests, DeadCodeEllumination_HasDeadCodeDifficultCase_ShouldDoLessOperations) {
+TEST(JITTests, DeadCodeEllumination_Array_ShouldDoLessOperations) {
     std::string experimentCode = R"(
     func test() {
-        var a = 1
-        var b = a + 3.2
+        var a = [..10]
     }
     {
         test()
@@ -394,7 +393,22 @@ TEST(JITTests, DeadCodeEllumination_HasDeadCodeDifficultCase_ShouldDoLessOperati
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
-TEST(JITTests, ConstantFolding_VariablesCreating_ShouldHaveOperationsCount) {
+TEST(JITTests, DeadCodeEllumination_Array2_ShouldDoLessOperations) {
+    std::string experimentCode = R"(
+    func test() {
+        var a = [1, 4, -1, 2]
+    }
+    {
+        test()
+    }
+    )";
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, ConstantFolding_VariablesCreating_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func test() {
         var a = 1 + 1
@@ -410,7 +424,7 @@ TEST(JITTests, ConstantFolding_VariablesCreating_ShouldHaveOperationsCount) {
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
-TEST(JITTests, ConstantFolding_If_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_If_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func test() {
         if (true or false) {
@@ -428,7 +442,7 @@ TEST(JITTests, ConstantFolding_If_ShouldHaveOperationsCount) {
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
-TEST(JITTests, ConstantFolding_While_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_While_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func test() {
         while (true or false) {
@@ -446,7 +460,7 @@ TEST(JITTests, ConstantFolding_While_ShouldHaveOperationsCount) {
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
-TEST(JITTests, ConstantFolding_For_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_For_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func test() {
         for (var i = 0; i < 5 * 8 + 1; i = i + 1) {
@@ -463,7 +477,7 @@ TEST(JITTests, ConstantFolding_For_ShouldHaveOperationsCount) {
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
-TEST(JITTests, ConstantFolding_Return_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_Return_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func test() {
         return 5 * 8 + 1 - 3
@@ -484,7 +498,7 @@ TEST(JITTests, ConstantFolding_Return_ShouldHaveOperationsCount) {
     EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
 }
 
-TEST(JITTests, ConstantFolding_FunctionCall_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_FunctionCall_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func test(a: num, b: num, c: boolean) {
         print(a)
@@ -511,7 +525,7 @@ TEST(JITTests, ConstantFolding_FunctionCall_ShouldHaveOperationsCount) {
     EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
 }
 
-TEST(JITTests, ConstantFolding_ArrayCreating_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_ArrayCreating_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func b() {
         a = [..10 + 6]
@@ -533,7 +547,7 @@ TEST(JITTests, ConstantFolding_ArrayCreating_ShouldHaveOperationsCount) {
     EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
 }
 
-TEST(JITTests, ConstantFolding_ArraySet_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_ArraySet_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func b() {
         a = [..10 + 6]
@@ -556,7 +570,7 @@ TEST(JITTests, ConstantFolding_ArraySet_ShouldHaveOperationsCount) {
     EXPECT_EQ(expectedOutput, actualOutputWithOptimization);
 }
 
-TEST(JITTests, ConstantFolding_Print_ShouldHaveOperationsCount) {
+TEST(JITTests, ConstantFolding_Print_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func b() {
         print((-11 + 3 + 2 * 12) % 5)
@@ -846,6 +860,65 @@ TEST(JITTests, SpeedTest_ShoudWorkFaster3) {
     size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
     std::cout << operationWithoutOptimizations << " " << operationWithOptimizations << '\n';
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
+TEST(JITTests, BehaviorTest_DeadCode_DivOnZero) {
+    std::string experimentCode = R"(
+    func test() {
+        var a = 1 / 0
+    }
+    {
+        test()
+    }
+    )";
+
+    EXPECT_THROW(runCodeAndGetOperationsCount(experimentCode, false), std::runtime_error);
+    EXPECT_THROW(runCodeAndGetOperationsCount(experimentCode, true), std::runtime_error);
+}
+
+TEST(JITTests, BehaviorTest_DeadCode_ArrayCreating) {
+    std::string experimentCode = R"(
+    func b() {
+        var a = [..10]
+        var vec = [-1, 3, 2.5, 2.4, -5]
+    }
+    {
+        b()
+    }
+    )";
+
+    EXPECT_NO_THROW(runCodeAndGetOperationsCount(experimentCode, false));
+    EXPECT_NO_THROW(runCodeAndGetOperationsCount(experimentCode, true));
+}
+
+TEST(JITTests, BehaviorTest_DeadCode_ArrayCreating2) {
+    std::string experimentCode = R"(
+    func b() {
+        var a = [..-10]
+        var vec = [-1, 3, 2.5, 2.4, -5]
+    }
+    {
+        b()
+    }
+    )";
+
+    EXPECT_THROW(runCodeAndGetOperationsCount(experimentCode, false), std::runtime_error);
+    EXPECT_THROW(runCodeAndGetOperationsCount(experimentCode, true), std::runtime_error);
+}
+
+TEST(JITTests, BehaviorTest_DeadCode_ArrayCreating3) {
+    std::string experimentCode = R"(
+    func b() {
+        var a = [..10]
+        var vec = [-1, 3 / 0, 2.5, 2.4, -5]
+    }
+    {
+        b()
+    }
+    )";
+
+    EXPECT_THROW(runCodeAndGetOperationsCount(experimentCode, false), std::runtime_error);
+    EXPECT_THROW(runCodeAndGetOperationsCount(experimentCode, true), std::runtime_error);
 }
 
 INSTANTIATE_TEST_SUITE_P(

@@ -372,6 +372,10 @@ void VirtualMachine::run() {
     return;
   }
 
+//  if (isOptimized) {
+//      optimizeMain();
+//  }
+
   while (ip >= 0 && ip < code.size()) {
     ++runnedOperationsCount;
     switch (const Instruction &inst = code[ip]; inst.op) {
@@ -719,6 +723,13 @@ size_t VirtualMachine::getHeapSize() const {
   return heapRefs.size();
 }
 
+void VirtualMachine::optimizeMain() {
+    int64_t address = start_address;
+    int64_t next_function_address = code.size();
+    foldConstants(address, next_function_address);
+    deleteDeadCode(address, next_function_address);
+}
+
 void VirtualMachine::optimizeFunction(const std::string &function_name) {
   auto iter = functionTable.find(function_name);
   if (iter == functionTable.end()) {
@@ -733,63 +744,67 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
     }
   }
 
+  foldConstants(address, next_function_address);
+  deleteDeadCode(address, next_function_address);
+  optimized_functions.insert(function_name);
+}
+
+void VirtualMachine::deleteDeadCode(int64_t start, int64_t finish) {
     std::unordered_set<std::string> usedVariables;
     std::unordered_map<std::string, int64_t> save_usages;
-    for (int64_t i = next_function_address - 1; i >= address; i--) {
-        if (code[i].op == InstructionType::STORE_VAR) {
+    for (int64_t i = finish - 1; i >= start; i--) {
+        if (code[i].op == InstructionType::PUSH_VAR || code[i].op == InstructionType::RET) {
             save_usages[code[i].strOperand]++;
         }
     }
     for (auto& p : save_usages) {
-        if (p.second > 1) {
+        if (p.second > 0) {
             usedVariables.insert(p.first);
         }
     }
 
-  for (int64_t i = next_function_address - 1; i >= address; i--) {
-    if (code[i].op == InstructionType::RET || code[i].op == InstructionType::PUSH_VAR) {
-      usedVariables.insert(code[i].strOperand);
-    } else if (code[i].op == InstructionType::STORE_VAR) {
-      if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
-        int64_t k = 1;
-        --i;
-        while ((code[i].op == InstructionType::ADD
-               || code[i].op == InstructionType::MUL
-               || code[i].op == InstructionType::SUB
-               || code[i].op == InstructionType::DIV
-               || code[i].op == InstructionType::DIV_REM
-               || code[i].op == InstructionType::PUSH_INT
-               || code[i].op == InstructionType::PUSH_BOOL
-               || code[i].op == InstructionType::PUSH_DOUBLE
-               || code[i].op == InstructionType::PUSH_STRING
-               || code[i].op == InstructionType::PUSH_VAR
-               || code[i].op == InstructionType::AND
-               || code[i].op == InstructionType::OR
-               || code[i].op == InstructionType::EQ
-               || code[i].op == InstructionType::NEQ
-                || code[i].op == InstructionType::LT
-                || code[i].op == InstructionType::LE
-                || code[i].op == InstructionType::GT
-                || code[i].op == InstructionType::GE
-                || code[i].op == InstructionType::NOT
-                || code[i].op == InstructionType::NEG) && i >= 0) {
-          --i;
-          k++;
+    for (int64_t i = finish - 1; i >= start; i--) {
+        if (code[i].op == InstructionType::STORE_VAR) {
+            if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
+                int64_t k = 1;
+                --i;
+                while ((code[i].op == InstructionType::ADD
+                        || code[i].op == InstructionType::MUL
+                        || code[i].op == InstructionType::SUB
+                        || code[i].op == InstructionType::DIV
+                        || code[i].op == InstructionType::DIV_REM
+                        || code[i].op == InstructionType::PUSH_INT
+                        || code[i].op == InstructionType::PUSH_BOOL
+                        || code[i].op == InstructionType::PUSH_DOUBLE
+                        || code[i].op == InstructionType::PUSH_STRING
+                        || code[i].op == InstructionType::PUSH_VAR
+                        || code[i].op == InstructionType::AND
+                        || code[i].op == InstructionType::OR
+                        || code[i].op == InstructionType::EQ
+                        || code[i].op == InstructionType::NEQ
+                        || code[i].op == InstructionType::LT
+                        || code[i].op == InstructionType::LE
+                        || code[i].op == InstructionType::GT
+                        || code[i].op == InstructionType::GE
+                        || code[i].op == InstructionType::NOT
+                        || code[i].op == InstructionType::NEG
+                        || code[i].op == InstructionType::JMP
+                        || code[i].op == InstructionType::NEW_ARRAY
+                           || code[i].op == InstructionType::DUP_TOP
+                              || code[i].op == InstructionType::SET_ELEMENT) && i >= 0) {
+                    --i;
+                    k++;
+                }
+                ++i;
+                code[i] = Instruction(InstructionType::JMP, k + i);
+                while (code[i + k].op == InstructionType::JMP) {
+                    k = code[i + k].intOperand - i;
+                    code[i] = Instruction(InstructionType::JMP, k + i);
+                }
+                continue;
+            }
         }
-        ++i;
-        code[i] = Instruction(InstructionType::JMP, k + i);
-        while (code[i + k].op == InstructionType::JMP) {
-          k = code[i + k].intOperand - i;
-          code[i] = Instruction(InstructionType::JMP, k + i);
-        }
-        continue;
-      }
     }
-  }
-
-    foldConstants(address, next_function_address);
-
-  optimized_functions.insert(function_name);
 }
 
 struct StackEntry {
@@ -831,7 +846,7 @@ Value calcUnary(InstructionType op, Value a) {
   }
 }
 
-std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t finish) {
+void VirtualMachine::foldConstants(int64_t start, int64_t finish) {
   std::vector<Instruction> optimizedBody;
   std::vector<StackEntry> stack;
 
@@ -939,16 +954,29 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
         }
         break;
       }
-      case InstructionType::STORE_VAR:
-        if (!stack.empty()) {
-          stack.pop_back();
-        }
-        optimizedBody.push_back(instr);
-        break;
+      case InstructionType::STORE_VAR: {
+          if (!stack.empty()) {
+              stack.pop_back();
+          }
+          optimizedBody.push_back(instr);
+          break;
+      }
+      case InstructionType::NEW_ARRAY: {
+          if (code[i].strOperand == "__stack") {
+              auto size = stack.back();
+              stack.pop_back();
+              if (size.value.asInt() < 0) {
+                  throw std::runtime_error("NEW_ARRAY: negative size is not allowed");
+              }
+          }
+          optimizedBody.push_back(instr);
+          break;
+      }
       default:
         optimizedBody.push_back(instr);
         break;
     }
+
   }
 
   int64_t j = start;
@@ -990,8 +1018,6 @@ std::vector<Instruction> VirtualMachine::foldConstants(int64_t start, int64_t fi
       code[place_to_jump] = Instruction(InstructionType::JMP, (int64_t) j);
     };
   }
-
-  return optimizedBody;
 }
 
 size_t VirtualMachine::getRunnedOperationsCount() {

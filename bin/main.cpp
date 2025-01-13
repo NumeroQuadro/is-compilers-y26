@@ -301,8 +301,18 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     }
     )";
 
+    std::string experimentCode = R"(
+    func b() {
+        var a = [..10]
+        var vec = [-1, 3, 2.5, 2.4, -5]
+    }
+    {
+        b()
+    }
+    )";
 
-    antlr4::ANTLRInputStream inputStream(sieveOfEratosthenes);
+
+    antlr4::ANTLRInputStream inputStream(experimentCode);
     GrammarLexer lexer(&inputStream);
     antlr4::CommonTokenStream tokens(&lexer);
     GrammarParser parser(&tokens);
