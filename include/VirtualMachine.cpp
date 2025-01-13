@@ -29,6 +29,28 @@ VirtualMachine::VirtualMachine(): gc(nullptr) {
   };
 }
 
+VirtualMachine::VirtualMachine(GarbageCollector *garbageCollector) : gc(garbageCollector) {
+    scope_ = new Scope(nullptr);
+
+    functionTable["__pushBack"] = FunctionInfo{
+            "__pushBack",
+            {{"array", ValueType::REF}, {"value"}},
+            -1ll
+    };
+
+    functionTable["__popBack"] = FunctionInfo{
+            "__popBack",
+            {{"array", ValueType::REF}},
+            -1ll
+    };
+
+    functionTable["__size"] = FunctionInfo{
+            "__size",
+            {{"array", ValueType::REF}},
+            -1ll
+    };
+}
+
 VirtualMachine::VirtualMachine(const std::vector<Instruction> &code,
                                const std::unordered_map<std::string, FunctionInfo> &functions,
                                GarbageCollector *garbageCollector)
@@ -746,6 +768,12 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
 
   foldConstants(address, next_function_address);
   deleteDeadCode(address, next_function_address);
+
+//    std::cout << "\n After Dead code ellumination:\n";
+//    for (int64_t i = address; i < next_function_address; i++) {
+//        std::cout << i << " " << code[i].toStr() << '\n';
+//    }
+
   optimized_functions.insert(function_name);
 }
 
@@ -766,40 +794,100 @@ void VirtualMachine::deleteDeadCode(int64_t start, int64_t finish) {
     for (int64_t i = finish - 1; i >= start; i--) {
         if (code[i].op == InstructionType::STORE_VAR) {
             if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
-                int64_t k = 1;
-                --i;
-                while ((code[i].op == InstructionType::ADD
-                        || code[i].op == InstructionType::MUL
-                        || code[i].op == InstructionType::SUB
-                        || code[i].op == InstructionType::DIV
-                        || code[i].op == InstructionType::DIV_REM
-                        || code[i].op == InstructionType::PUSH_INT
-                        || code[i].op == InstructionType::PUSH_BOOL
-                        || code[i].op == InstructionType::PUSH_DOUBLE
-                        || code[i].op == InstructionType::PUSH_STRING
-                        || code[i].op == InstructionType::PUSH_VAR
-                        || code[i].op == InstructionType::AND
-                        || code[i].op == InstructionType::OR
-                        || code[i].op == InstructionType::EQ
-                        || code[i].op == InstructionType::NEQ
-                        || code[i].op == InstructionType::LT
-                        || code[i].op == InstructionType::LE
-                        || code[i].op == InstructionType::GT
-                        || code[i].op == InstructionType::GE
-                        || code[i].op == InstructionType::NOT
-                        || code[i].op == InstructionType::NEG
-                        || code[i].op == InstructionType::JMP
-                        || code[i].op == InstructionType::NEW_ARRAY
-                           || code[i].op == InstructionType::DUP_TOP
-                              || code[i].op == InstructionType::SET_ELEMENT) && i >= 0) {
+                if (code[i - 1].op == InstructionType::SET_ELEMENT) {
+                    int64_t k = 1;
                     --i;
-                    k++;
-                }
-                ++i;
-                code[i] = Instruction(InstructionType::JMP, k + i);
-                while (code[i + k].op == InstructionType::JMP) {
-                    k = code[i + k].intOperand - i;
+                    while ((code[i].op == InstructionType::ADD
+                            || code[i].op == InstructionType::MUL
+                            || code[i].op == InstructionType::SUB
+                            || code[i].op == InstructionType::DIV
+                            || code[i].op == InstructionType::DIV_REM
+                            || code[i].op == InstructionType::PUSH_INT
+                            || code[i].op == InstructionType::PUSH_BOOL
+                            || code[i].op == InstructionType::PUSH_DOUBLE
+                            || code[i].op == InstructionType::PUSH_STRING
+                            || code[i].op == InstructionType::PUSH_VAR
+                            || code[i].op == InstructionType::AND
+                            || code[i].op == InstructionType::OR
+                            || code[i].op == InstructionType::EQ
+                            || code[i].op == InstructionType::NEQ
+                            || code[i].op == InstructionType::LT
+                            || code[i].op == InstructionType::LE
+                            || code[i].op == InstructionType::GT
+                            || code[i].op == InstructionType::GE
+                            || code[i].op == InstructionType::NOT
+                            || code[i].op == InstructionType::NEG
+                            || code[i].op == InstructionType::JMP
+                            || code[i].op == InstructionType::DUP_TOP
+                            || code[i].op == InstructionType::SET_ELEMENT) && i >= 0) {
+                        --i;
+                        k++;
+                    }
+
+                    while ((code[i].op == InstructionType::ADD
+                            || code[i].op == InstructionType::MUL
+                            || code[i].op == InstructionType::SUB
+                            || code[i].op == InstructionType::DIV
+                            || code[i].op == InstructionType::DIV_REM
+                            || code[i].op == InstructionType::PUSH_INT
+                            || code[i].op == InstructionType::PUSH_BOOL
+                            || code[i].op == InstructionType::PUSH_DOUBLE
+                            || code[i].op == InstructionType::PUSH_STRING
+                            || code[i].op == InstructionType::PUSH_VAR
+                            || code[i].op == InstructionType::AND
+                            || code[i].op == InstructionType::OR
+                            || code[i].op == InstructionType::EQ
+                            || code[i].op == InstructionType::NEQ
+                            || code[i].op == InstructionType::LT
+                            || code[i].op == InstructionType::LE
+                            || code[i].op == InstructionType::GT
+                            || code[i].op == InstructionType::GE
+                            || code[i].op == InstructionType::NOT
+                            || code[i].op == InstructionType::NEG
+                            || code[i].op == InstructionType::JMP) && i >= 0) {
+                        --i;
+                        k++;
+                    }
+                    ++i;
                     code[i] = Instruction(InstructionType::JMP, k + i);
+                    while (code[i + k].op == InstructionType::JMP) {
+                        k = code[i + k].intOperand - i;
+                        code[i] = Instruction(InstructionType::JMP, k + i);
+                    }
+                } else {
+                    int64_t k = 1;
+                    --i;
+                    while ((code[i].op == InstructionType::ADD
+                            || code[i].op == InstructionType::MUL
+                            || code[i].op == InstructionType::SUB
+                            || code[i].op == InstructionType::DIV
+                            || code[i].op == InstructionType::DIV_REM
+                            || code[i].op == InstructionType::PUSH_INT
+                            || code[i].op == InstructionType::PUSH_BOOL
+                            || code[i].op == InstructionType::PUSH_DOUBLE
+                            || code[i].op == InstructionType::PUSH_STRING
+                            || code[i].op == InstructionType::PUSH_VAR
+                            || code[i].op == InstructionType::AND
+                            || code[i].op == InstructionType::OR
+                            || code[i].op == InstructionType::EQ
+                            || code[i].op == InstructionType::NEQ
+                            || code[i].op == InstructionType::LT
+                            || code[i].op == InstructionType::LE
+                            || code[i].op == InstructionType::GT
+                            || code[i].op == InstructionType::GE
+                            || code[i].op == InstructionType::NOT
+                            || code[i].op == InstructionType::NEG
+                            || code[i].op == InstructionType::JMP
+                            || code[i].op == InstructionType::NEW_ARRAY) && i >= 0) {
+                        --i;
+                        k++;
+                    }
+                    ++i;
+                    code[i] = Instruction(InstructionType::JMP, k + i);
+                    while (code[i + k].op == InstructionType::JMP) {
+                        k = code[i + k].intOperand - i;
+                        code[i] = Instruction(InstructionType::JMP, k + i);
+                    }
                 }
                 continue;
             }

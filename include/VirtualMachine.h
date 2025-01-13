@@ -21,6 +21,8 @@ class VirtualMachine {
 public:
   VirtualMachine();
 
+  VirtualMachine(GarbageCollector *garbageCollector);
+
   explicit VirtualMachine(const std::vector<Instruction> &code,
                           const std::unordered_map<std::string, FunctionInfo> &functions,
                           GarbageCollector *garbageCollector);

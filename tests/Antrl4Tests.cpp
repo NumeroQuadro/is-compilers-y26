@@ -408,6 +408,32 @@ TEST(JITTests, DeadCodeEllumination_Array2_ShouldDoLessOperations) {
     EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
 }
 
+TEST(JITTests, DeadCodeEllumination_Array3_ShouldDoLessOperations) {
+    std::string experimentCode = R"(
+    func test() {
+        var a = [..3]
+        a[2] = 9
+        a[0] = 3
+        a[1] = 4
+        var c = [1, 2, 3]
+        print(a)
+    }
+    {
+        test()
+    }
+    )";
+
+    std::string expectedOutput = "[3, 4, 9]\n";
+    std::string notOptimizedOutput = runCode(experimentCode, false);
+    std::string optimizedOutput = runCode(experimentCode, true);
+    EXPECT_EQ(notOptimizedOutput, expectedOutput);
+    EXPECT_EQ(optimizedOutput, expectedOutput);
+
+    size_t operationWithoutOptimizations = runCodeAndGetOperationsCount(experimentCode, false);
+    size_t operationWithOptimizations = runCodeAndGetOperationsCount(experimentCode, true);
+    EXPECT_LT(operationWithOptimizations, operationWithoutOptimizations);
+}
+
 TEST(JITTests, ConstantFolding_VariablesCreating_ShouldHaveLessOperationsCount) {
     std::string experimentCode = R"(
     func test() {

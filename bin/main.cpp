@@ -304,7 +304,10 @@ for (var i = 0; i < __size(prime); i = i + 1) {
     std::string experimentCode = R"(
     func b() {
         var a = [..10]
-        var vec = [-1, 3, 2.5, 2.4, -5]
+        //a[0] = 3
+        a[1] = 4
+        var c = [1, 2, 3]
+        print(a)
     }
     {
         b()

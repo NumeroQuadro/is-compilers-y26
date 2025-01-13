@@ -36,7 +36,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: add benchmarks tests and delete comments, fix in constant folding optimization">
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: optimization order + dead array removing + possible main optimization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
@@ -113,12 +113,6 @@
     </key>
   </component>
   <component name="RunManager" selected="CMake Application.run_tests">
-    <configuration name="JITTests.BehaviorTest_DeadCode_ArrayCreating" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="BehaviorTest_DeadCode_ArrayCreating" TEST_MODE="SUITE_TEST">
-      <method v="2">
-        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-        <option name="BeforeTestRunTask" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="JITTests.BehaviorTest_DeadCode_ArrayCreating2" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="BehaviorTest_DeadCode_ArrayCreating2" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -132,6 +126,12 @@
       </method>
     </configuration>
     <configuration name="JITTests.DeadCodeEllumination_Array2_ShouldDoLessOperations" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_Array2_ShouldDoLessOperations" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JITTests.DeadCodeEllumination_Array3_ShouldDoLessOperations" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_Array3_ShouldDoLessOperations" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -224,18 +224,18 @@
       <item itemvalue="CMake Application.run_tests" />
       <item itemvalue="CTest Application.All CTest" />
       <item itemvalue="Google Test.antlr4_tests" />
-      <item itemvalue="Google Test.JITTests.BehaviorTest_DeadCode_ArrayCreating" />
       <item itemvalue="Google Test.JITTests.BehaviorTest_DeadCode_ArrayCreating2" />
       <item itemvalue="Google Test.JITTests.BehaviorTest_DeadCode_ArrayCreating3" />
       <item itemvalue="Google Test.JITTests.DeadCodeEllumination_Array2_ShouldDoLessOperations" />
+      <item itemvalue="Google Test.JITTests.DeadCodeEllumination_Array3_ShouldDoLessOperations" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="CMake Application.run_tests" />
+        <item itemvalue="Google Test.JITTests.DeadCodeEllumination_Array3_ShouldDoLessOperations" />
         <item itemvalue="Google Test.JITTests.DeadCodeEllumination_Array2_ShouldDoLessOperations" />
         <item itemvalue="Google Test.JITTests.BehaviorTest_DeadCode_ArrayCreating3" />
         <item itemvalue="Google Test.JITTests.BehaviorTest_DeadCode_ArrayCreating2" />
-        <item itemvalue="Google Test.JITTests.BehaviorTest_DeadCode_ArrayCreating" />
       </list>
     </recent_temporary>
   </component>
@@ -257,7 +257,7 @@
       <workItem from="1736193600842" duration="5603000" />
       <workItem from="1736267793460" duration="3000" />
       <workItem from="1736329041620" duration="4000" />
-      <workItem from="1736765427675" duration="7707000" />
+      <workItem from="1736765427675" duration="11579000" />
     </task>
     <task id="LOCAL-00001" summary="feat">
       <option name="closed" value="true" />
@@ -323,7 +323,14 @@
       <option name="project" value="LOCAL" />
       <updated>1736335405818</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="fix: optimization order + dead array removing + possible main optimization">
+      <created>1736773845992</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1736773845992</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -355,19 +362,20 @@
     <MESSAGE value="feat: cache optimization new test - speed" />
     <MESSAGE value="feat: cache optimization new tests + scope bug fix" />
     <MESSAGE value="feat: add benchmarks tests and delete comments, fix in constant folding optimization" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add benchmarks tests and delete comments, fix in constant folding optimization" />
+    <MESSAGE value="fix: optimization order + dead array removing + possible main optimization" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: optimization order + dead array removing + possible main optimization" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>154</line>
+          <line>176</line>
           <option name="timeStamp" value="65" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>983</line>
+          <line>1071</line>
           <option name="timeStamp" value="75" />
         </line-breakpoint>
       </breakpoints>
