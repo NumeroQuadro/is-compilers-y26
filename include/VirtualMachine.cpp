@@ -769,11 +769,6 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
   foldConstants(address, next_function_address);
   deleteDeadCode(address, next_function_address);
 
-//    std::cout << "\n After Dead code ellumination:\n";
-//    for (int64_t i = address; i < next_function_address; i++) {
-//        std::cout << i << " " << code[i].toStr() << '\n';
-//    }
-
   optimized_functions.insert(function_name);
 }
 
