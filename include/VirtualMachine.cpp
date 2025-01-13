@@ -773,24 +773,18 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
 }
 
 void VirtualMachine::deleteDeadCode(int64_t start, int64_t finish) {
-    std::unordered_set<std::string> usedVariables;
     std::unordered_map<std::string, int64_t> save_usages;
     for (int64_t i = finish - 1; i >= start; i--) {
         if (code[i].op == InstructionType::PUSH_VAR || code[i].op == InstructionType::RET) {
             save_usages[code[i].strOperand]++;
         }
     }
-    for (auto& p : save_usages) {
-        if (p.second > 0) {
-            usedVariables.insert(p.first);
-        }
-    }
 
     for (int64_t i = finish - 1; i >= start; i--) {
         if (code[i].op == InstructionType::STORE_VAR) {
-            if (usedVariables.find(code[i].strOperand) == usedVariables.end()) {
-                if (code[i - 1].op == InstructionType::SET_ELEMENT) {
-                    int64_t k = 1;
+            if (save_usages[code[i].strOperand] == 0) {
+                int64_t k = 1;
+                if (i > 0 && code[i - 1].op == InstructionType::SET_ELEMENT) {
                     --i;
                     while ((code[i].op == InstructionType::ADD
                             || code[i].op == InstructionType::MUL
@@ -818,7 +812,6 @@ void VirtualMachine::deleteDeadCode(int64_t start, int64_t finish) {
                         --i;
                         k++;
                     }
-
                     while ((code[i].op == InstructionType::ADD
                             || code[i].op == InstructionType::MUL
                             || code[i].op == InstructionType::SUB
@@ -843,14 +836,7 @@ void VirtualMachine::deleteDeadCode(int64_t start, int64_t finish) {
                         --i;
                         k++;
                     }
-                    ++i;
-                    code[i] = Instruction(InstructionType::JMP, k + i);
-                    while (code[i + k].op == InstructionType::JMP) {
-                        k = code[i + k].intOperand - i;
-                        code[i] = Instruction(InstructionType::JMP, k + i);
-                    }
                 } else {
-                    int64_t k = 1;
                     --i;
                     while ((code[i].op == InstructionType::ADD
                             || code[i].op == InstructionType::MUL
@@ -877,12 +863,12 @@ void VirtualMachine::deleteDeadCode(int64_t start, int64_t finish) {
                         --i;
                         k++;
                     }
-                    ++i;
+                }
+                ++i;
+                code[i] = Instruction(InstructionType::JMP, k + i);
+                while (code[i + k].op == InstructionType::JMP) {
+                    k = code[i + k].intOperand - i;
                     code[i] = Instruction(InstructionType::JMP, k + i);
-                    while (code[i + k].op == InstructionType::JMP) {
-                        k = code[i + k].intOperand - i;
-                        code[i] = Instruction(InstructionType::JMP, k + i);
-                    }
                 }
                 continue;
             }

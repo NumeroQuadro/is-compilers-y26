@@ -36,12 +36,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: optimization order + dead array removing + possible main optimization">
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: delete comments">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -257,7 +254,7 @@
       <workItem from="1736193600842" duration="5603000" />
       <workItem from="1736267793460" duration="3000" />
       <workItem from="1736329041620" duration="4000" />
-      <workItem from="1736765427675" duration="11579000" />
+      <workItem from="1736765427675" duration="14321000" />
     </task>
     <task id="LOCAL-00001" summary="feat">
       <option name="closed" value="true" />
@@ -330,7 +327,21 @@
       <option name="project" value="LOCAL" />
       <updated>1736773845992</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="fix: dead array removing fix">
+      <created>1736781627410</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1736781627410</updated>
+    </task>
+    <task id="LOCAL-00012" summary="fix: delete comments">
+      <created>1736781700408</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1736781700408</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -363,7 +374,9 @@
     <MESSAGE value="feat: cache optimization new tests + scope bug fix" />
     <MESSAGE value="feat: add benchmarks tests and delete comments, fix in constant folding optimization" />
     <MESSAGE value="fix: optimization order + dead array removing + possible main optimization" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: optimization order + dead array removing + possible main optimization" />
+    <MESSAGE value="fix: dead array removing fix" />
+    <MESSAGE value="fix: delete comments" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: delete comments" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -375,7 +388,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>1071</line>
+          <line>1052</line>
           <option name="timeStamp" value="75" />
         </line-breakpoint>
       </breakpoints>
