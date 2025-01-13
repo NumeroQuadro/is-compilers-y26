@@ -1,0 +1,8 @@
+{
+    var value = 1
+    for (var i = 2; i <= 20; i = i + 1) {
+        value = value * i
+    }
+
+    print(value)
+}

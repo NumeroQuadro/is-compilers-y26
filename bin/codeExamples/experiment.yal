@@ -1,0 +1,22 @@
+func test(in: num) {
+    var r = in + 3
+    var e = 2 + 4 - 1
+    var d = !true or (!true or false) and true or (5 > 3) and (7 < in) or false
+    var c = a + 2
+    var m = 3 + 2 + in + 8
+    var w = 8 * 3 + in
+    print(w)
+    print(d)
+    if (true or false) {
+        print(5)
+        print(r)
+    }
+    print(m)
+    print(e)
+    print(8 + 1)
+}
+
+{
+    test(34)
+    print("finish")
+}

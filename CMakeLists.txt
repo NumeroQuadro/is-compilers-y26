@@ -7,7 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Java 1.11 COMPONENTS Runtime REQUIRED)
 
 include(FetchContent)
-
 FetchContent_Declare(
         antlr4
         GIT_REPOSITORY https://github.com/antlr/antlr4.git

@@ -1,0 +1,14 @@
+func red() {
+    print (9 * 7 + 1)
+    print("gol")
+}
+
+func test(in: num, out: num) {
+    return 5 + 3 * 2
+}
+
+{
+    print(test(34 + 2 * 3, 3 + 2))
+    red()
+    print("finish")
+}

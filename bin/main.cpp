@@ -65,6 +65,8 @@
 
 
 #include <iostream>
+#include <fstream>
+#include <cxxopts.hpp>
 #include "antlr4-runtime.h"
 #include "GarbageCollector.h"
 #include "GrammarLexer.h"
@@ -97,212 +99,44 @@
  }
 
 
-int main() {
-    std::string factorial = R"(
-  {
-    var value = 1
-    for (var i = 2; i <= 20; i = i + 1) {
-      value = value * i
+int main(int argc, char* argv[]) {
+    cxxopts::Options options("YalVM", "yet another language virtual machine");
+
+    bool opt;
+    std::string filename;
+    options.add_options()
+        ("h,help", "Show help")
+        ("O2", "Optimization", cxxopts::value(opt))
+        ("i,input", "Input file", cxxopts::value(filename));
+
+      try {
+        auto result = options.parse(argc, argv);
+
+        if (result.count("help")) {
+            std::cout << options.help() << "\n";
+            return 0;
+        }
+
+        if (!result.count("input")) {
+            std::cerr << "Error: option -i, --input not set.\n";
+            std::cerr << options.help() << "\n";
+            return 1;
+        }
+
+    } catch (const cxxopts::OptionException& e) {
+        std::cerr << "Error: " << e.what() << "\n";
+        return 1;
     }
 
-    print(value)
-  }
-  )";
-
-    const std::string mergeSort = R"(
-    func merge (arr: [], left: num, mid: num, right: num) {
-        var n1 = mid - left + 1
-        var n2 = right - mid
-
-        var l = [..n1]
-        var r = [..n2]
-
-        for (var i = 0; i < n1; i = i + 1) {
-            l[i] = arr[left + i]
-        }
-
-        for (var i = 0; i < n2; i = i + 1) {
-            r[i] = arr[mid + 1 + i]
-        }
-        var i = 0
-        var j = 0
-        var k = left
-
-        while (i < n1 and j < n2) {
-            if (l[i] <= r[j]) {
-                arr[k] = l[i]
-                i = i + 1
-            } else {
-                arr[k] = r[j]
-                j = j + 1
-            }
-            k = k + 1
-        }
-
-        while (i < n1) {
-            arr[k] = l[i]
-            i = i + 1
-            k = k + 1
-        }
-
-        while (j < n2) {
-            arr[k] = r[j]
-            j = j + 1
-            k = k + 1
-        }
-    }
-
-    func mergeSort(arr: [], left: num, right: num) {
-        if (left >= right) {
-            return 0
-        }
-
-        var tmp = right - left
-        tmp = tmp / 2
-        var mid = left + tmp
-        mergeSort(arr, left, mid)
-        mergeSort(arr, mid + 1, right)
-        merge(arr, left, mid, right)
-    }
-
+    std::ifstream file(filename);
+    if (!file.is_open())
     {
-        var n = 10000
-        var vec = [..n]
+        std::cerr << "Error: File doesn\'t exist\n";
+        return 1;
+    }
+    
 
-        for (var i = 0; i < n; i = i + 1) {
-          vec[i] = (n - i) % 100
-        }
-        mergeSort(vec, 0, n - 1)
-        for (var i = 0; i < __size(vec); i = i + 1) {
-            print(vec[i])
-        }
-    }
-    )";
-
-    const std::string sieveOfEratosthenes = R"(
-    func sieveOfEratosthenes(n: num) {
-        var prime = [..n + 1]
-        for (var i = 0; i < __size(prime); i = i + 1) {
-            prime[i] = 1
-        }
-
-        for (var p = 2; p <= n; p = p + 1) {
-            if (prime[p] == true) {
-                for (var i = p * p; i <= n; i = i + p) {
-                    prime[i] = false
-                }
-            }
-        }
-
-        for (var i = 2; i <= n; i = i + 1) {
-            if (prime[i] == true) {
-                print(i)
-            }
-        }
-    }
-
-    {
-        sieveOfEratosthenes(100000)
-    }
-    )";
-
-    std::string experiment = R"(
-    func test(in: num) {
-        var r = in + 3
-        var e = 2 + 4 - 1
-      var d = !true or (!true or false) and true or (5 > 3) and (7 < in) or false
-      var c = a + 2
-        var m = 3 + 2 + in + 8
-var w = 8 * 3 + in
-print(w)
-      print(d)
-    if (true or false) {
-        print(5)
-        print(r)
-    }
-print(m)
-        print(e)
-print(8 + 1)
-    }
-    {
-      test(34)
-      print("finish")
-    }
-  )";
-    std::string experiment2 = R"(
-    func red() {
-        print (9 * 7 + 1)
-        print("gol")
-    }
-    func test(in: num) {
-        while (false or false and true) {
-            print(6 * 8 + 9)
-            return true
-        }
-if (in > 0) {
-print((8 * 3 + 1) + in + (5 * 3))
-}
-        for (var i = 8 + 7 * 8 - 7; i < 100 - 1 + (-3); i = i + 1) {
-            print(i)
-        }
-
-        var prime = [..10 + 4]
-        for (var i = 0; i < __size(prime); i = i + 1) {
-            prime[i] = 1 + 3 + 4 + in + 5
-        }
-print(in)
-for (var i = 0; i < __size(prime); i = i + 1) {
-            print(prime[i])
-        }
-    }
-    {
-      test(34)
-        red()
-      print("finish")
-    }
-  )";
-
-    std::string experiment3 = R"(
-    func red() {
-        print (9 * 7 + 1)
-        print("gol")
-    }
-    func test(in: num, out: num) {
-        return 5 + 3 * 2
-    }
-    {
-      print(test(34 + 2 * 3, 3 + 2))
-        red()
-      print("finish")
-    }
-  )";
-
-    std::string factorial2 = R"(
-    func factorial(a: num) {
-        if (a == 1 or a == 0) {
-            return 1
-        }
-        return a * factorial(a - 1)
-    }
-    {
-      print(factorial(19))
-    }
-  )";
-    std::string experiment4 = R"(
-
-    )";
-
-    std::string experiment5 = R"(
-    {
-        var vec = [1, 2, 3]
-        var arr = vec
-        vec[0] = 5
-        print(arr)
-    }
-    )";
-
-
-    antlr4::ANTLRInputStream inputStream(sieveOfEratosthenes);
+    antlr4::ANTLRInputStream inputStream(file);
     GrammarLexer lexer(&inputStream);
     antlr4::CommonTokenStream tokens(&lexer);
     GrammarParser parser(&tokens);
@@ -329,7 +163,7 @@ for (var i = 0; i < __size(prime); i = i + 1) {
   GarbageCollector gc;
 
   VirtualMachine vm(visitor.code, visitor.functionTable, &gc, visitor.startPos);
-  vm.optimize(true);
+  vm.optimize(opt);
   vm.run();
 
     // getTimeScoreOfLanguage(experiment5);

@@ -1,0 +1,67 @@
+func merge (arr: [], left: num, mid: num, right: num) {
+    var n1 = mid - left + 1
+    var n2 = right - mid
+
+    var l = [..n1]
+    var r = [..n2]
+
+    for (var i = 0; i < n1; i = i + 1) {
+        l[i] = arr[left + i]
+    }
+
+    for (var i = 0; i < n2; i = i + 1) {
+        r[i] = arr[mid + 1 + i]
+    }
+    var i = 0
+    var j = 0
+    var k = left
+
+    while (i < n1 and j < n2) {
+        if (l[i] <= r[j]) {
+            arr[k] = l[i]
+            i = i + 1
+        } else {
+            arr[k] = r[j]
+            j = j + 1
+        }
+        k = k + 1
+    }
+
+    while (i < n1) {
+        arr[k] = l[i]
+        i = i + 1
+        k = k + 1
+    }
+
+    while (j < n2) {
+        arr[k] = r[j]
+        j = j + 1
+        k = k + 1
+    }
+}
+
+func mergeSort(arr: [], left: num, right: num) {
+    if (left >= right) {
+        return 0
+    }
+
+    var tmp = right - left
+    tmp = tmp / 2
+    var mid = left + tmp
+    mergeSort(arr, left, mid)
+    mergeSort(arr, mid + 1, right)
+    merge(arr, left, mid, right)
+}
+
+{
+    var n = 10000
+    var vec = [..n]
+
+    for (var i = 0; i < n; i = i + 1) {
+        vec[i] = (n - i) % 100
+    }
+    mergeSort(vec, 0, n - 1)
+    for (var i = 0; i < __size(vec); i = i + 1) {
+        print(vec[i])
+    }
+}
