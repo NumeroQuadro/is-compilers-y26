@@ -1,15 +1,13 @@
-include(FetchContent)
-
-FetchContent_Declare(
-    cxxopts
-    GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
-    GIT_TAG v2.2.0
-)
-
-FetchContent_MakeAvailable(cxxopts)
-
 add_executable(yal
-        main.cpp
+        main.cpp        
+        
+        CommandLineChainParsers/RunCommandParser.cpp
+        CommandLineChainParsers/RunWithLogsCommandParser.cpp
+        CommandLineChainParsers/GetTimeDecoratorParser.cpp
+
+        Commands/RunCommand.cpp
+        Commands/RunWithLogsCommand.cpp
+        Commands/GetTimeDecorator.cpp
 )
 
 target_include_directories(yal PRIVATE
@@ -18,4 +16,4 @@ target_include_directories(yal PRIVATE
         ${ANTLR4_INCLUDE_DIR}
 )
 
-target_link_libraries(yal PRIVATE Core_lib cxxopts)
+target_link_libraries(yal PRIVATE Core_lib)

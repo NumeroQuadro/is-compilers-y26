@@ -5,6 +5,7 @@
 
 #include "FunctionInfo.h"
 #include "GarbageCollector.h"
+// #include "Instruction.h"
 
 
 VirtualMachine::VirtualMachine(): gc(nullptr) {
