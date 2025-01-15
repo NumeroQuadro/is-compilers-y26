@@ -1,0 +1,11 @@
+func test(z: num) {
+    var a = 4 + 10
+    var b = 3 * 2 + 5 + 9 * 100
+    if (z == 10 * 10 * 10 * 10 * 10 * 10) {
+        return 0
+    }
+    test(z + 1)
+}
+{
+    test(0)
+}

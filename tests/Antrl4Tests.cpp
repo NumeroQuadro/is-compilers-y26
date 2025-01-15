@@ -876,9 +876,9 @@ TEST(JITTests, SpeedTest_ShoudWorkFaster3) {
         return a * factorial(a - 1)
     }
     {
-    for(var i = 20; i >= 0; i = i - 1) {
-          print(factorial(i))
-    }
+        for(var i = 20; i >= 0; i = i - 1) {
+              print(factorial(i))
+        }
     }
     )";
 

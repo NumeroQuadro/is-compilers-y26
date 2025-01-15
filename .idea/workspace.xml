@@ -36,9 +36,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: delete comments">
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: refactor code">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/bin/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +51,13 @@
     <option name="formatViaClangd" value="false" />
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
@@ -70,7 +79,9 @@
   &quot;associatedIndex&quot;: 6
 }</component>
   <component name="ProjectId" id="2qOZPewpqnLAF1iFsQyit4obt8W" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -106,29 +117,37 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="\\wsl$\Ubuntu\home\andrey\project\is-compilers-y26\bin\Commands" />
+      <recent name="\\wsl$\Ubuntu\home\andrey\project\is-compilers-y26\bin\CommandLineChainParsers" />
+      <recent name="\\wsl$\Ubuntu\home\andrey\project\is-compilers-y26\bin\codeExamples" />
       <recent name="\\wsl.localhost\Ubuntu\home\mityaiii\new\include" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.run_tests">
-    <configuration name="JITTests.BehaviorTest_DeadCode_ArrayCreating2" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="BehaviorTest_DeadCode_ArrayCreating2" TEST_MODE="SUITE_TEST">
+  <component name="RunManager" selected="CMake Application.yal">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JITTests.BehaviorTest_DeadCode_ArrayCreating2" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="BehaviorTest_DeadCode_ArrayCreating2" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.BehaviorTest_DeadCode_ArrayCreating3" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="BehaviorTest_DeadCode_ArrayCreating3" TEST_MODE="SUITE_TEST">
+    <configuration name="JITTests.BehaviorTest_DeadCode_ArrayCreating3" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="BehaviorTest_DeadCode_ArrayCreating3" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.DeadCodeEllumination_Array2_ShouldDoLessOperations" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_Array2_ShouldDoLessOperations" TEST_MODE="SUITE_TEST">
+    <configuration name="JITTests.DeadCodeEllumination_Array2_ShouldDoLessOperations" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_Array2_ShouldDoLessOperations" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="JITTests.DeadCodeEllumination_Array3_ShouldDoLessOperations" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_Array3_ShouldDoLessOperations" TEST_MODE="SUITE_TEST">
+    <configuration name="JITTests.DeadCodeEllumination_Array3_ShouldDoLessOperations" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_Array3_ShouldDoLessOperations" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
         <option name="BeforeTestRunTask" enabled="true" />
@@ -190,12 +209,12 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="run_tests" type="CMakeRunConfiguration" factoryName="Application" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests">
+    <configuration name="run_tests" type="CMakeRunConfiguration" factoryName="Application" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="yal" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="yal" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="yal">
+    <configuration name="yal" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-t -i /home/andrey/project/is-compilers-y26/bin/codeExamples/test.yal" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="yal" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="yal">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -254,7 +273,8 @@
       <workItem from="1736193600842" duration="5603000" />
       <workItem from="1736267793460" duration="3000" />
       <workItem from="1736329041620" duration="4000" />
-      <workItem from="1736765427675" duration="14321000" />
+      <workItem from="1736765427675" duration="14941000" />
+      <workItem from="1736952393051" duration="7568000" />
     </task>
     <task id="LOCAL-00001" summary="feat">
       <option name="closed" value="true" />
@@ -341,7 +361,14 @@
       <option name="project" value="LOCAL" />
       <updated>1736781700408</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="fix: refactor code">
+      <created>1736787489497</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1736787489497</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -376,7 +403,8 @@
     <MESSAGE value="fix: optimization order + dead array removing + possible main optimization" />
     <MESSAGE value="fix: dead array removing fix" />
     <MESSAGE value="fix: delete comments" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: delete comments" />
+    <MESSAGE value="fix: refactor code" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor code" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
