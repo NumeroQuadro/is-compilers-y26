@@ -1,6 +1,5 @@
 add_executable(yal
         main.cpp
-
         CommandLineChainParsers/RunCommandParser.cpp
         CommandLineChainParsers/RunWithLogsCommandParser.cpp
         CommandLineChainParsers/GetTimeDecoratorParser.cpp

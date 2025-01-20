@@ -370,6 +370,7 @@ void VirtualMachine::doRet() {
   function_cache_params_stack.pop();
   callStack.pop();
 
+  // gc->collectGarbage(heapRefs, scope_);
   delete scope_;
   scope_ = prevScope;
 
@@ -599,23 +600,27 @@ void VirtualMachine::run() {
         // break;
       }
       case InstructionType::GET_ELEMENT: {
-        Value idxVal = pop();
-        Value arrVal = pop();
-        int64_t idx = idxVal.asInt();
-        auto *arr = dynamic_cast<ArrayValue *>(arrVal.asHeapRef());
-        if (!arr) throw std::runtime_error("Not an array");
-        if (idx < 0 || idx >= arr->elements.size()) throw std::runtime_error("Array index out of bounds");
-        push(arr->getValue(idx));
-        ++ip;
-        break;
-      }
+          Value idxVal = pop();
+          Value arrVal = pop();
+          int64_t idx = idxVal.asInt();
+          auto *arr = dynamic_cast<ArrayValue *>(arrVal.asHeapRef());
+          if (!arr) {
+              throw std::runtime_error("Not an array");
+            }
+            if (idx < 0 || idx >= arr->elements.size()) throw std::runtime_error("Array index out of bounds");
+            push(arr->getValue(idx));
+            ++ip;
+            break;
+          }
       case InstructionType::SET_ELEMENT: {
-        Value val = pop();
-        Value idxVal2 = pop();
-        Value arrVal2 = pop();
-        int64_t idx2 = idxVal2.asInt();
-        auto *arr2 = dynamic_cast<ArrayValue *>(arrVal2.asHeapRef());
-        if (!arr2) throw std::runtime_error("Not an array");
+          Value val = pop();
+          Value idxVal2 = pop();
+          Value arrVal2 = pop();
+          int64_t idx2 = idxVal2.asInt();
+          auto *arr2 = dynamic_cast<ArrayValue *>(arrVal2.asHeapRef());
+          if (!arr2) {
+           throw std::runtime_error("Not an array");
+      }
         if (idx2 < 0 || idx2 >= arr2->elements.size())
           throw std::runtime_error(
             "Array index out of bounds" + code[ip].toStr());
@@ -766,9 +771,15 @@ void VirtualMachine::optimizeFunction(const std::string &function_name) {
     }
   }
 
+//  for (int64_t i = address; i < next_function_address; i++) {
+//      std::cout << i << " " << code[i].toStr() << "\n";
+//  }
   foldConstants(address, next_function_address);
   deleteDeadCode(address, next_function_address);
 
+//    for (int64_t i = address; i < next_function_address; i++) {
+//        std::cout << i << " " << code[i].toStr() << "\n";
+//    }
   optimized_functions.insert(function_name);
 }
 
@@ -948,7 +959,8 @@ void VirtualMachine::foldConstants(int64_t start, int64_t finish) {
       case InstructionType::SUB:
       case InstructionType::MUL:
       case InstructionType::DIV:
-      case InstructionType::DIV_REM: {
+      case InstructionType::DIV_REM:
+      case InstructionType::GET_ELEMENT: {
         if (stack.size() >= 2) {
           auto b = stack.back();
           stack.pop_back();
