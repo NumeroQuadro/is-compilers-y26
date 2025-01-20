@@ -112,28 +112,28 @@ int test() {
 }
 
 int main(int argc, char *argv[]) {
-    test();
-//    GetTimeDecoratorParser parser;
-//
-//    parser
-//        .AddNextParser(std::make_unique<RunWithLogsCommandParser>())
-//        .AddNextParser(std::make_unique<RunCommandParser>());
-//
-//    std::vector<std::string> request(argv, argv + argc);
-//
-//    if(std::find(request.begin(), request.end(), "--help") != request.end() &&
-//       std::find(request.begin(), request.end(), "-h") != request.end()) {
-//        std::cerr << help_description;
-//        return 0;
-//    }
-//
-//    auto command = parser.Parse(request);
-//    if (!command.get())
-//    {
-//        std::cerr << help_description;
-//        return 0;
-//    }
-//
-//    command->Execute();
+    //test();
+    GetTimeDecoratorParser parser;
+
+    parser
+        .AddNextParser(std::make_unique<RunWithLogsCommandParser>())
+        .AddNextParser(std::make_unique<RunCommandParser>());
+
+    std::vector<std::string> request(argv, argv + argc);
+
+    if(std::find(request.begin(), request.end(), "--help") != request.end() &&
+       std::find(request.begin(), request.end(), "-h") != request.end()) {
+        std::cerr << help_description;
+        return 0;
+    }
+
+    auto command = parser.Parse(request);
+    if (!command.get())
+    {
+        std::cerr << help_description;
+        return 0;
+    }
+
+    command->Execute();
     return 0;
 }

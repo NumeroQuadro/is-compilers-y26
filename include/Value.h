@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include <variant>
+#include <memory>
 
 class Value;
 
@@ -15,6 +16,8 @@ public:
 
   virtual void markChildren() {
   }
+
+    virtual std::unique_ptr<HeapValue> clone() const = 0;
 };
 
 class ArrayValue final : public HeapValue {
@@ -33,6 +36,13 @@ public:
   void pushValue(const Value& value);
 
   void markChildren() override;
+
+    std::unique_ptr<HeapValue> clone() const override {
+        auto copy = std::make_unique<ArrayValue>(elements.size());
+        copy->elements = elements;
+        copy->refIndices = refIndices;
+        return copy;
+    }
 };
 
 class StringValue final : public HeapValue {
@@ -41,6 +51,10 @@ public:
 
   explicit StringValue(std::string v) : value(std::move(v)) {
   }
+
+    std::unique_ptr<HeapValue> clone() const override {
+        return std::make_unique<StringValue>(value);
+    }
 };
 
 enum class ValueType {

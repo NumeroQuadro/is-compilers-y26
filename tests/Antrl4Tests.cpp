@@ -5,8 +5,8 @@
 class LanguageTests : public ::testing::TestWithParam<bool> {
 };
 
-TEST(Task4, wihoutO2) {
-    std::string factorialCode = R"(
+TEST(Task4, BinaryTreeWihoutO2) {
+    std::string code = R"(
     func itemCheck(node: []) {
         if (node[0] == -1) {
             return node[2]
@@ -59,67 +59,67 @@ TEST(Task4, wihoutO2) {
     )";
 
     std::string expectedOutput = "-4\n";
-    std::string actualOutput = runCode(factorialCode, false);
+    std::string actualOutput = runCode(code, false);
     EXPECT_EQ(actualOutput, expectedOutput);
 }
 
-//TEST(Task4, withO2) {
-//    std::string factorialCode = R"(
-//    func itemCheck(node: []) {
-//        if (node[0] == -1) {
-//            return node[2]
-//        }
-//        return node[2] + itemCheck(node[0]) - itemCheck(node[1])
-//    }
-//    func bottomUpTree(item: num, depth: num) {
-//        if (depth > 0) {
-//            return [bottomUpTree(2 * item - 1, depth - 1), bottomUpTree(2 * item, depth - 1), item]
-//        }
-//        return [-1, -1, item]
-//    }
-//    {
-//        var ret = 0
-//        for ( var n = 4; n <= 7; n = n + 1 ) {
-//            var minDepth = 4
-//            var maxDepth = 0
-//            if (minDepth + 2 > n) {
-//                maxDepth = minDepth + 2
-//            } else {
-//                maxDepth = n
-//            }
-//            var stretchDepth = maxDepth + 1
-//
-//            var check = itemCheck(bottomUpTree(0, stretchDepth))
-//            var longLivedTree = bottomUpTree(0,maxDepth)
-//            for (var depth = minDepth; depth <= maxDepth; depth = depth + 2){
-//                var iterations = 1
-//                for (var j = 0; j < maxDepth - depth + minDepth; j = j + 1) {
-//                    iterations = iterations * 2
-//                }
-//
-//                check = 0
-//                for (var i = 1; i <= iterations; i = i + 1){
-//                    check = check + itemCheck(bottomUpTree(i, depth))
-//                    check = check + itemCheck(bottomUpTree(-i, depth))
-//                }
-//            }
-//
-//            ret = ret +  itemCheck(longLivedTree)
-//        }
-//
-//        var expected = -4
-//        if (ret != expected) {
-//            print("Error!")
-//        } else {
-//            print(ret)
-//        }
-//    }
-//    )";
-//
-//    std::string expectedOutput = "-4\n";
-//    std::string actualOutput = runCode(factorialCode, true);
-//    EXPECT_EQ(actualOutput, expectedOutput);
-//}
+TEST(Task4, BinaryTreeWithO2) {
+    std::string code = R"(
+    func itemCheck(node: []) {
+        if (node[0] == -1) {
+            return node[2]
+        }
+        return node[2] + itemCheck(node[0]) - itemCheck(node[1])
+    }
+    func bottomUpTree(item: num, depth: num) {
+        if (depth > 0) {
+            return [bottomUpTree(2 * item - 1, depth - 1), bottomUpTree(2 * item, depth - 1), item]
+        }
+        return [-1, -1, item]
+    }
+    {
+        var ret = 0
+        for ( var n = 4; n <= 7; n = n + 1 ) {
+            var minDepth = 4
+            var maxDepth = 0
+            if (minDepth + 2 > n) {
+                maxDepth = minDepth + 2
+            } else {
+                maxDepth = n
+            }
+            var stretchDepth = maxDepth + 1
+
+            var check = itemCheck(bottomUpTree(0, stretchDepth))
+            var longLivedTree = bottomUpTree(0,maxDepth)
+            for (var depth = minDepth; depth <= maxDepth; depth = depth + 2){
+                var iterations = 1
+                for (var j = 0; j < maxDepth - depth + minDepth; j = j + 1) {
+                    iterations = iterations * 2
+                }
+
+                check = 0
+                for (var i = 1; i <= iterations; i = i + 1){
+                    check = check + itemCheck(bottomUpTree(i, depth))
+                    check = check + itemCheck(bottomUpTree(-i, depth))
+                }
+            }
+
+            ret = ret +  itemCheck(longLivedTree)
+        }
+
+        var expected = -4
+        if (ret != expected) {
+            print("Error!")
+        } else {
+            print(ret)
+        }
+    }
+    )";
+
+    std::string expectedOutput = "-4\n";
+    std::string actualOutput = runCode(code, true);
+    EXPECT_EQ(actualOutput, expectedOutput);
+}
 
 
 TEST_P(LanguageTests, FactorialTest) {

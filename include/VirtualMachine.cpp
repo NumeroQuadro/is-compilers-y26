@@ -353,19 +353,8 @@ void VirtualMachine::doRet() {
   }
 
   const auto [returnIp, prevScope, hasReturnValue, funcName] = callStack.top();
-  if (isOptimized && functionsCallCache.find(function_cache_params_stack.top().toStr()) == functionsCallCache.end()) {
-    if (retVal.isHeapRef()) {
-      auto heapValueCopy = retVal.asHeapRef();
-      HeapValue* value;
-      if (const auto str = dynamic_cast<StringValue*>(heapValueCopy)) {
-        value = gc->allocObject(std::make_unique<StringValue>(*str));
-      } else if (const auto arr = dynamic_cast<ArrayValue*>(heapValueCopy)) {
-        value = gc->allocObject(std::make_unique<ArrayValue>(*arr));
-      }
-      functionsCallCache.emplace(function_cache_params_stack.top().toStr(), value);
-    } else {
+  if (isOptimized && functionsCallCache.find(function_cache_params_stack.top().toStr()) == functionsCallCache.end() && !retVal.isHeapRef()) {
       functionsCallCache[function_cache_params_stack.top().toStr()] = retVal;
-    }
   }
   function_cache_params_stack.pop();
   callStack.pop();

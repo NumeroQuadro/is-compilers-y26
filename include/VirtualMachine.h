@@ -55,6 +55,7 @@ private:
   GarbageCollector *gc;
 
   std::unordered_map<std::string, Value> functionsCallCache;
+  std::unordered_map<std::string, HeapValue*> functionsCallCacheHeapValues;
   std::unordered_map<std::string, FunctionInfo> functionTable;
   std::vector<Instruction> code;
   std::stack<Value> stack;

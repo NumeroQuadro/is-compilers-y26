@@ -36,14 +36,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="feat: Rafaels input">
+    <list default="true" id="7d49377f-0727-47de-9f8e-9435747d7b99" name="Changes" comment="fix: task 4">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/bin/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bin/codeExamples/test.yal" beforeDir="false" afterPath="$PROJECT_DIR$/bin/codeExamples/test.yal" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/bin/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/Value.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/Value.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/include/VirtualMachine.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/VirtualMachine.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/VirtualMachine.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Antrl4Tests.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/yal_bytecode.txt" beforeDir="false" afterPath="$PROJECT_DIR$/yal_bytecode.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,7 +125,7 @@
       <recent name="\\wsl.localhost\Ubuntu\home\mityaiii\new\include" />
     </key>
   </component>
-  <component name="RunManager" selected="CMake Application.run_tests">
+  <component name="RunManager" selected="CMake Application.yal">
     <configuration name="JITTests.DeadCodeEllumination_Array2_ShouldDoLessOperations" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" temporary="true" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="yal" TARGET_NAME="run_tests" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="yal" RUN_TARGET_NAME="run_tests" TEST_CLASS="JITTests" TEST_METHOD="DeadCodeEllumination_Array2_ShouldDoLessOperations" TEST_MODE="SUITE_TEST">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -438,12 +437,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>607</line>
+          <line>596</line>
           <option name="timeStamp" value="81" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/include/VirtualMachine.cpp</url>
-          <line>621</line>
+          <line>610</line>
           <option name="timeStamp" value="82" />
         </line-breakpoint>
       </breakpoints>
